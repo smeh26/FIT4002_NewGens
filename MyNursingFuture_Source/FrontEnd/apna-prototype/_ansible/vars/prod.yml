@@ -1,0 +1,56 @@
+---
+# Enviroment
+env: prod
+
+# Php
+php_version:             7.1
+#php_version_old:         7.0
+php_fpm_socket:          /var/run/php-fpm.sock
+php_memory_limit:        32M
+php_date_timezone:       Australia/Melbourne
+php_max_execution_time:  30
+php_upload_max_filesize: 5M
+php_session_save_path:   /var/lib/php/sessions
+
+# Nginx
+nginx_upload_max_filesize: 10M
+
+# Symfony
+site_domain: nejibem.io
+site_url:    apna.nejibem.io
+
+# Database
+database_name: apna
+database_user: apna
+database_pass: pass
+database_host: localhost
+
+# Mail
+mailer_transport:  smtp
+mailer_host:       localhost
+mailer_user:       ~
+mailer_password:   ~
+mailer_encryption: ~
+mailer_port:       false
+
+# Repository
+repo_url:     git@github.com:rxpcollective/apna.git
+repo_remote:  origin
+repo_version: master
+
+# Ansible
+ansible_ssh_user:             ubuntu
+ansible_ssh_private_key_file: ~/.ssh/apna-nejibem-keypair.pem
+
+# AWS
+web_instance_type:  t2.micro
+db_instance_type:   t2.micro
+region:             ap-southeast-2
+domain_tag:         apna_nejibem
+security_group_web: apna-nejibem-web-sg
+security_group_db:  apna-nejibem-db-sg
+keyname:            apna-nejibem-keypair
+load_balancer:      apna-nejibem-loadbalancer
+allowed_ip:         27.253.38.155/32
+instance_count:     1
+

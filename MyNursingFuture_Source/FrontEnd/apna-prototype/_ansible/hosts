@@ -1,0 +1,11 @@
+[local]
+localhost
+
+[dev-server]
+192.168.51.10
+
+[dev-server:vars]
+ansible_password=vagrant
+
+[db-server]
+192.168.51.11

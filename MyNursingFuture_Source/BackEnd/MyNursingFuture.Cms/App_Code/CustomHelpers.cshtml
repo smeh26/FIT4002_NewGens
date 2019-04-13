@@ -1,0 +1,361 @@
+﻿@using MyNursingFuture.BL.Entities
+@using MyNursingFuture.BL.Managers
+@using MyNursingFuture.Util
+@using System.Web.Mvc.Html
+@using MyNursingFuture.Cms
+
+@helper ImageHelper(string fileName, string name, string imageName)
+    {
+var Html = ((System.Web.Mvc.WebViewPage)WebPageContext.Current.Page).Html;
+var id = Guid.NewGuid();
+    
+<input id="file-@id" type="file" name="@fileName" style="display: none" onchange="readURL(this)" data-image-div="img-div-@id" data-image="img-@id" data-hidden="@name" />
+
+<button class="btn btn-primary" onclick="triggerFile('file-@id')">Add Image</button>
+        <button class="btn btn-info" onclick="event.preventDefault(); openModalImage('@name', 'img-@id','img-div-@id','file-@id')">Load previous Image</button>
+        <button class="btn btn-danger" onclick="removeFileImage('file-@id', 'img-div-@id','img-@id','@name' )">Remove Image</button>
+        <input type="hidden" name="@name" value="@imageName" id="@name" />
+
+        if (!string.IsNullOrEmpty(imageName))
+        {
+            <div class="well" id="img-div-@id">
+                <img id="img-@id" src="~/Content/img/Uploads/@imageName" />
+            </div>
+        }
+        else
+        {
+            <div class="well" id="img-div-@id" style="display: none">
+                <img id="img-@id" />
+            </div>
+        }
+        using (Html.BeginScriptContext())
+        {
+            Html.AddScriptBlock(@"
+
+                if (!window.readURL) {
+                        function readURL(input) {
+                            if (input.files && input.files[0]) {
+                                var reader = new FileReader();
+                                var divC = $(input).data('image-div');
+                                var imgC = $(input).data('image');
+                                var imgH = $(input).data('hidden');
+                                reader.onload = function (e) {
+                                    $('#' + divC).css('display', 'block');
+                                    $('#' + imgC).attr('src', e.target.result);
+                                    $('#' + imgH).val('imageChanged');
+                        };
+                    reader.readAsDataURL(input.files[0]);
+                }
+                    }
+                }
+
+                if (!window.triggerFile) {
+                    function triggerFile(id) {
+                        event.preventDefault(); $('#' + id).trigger('click');
+                    }
+                }
+
+                if (!window.removeFileImage) {
+                    function removeFileImage(fileId, imgDiv, img, imgHidden) {
+                        event.preventDefault();
+                        $('#' + imgHidden).val('');
+                        $('#' + img).attr('src', '#');
+                        $('#' + imgDiv).hide();
+                        var $el = $('#' + fileId);
+                        $el.wrap('<form>').closest('form').get(0).reset();
+                        $el.unwrap();
+                    }
+                }
+
+            ");
+        }
+}
+
+
+@helper SuccessMessage(System.Web.Mvc.TempDataDictionary tempData)
+    {
+        if (tempData["ErrorMessage"] != null)
+        {
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @tempData["ErrorMessage"]
+                    </div>
+                </div>
+            </div>
+        }
+
+        if (tempData["Result"] != null)
+        {
+            var result = (Result)tempData["Result"];
+            <div class="row">
+                @if (result.Success)
+                {
+                    <div class="col-lg-12">
+                        <div class="alert alert-success">
+                            @result.Message
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @result.Message
+                        </div>
+                    </div>
+
+                }
+            </div>
+        }
+}
+
+@helper LinkButton(string text, string name, string value, List<LinkEntity> links)
+    {
+
+
+        var nameText = "";
+        var href = "";
+        var id = Guid.NewGuid();
+        if (!string.IsNullOrEmpty(value))
+        {
+            var linkObj = (Json.Decode(value));
+            nameText = linkObj.Text;
+            href = linkObj.Href;
+        }
+        <div class="form-group">
+            <label>@text</label>
+            <input type="checkbox" onclick="" />
+        </div>
+        <div id="@id" class="form-group">
+            <input type="hidden" value="@value" name="@name" />
+            <div class="form-group">
+                <label>Link Text</label>
+                <input type="text" value="@nameText" />
+            </div>
+
+            <div class="row" id="section-link-select">
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="section" />
+                    Sections
+                </div>
+                <div class="col-sm-4">
+                    <input type="text" value="@href" />
+                </div>
+            </div>
+
+            <div class="row" id="section-link-select">
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="section" />
+                    Sections
+                </div>
+                <div class="col-sm-4">
+                    <select>
+                        @foreach (var item in links)
+                        {
+                            if (item.Type == LinksTypes.SECTION.ToString())
+                            {
+                                var selected = "";
+                                if (item.Href == href)
+                                {
+                                    selected = "selected";
+                                }
+                                <option selected="@selected" value="@item.Href">@item.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row" id="section-link-select">
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="section" />
+                    Sections
+                </div>
+                <div class="col-sm-4">
+                    <select>
+                        @foreach (var item in links)
+                        {
+                            if (item.Type == LinksTypes.SECTION.ToString())
+                            {
+                                var selected = "";
+                                if (item.Href == href)
+                                {
+                                    selected = "selected";
+                                }
+                                <option selected="@selected" value="@item.Href">@item.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="row" id="articles-link-select">
+
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="articles" />
+                    Articles
+                </div>
+                <div class="col-sm-4">
+                    <select>
+                        @foreach (var item in links)
+                        {
+                            if (item.Type == LinksTypes.ARTICLE.ToString())
+                            {
+                                var selected = "";
+                                if (item.Href == href)
+                                {
+                                    selected = "selected";
+                                }
+                                <option selected="@selected" value="@item.Href">@item.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="row" id="sectors-link-select">
+
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="sectors" />
+                    Sectors
+                </div>
+                <div class="col-sm-4">
+                    <select>
+                        @foreach (var item in links)
+                        {
+                            if (item.Type == LinksTypes.SECTOR.ToString())
+                            {
+                                var selected = "";
+                                if (item.Href == href)
+                                {
+                                    selected = "selected";
+                                }
+                                <option selected="@selected" value="@item.Href">@item.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="row" id="roles-link-select">
+
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="roles" />
+                    Roles
+                </div>
+                <div class="col-sm-4">
+                    <select>
+                        @foreach (var item in links)
+                        {
+                            if (item.Type == LinksTypes.ROLE.ToString())
+                            {
+                                var selected = "";
+                                if (item.Href == href)
+                                {
+                                    selected = "selected";
+                                }
+                                <option selected="@selected" value="@item.Href">@item.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="row" id="domain-link-select">
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="domains" />
+                    Domains
+                </div>
+                <div class="col-sm-4">
+                    <select>
+                        @foreach (var item in links)
+                        {
+                            if (item.Type == LinksTypes.DOMAIN.ToString())
+                            {
+                                var selected = "";
+                                if (item.Href == href)
+                                {
+                                    selected = "selected";
+                                }
+                                <option selected="@selected" value="@item.Href">@item.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="row" id="aspect-link-select">
+                <div class="col-sm-2">
+                    <input type="checkbox" name="check-select-@id" value="aspects" />
+                    Aspects
+                </div>
+                <div class="col-sm-4">
+                    <select>
+                        @foreach (var item in links)
+                        {
+                            if (item.Type == LinksTypes.ASPECT.ToString())
+                            {
+                                var selected = "";
+                                if (item.Href == href)
+                                {
+                                    selected = "selected";
+                                }
+                                <option selected="@selected" value="@item.Href">@item.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+            </div>
+        </div>
+}
+
+@helper PublishedButton(bool published, dynamic id)
+    {
+        var Html = ((System.Web.Mvc.WebViewPage)WebPageContext.Current.Page).Html;
+        if (published)
+        {
+            <span class="label label-success">Published</span>
+        }
+        else
+        {
+            @Html.ActionLink("Publish", "Publish", new { id }, new { @class = "btn btn-sm btn-info" })
+        }
+}
+
+
+@helper UpdatePositionControl(int id, int position, string controller, string label = "Update")
+    {
+        <div class="input-group input-group-sm" style="width: 8em">
+            <input type="number" class="form-control" value="@position" id="post-@id" />
+            <span class="input-group-btn">
+                <input type="button" class="btn btn-info" value="@label" onclick="updatePosition('@controller', @id, 'post-@(id)','success-position','error-position')" />
+            </span>
+        </div>
+}
+@helper UpdatePositionFieldControl(int id, int position, string controller, string label = "Update")
+    {
+        <div class="input-group input-group-sm" style="width: 8em">
+            <input type="number" class="form-control" value="@position" id="post-@id" />
+            <span class="input-group-btn">
+                <input type="button" class="btn btn-info" value="@label" onclick="updatePositionField('@controller', @id, 'post-@(id)','post-field-@(id)','success-position','error-position')" />
+            </span>
+        </div>
+}
+
+@helper EditActionButton(int id, string label = "Edit", string action = "Edit")
+    {
+        var Html = ((System.Web.Mvc.WebViewPage)WebPageContext.Current.Page).Html;
+        @Html.ActionLink(label, action, new { id }, new { @class = "btn btn-info btn-sm" })
+}
+@helper DeleteActionButton(int id, string label = "✗", string action = "Delete")
+    {
+
+        var Html = ((System.Web.Mvc.WebViewPage)WebPageContext.Current.Page).Html;
+        @Html.ActionLink(label, action, new { id }, new { @class = "btn btn-danger btn-sm", onclick = "confirmDelete(event)" })
+}

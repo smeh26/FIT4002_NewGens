@@ -1,0 +1,24 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+}
+
+@section ColumnLabels {
+    <th>Date</th>
+    <th>Name</th>
+    <th>Category Name</th>
+    <th>Status</th>
+}
+@foreach (var item in ViewBag.Articles)
+{
+    <tr>
+        <td>@item.Date.ToString("d MMM yyyy")</td>
+        <td>@item.Title</td>
+        <td>@item.CategoryName</td>
+        <td>@CustomHelpers.PublishedButton(item.Published, item.ArticleId)</td>
+        <td>
+            @CustomHelpers.EditActionButton(item.ArticleId)
+            @CustomHelpers.DeleteActionButton(item.ArticleId)
+        </td>
+</tr>
+}

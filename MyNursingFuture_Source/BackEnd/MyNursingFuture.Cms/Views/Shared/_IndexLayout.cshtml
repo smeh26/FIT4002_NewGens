@@ -1,0 +1,110 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString();
+    ViewBag.EntityName = ViewBag.EntityName == null ? controllerName.Substring(0, controllerName.Length - 1) : ViewBag.EntityName;
+
+    ViewBag.Title = ViewBag.Title ?? ViewBag.EntityName + "s";
+
+    ViewBag.EntityActions = ViewBag.EntityActions ?? new string[] { "insert", "edit", "delete" };
+
+    List<string> actions = new List<string>();
+
+    if (ViewBag.EntityActions != null && ViewBag.EntityActions is IEnumerable<string>)
+    {
+        actions.AddRange(ViewBag.EntityActions);
+    } else if (!IsSectionDefined("Actions"))
+    {
+        actions.Add("create");
+    }
+}
+
+@if (IsSectionDefined("PageTitle"))
+{
+    <h2>@RenderSection("PageTitle")</h2>
+}
+else
+{
+    <h2>@ViewBag.Title</h2>
+}
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@Html.Partial("_UpdatePosition")
+
+@RenderSection("BeforeTable", false)
+
+<table class="table table-striped table-hover">
+    @RenderSection("TableTop", false)
+    <thead>
+        <tr>
+            <th colspan="100">
+                @Html.ActionLink("Go Back", ViewBag.BackAction == null ? "Index" : ViewBag.BackAction as string, ViewBag.BackController == null ? "Home" : ViewBag.BackController as string, null, new { @class = "btn btn-primary pull-left" })
+
+                @if (IsSectionDefined("Actions"))
+                {
+                    @RenderSection("Actions", false)
+                }
+                else if (actions.Contains("insert"))
+                {
+                    @Html.ActionLink("New " + ViewBag.EntityName as string, "Insert", null, new { @class = "btn btn-primary pull-right" })
+                }
+            </th>
+        </tr>
+    </thead>
+    <thead>
+        <tr>
+            @RenderSection("ColumnLabels", false)
+            @if ((actions.Contains("update") || actions.Contains("delete")))
+            {
+                <th>Actions</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @RenderBody()
+    </tbody>
+</table>
+
+@RenderSection("AfterTable", false)
+
+@using (Html.BeginForm("Delete", ViewBag.DeleteController as string ?? controllerName, FormMethod.Post, new { id = "form-delete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" value="" id="delete-id" name="id" />
+
+    @RenderSection("DeleteActionFields", false)
+}
+
+@section scripts
+{
+    @RenderSection("scripts", false)
+
+    <script src="~/Content/js/custom/updatePosition.js"></script>
+    <script>
+        function confirmDelete(ev) {
+            ev.preventDefault();
+            var id = ev.target.href.split('/').pop();
+            $("#delete-id").val(id);
+            $("#confirm-delete").modal('show');
+        }
+    </script>
+}
+
+
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Delete @ViewBag.EntityName
+            </div>
+            <div class="modal-body">
+                Are you sure that you want to delete this @ViewBag.EntityName?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" onclick="$('#form-delete').submit()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>

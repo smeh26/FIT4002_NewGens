@@ -1,0 +1,33 @@
+﻿@model string
+@{
+    Layout = "_Layout.cshtml";
+    var defaultHtmlAttributesObject = new { @class = "form-control" };
+    var htmlAttributesObject = ViewData["htmlAttributes"] ?? new { };
+    var htmlAttributes = Html.MergeHtmlAttributes(htmlAttributesObject, defaultHtmlAttributesObject);
+    dynamic config = Newtonsoft.Json.JsonConvert.DeserializeObject(ViewBag.Configuration ?? @"{
+                btns: [
+                    ['viewHTML'],
+                    ['formatting'],
+                    'btnGrp-semantic',
+                    ['superscript', 'subscript'],
+                    ['link'],
+                    'btnGrp-justify',
+                    'btnGrp-lists',
+                    ['horizontalRule'],
+                    ['removeformat'],
+                    ['fullscreen']
+                ]
+    }");
+
+}
+
+
+
+@Html.TextArea("", ViewData.TemplateInfo.FormattedModelValue as string, htmlAttributes)
+
+
+@using (Html.BeginScriptContext())
+    {
+        //Html.AddScriptFile("~/Content/js/custom/loadWysiwyg.js");
+        Html.AddScriptBlock(@"$(document).ready(function() {$('#"+Html.Id("")+@"').trumbowyg("+Newtonsoft.Json.JsonConvert.SerializeObject(config as object)+");});");
+}

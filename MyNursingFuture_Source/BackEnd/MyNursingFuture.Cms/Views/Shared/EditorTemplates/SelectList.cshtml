@@ -1,0 +1,9 @@
+﻿@{
+    Layout = "_Layout.cshtml";
+    var defaultHtmlAttributesObject = new { @class = "form-control" };
+    var htmlAttributesObject = ViewData["htmlAttributes"] ?? new { };
+    var htmlAttributes = Html.MergeHtmlAttributes(htmlAttributesObject, defaultHtmlAttributesObject);
+}
+
+@Html.DropDownList("", ViewBag.List as IEnumerable<SelectListItem>, (ViewBag.Placeholder as string) ?? ("Select " + ViewData.TemplateInfo.HtmlFieldPrefix ?? string.Empty), htmlAttributes)
+      

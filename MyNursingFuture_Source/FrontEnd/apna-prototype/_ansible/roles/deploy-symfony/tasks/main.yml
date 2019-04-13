@@ -1,0 +1,77 @@
+---
+# setup codebase
+- name: ensure site directory
+  file: dest=/var/www/{{ site_url }} state=directory owner=www-data group=www-data mode=0755
+  when: env != 'dev'
+
+- name: synchronize source !dev
+  synchronize:
+    src: ../../../../web
+    dest: /var/www/{{ site_url }}
+    delete: yes
+    recursive: yes
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=.gitignore"
+      - "--exclude=.vagrant"
+      - "--exclude=.idea"
+      - "--exclude=_ansible"
+      - "--exclude=tests"
+      - "--exclude=/vendor"
+      - "--exclude=Vagrantfile"
+      - "--exclude=phpunit.xml.dist"
+      - "--exclude=README.md"
+  when: env != 'dev'
+
+
+## setup symfony config
+#- name: setup symfony config dist
+#  template: src=parameters.yml dest=/var/www/{{ site_url }}/app/config/parameters.yml.dist.ansible
+#
+#- name: setup symfony config
+#  template: src=parameters.yml dest=/var/www/{{ site_url }}/app/config/parameters.yml
+#
+#
+## handle composer install
+#- name: composer vendor dir exists
+#  stat: path=/var/www/{{ site_url }}/vendor
+#  register: vendor
+#
+#- name: composer install packages dev
+#  command: composer install --no-interaction chdir=/var/www/{{ site_url }}
+#  when: vendor.stat.exists == False and env == 'dev'
+#
+#- name: composer install packages !dev
+#  command: composer install --no-interaction --optimize-autoloader chdir=/var/www/{{ site_url }}
+#  when: vendor.stat.exists == False and env != 'dev'
+#
+#- name: composer update packages
+#  command: composer --no-interaction update chdir=/var/www/{{ site_url }}
+#  when: vendor.stat.isdir is defined and vendor.stat.isdir and composer == "update"
+#
+#
+## run symfony commands
+#- name: symfony cache clear
+#  command: php bin/console cache:clear --env={{ env }} chdir=/var/www/{{ site_url }}
+#
+#- name: symfony install assets dev
+#  command: php bin/console assets:install web --symlink --relative --env={{ env }} chdir=/var/www/{{ site_url }}
+#  when: env == 'dev'
+#
+#- name: symfony install assets !dev
+#  command: php bin/console assets:install --env={{ env }} chdir=/var/www/{{ site_url }}
+#  when: env != 'dev'
+#
+##- name: symfony dump assets
+##  command: php bin/console assetic:dump --env={{ env }} chdir=/var/www/{{ site_url }}
+#
+#- name: doctrine run migrations
+#  command: php bin/console doctrine:migrations:migrate --no-interaction --env={{ env }} chdir=/var/www/{{ site_url }}
+#
+#
+## fix dir permissions
+#- name: fix site/var permissions
+#  file: dest=/var/www/{{ site_url }}/var state=directory owner=www-data group=www-data mode=0755 recurse=yes
+#  become: yes
+#  become_user: root
+#  when: env != 'dev'

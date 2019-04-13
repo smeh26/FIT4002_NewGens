@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewBag.Title = "Reasons";
+    var reasonsList = ViewBag.Reasons;
+}
+
+<script>
+    var reasons = @Html.Raw(Json.Encode(ViewBag.Reasons));
+</script>
+
+<h2>Reasons</h2>
+@CustomHelpers.SuccessMessage(TempData)
+
+<div class="form-group btn-back">
+    @Html.ActionLink("Go Back", "Index", "Home", null, new { @class = "btn btn-primary" })
+    <button class="btn btn-primary pull-right" onclick="addReason()">Add Reason</button>
+    <button class="btn btn-primary pull-right" id="save-changes" onclick="submitForm()" style="display: none; margin-right: 1em;">Save Changes</button>
+</div>
+<div class="alert alert-danger" id="error-reasons" style="display:none">Reasons need to be added</div>
+<div class="alert alert-danger" id="error-reasons-title" style="display:none">Reasons require a title</div>
+<div class="alert alert-danger" id="error-reasons-text" style="display:none">Reasons require text</div>
+<div class="alert alert-danger" id="error-reasons-textprev" style="display:none">Reasons require preview Text</div>
+
+<div id="reasons-div">
+
+</div>
+
+
+@using (Html.BeginForm("EditReasons", "Articles", FormMethod.Post, new { id = "form-post" }))
+{
+    @Html.AntiForgeryToken();
+    <input type="hidden" name="reasons" id="reasons-hidden" />
+}
+
+@section scripts{
+    <script>
+        var currentIx = 0;
+
+
+        function submitForm() {
+            $(".error-message").hide();
+            var error = false
+            if (reasons.length < 1) {
+                $("#error-reasons").show();
+                return;
+            }
+
+
+            $(".reasons-text").each(function (i, el) {
+                var val = $(el).val();
+                if (val == "") {
+                    $("#error-reasons-text").show();
+                    error = true;
+                }
+            });
+
+            $(".reasons-title").each(function (i, el) {
+                var val = $(el).val();
+                if (val == "") {
+                    $("#error-reasons-title").show();
+                    error = true;
+                }
+            });
+
+            $(".reasons-prevtext").each(function (i, el) {
+                var val = $(el).val();
+                if (val == "") {
+                    $("#error-reasons-textprev").show();
+                    error = true;
+                }
+            });
+
+
+            if (error) {
+                return;
+            }
+
+
+            $("#reasons-hidden").val(JSON.stringify(reasons));
+            $("#form-post").submit();
+        }
+
+        function addReason() {
+            reasons.unshift({ Text: "", Ix: currentIx, TextPrev: "", Title: "" });
+            currentIx++;
+            renderReasons();
+        }
+
+        function updateReasonText(el, index) {
+            for (var i = 0; i < reasons.length; i++) {
+                if (reasons[i].Ix == index) {
+                    reasons[i].Text = $(el).val();
+                }
+            }
+        }
+        function updateReasonTextPrev(el, index) {
+            for (var i = 0; i < reasons.length; i++) {
+                if (reasons[i].Ix == index) {
+                    reasons[i].TextPrev = $(el).val();
+                }
+            }
+        }
+        function updateReasonTitle(el, index) {
+            for (var i = 0; i < reasons.length; i++) {
+                if (reasons[i].Ix == index) {
+                    reasons[i].Title = $(el).val();
+                }
+            }
+        }
+
+        function renderReasons() {
+            var rdiv = $("#reasons-div");
+            rdiv.html("");
+            var template = $('#reason-template').html();
+            var rendered = Mustache.render(template, { reasons: reasons });
+            rdiv.html(rendered);
+        }
+
+        function removeReason(index) {
+            for (var i = 0; i < reasons.length; i++) {
+                if (reasons[i].Ix == index) {
+                    reasons.splice(i, 1);
+                }
+            }
+            renderReasons();
+            $('#save-changes').show()
+        }
+
+        $(document).ready(function () {
+            for (var e = 0; e < reasons.length; e++) {
+                reasons[e].Ix = currentIx;
+                currentIx++;
+            }
+            renderReasons();
+        });
+
+
+    </script>
+
+
+    <script id="reason-template" type="x-tmpl-mustache">
+        {{#reasons}}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <label class="col-sm-1">Title</label>
+                    <div class="col-sm-11">
+                        <input type="text" class="form-control reasons-title" onchange="updateReasonTitle(this, {{Ix}})" value="{{Title}}" />
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+
+                <div class="form-group">
+
+                    <label>Text</label>
+                    <textarea style="height:100px;" class="form-control reasons-text" onchange="updateReasonText(this, {{Ix}})">{{Text}}</textarea>
+
+                </div>
+                <div class="form-group">
+                    <label>Preview Text</label>
+                    <textarea style="height:100px;" onchange="updateReasonTextPrev(this, {{Ix}})" class="form-control reasons-prevtext">{{TextPrev}}</textarea>
+                </div>
+
+            </div>
+            <div class="panel-footer">
+                <button class="btn btn-danger" onclick="removeReason({{Ix}})">X</button>
+                <button class="btn btn-primary pull-right" onclick="submitForm()">Save</button>
+            </div>
+        </div>
+        {{/reasons}}
+    </script>
+}

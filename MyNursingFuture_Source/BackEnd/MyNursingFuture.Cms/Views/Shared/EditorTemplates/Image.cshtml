@@ -1,0 +1,116 @@
+﻿@model string
+@{
+    Layout = "_Layout.cshtml";
+}
+
+<div class="modal fade" id="@Html.Id("Modal")" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="padding:5px">
+            <div class="images-container" style="min-height:300px; overflow-x: hidden;  overflow-y: scroll;">
+
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <button class="btn" onclick="event.preventDefault(); loadImages('@Html.Id("Modal")', '@Html.Id("Preview")', '@Html.Id("File")', '@Html.Id("")')">Show more</button>
+                </div>
+                <div class="col-sm-6">
+                    <button class="btn inverse" onclick="event.preventDefault(); $('#@Html.Id("Modal")').modal('hide');">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    var imageName = ViewData.TemplateInfo.FormattedModelValue as string;
+}
+
+<input id="@Html.Id("File")" name="@ViewBag.FileInput" type="file" onchange="@string.Format("readURL(this, '{0}')", Html.Id("Preview")); $('#@Html.Id("")').val(this.files.length > 0 ? this.files[0].name : '')" style="display:none" />
+
+<button class="btn btn-primary" onclick="event.preventDefault(); $('#@Html.Id("File")').trigger('click')">Add Image</button>
+<button class="btn btn-info" onclick="event.preventDefault(); $('#@Html.Id("Modal")').modal('show')">Load previous Image</button>
+<button class="btn btn-danger" onclick="event.preventDefault(); $('#@Html.Id("File")').val('').trigger('change')">Remove Image</button>
+
+@Html.Hidden("", Model)
+
+
+<div class="well" style="display: @(string.IsNullOrEmpty(imageName) ? "none" : "block")">
+    @if (string.IsNullOrEmpty(imageName))
+    {
+        <img id="@Html.Id("Preview")" style="max-width: 100%;" />
+    }
+    else
+    {
+        <img id="@Html.Id("Preview")" style="max-width: 100%;" src="~/Content/img/Uploads/@imageName" />
+    }
+</div>
+
+@Html.ValidationMessage("")
+<div id="image-required-error" style="display: none">
+    <span class="field-validation-error text-danger">@(ViewBag.ErrorMessage ?? "An image is required")</span>
+</div>
+
+
+@using (Html.BeginScriptContext())
+{
+    Html.AddScriptBlock(@"");
+}
+
+
+
+<script type="text/javascript">
+
+    function readURL(fileInput, imgElement) {
+        if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#' + imgElement).attr('src', e.target.result).parent().show();
+            };
+
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            $('#' + imgElement).removeAttr('src').parent().hide();
+        }
+    }
+
+    function loadImages(modalId, imgElement, fileInput, fieldInput) {
+        currentRow = $('#' + modalId).data('currentRow');
+        currentRow = (currentRow && parseInt(currentRow)) || 1;
+
+        $.ajax({
+            dataType: "json",
+            url: '/Images',
+            data: { row: currentRow },
+            success: function (data) {
+                if (data.Success) {
+                    currentRow++
+                    var images = data.Entity.map(function (img) {
+                        var imgEl = $('<img />').on('click', function () {
+                            $('#' + fieldInput).val(img.Name);
+                            $('#' + fileInput).val('').trigger('change');
+                            $('#' + imgElement).attr('src', img.Name).parent().show();
+                            $('#' + modalId).modal('hide');
+                        }).attr('src', '/Content/img/Uploads/' + img.Name)
+                            .addClass("img-responsive")
+
+                        return $('<div class="col-sm-4"></div>').append(imgEl)
+                    })
+
+                    $('#' + modalId).data('currentRow', currentRow).find('.images-container').append(images)
+                }
+
+            },
+            error: function (data) {
+
+            }
+        })
+    }
+
+    
+</script>
+
+@using (Html.BeginScriptContext())
+{
+    Html.AddScriptBlock(string.Format(@"$('#{0}').one('show.bs.modal', function (ev) {{ loadImages(ev.target.id, '{1}', '{2}', '{3}'); }})", Html.Id("Modal"), Html.Id("Preview"), Html.Id("File"), Html.Id("")));
+}

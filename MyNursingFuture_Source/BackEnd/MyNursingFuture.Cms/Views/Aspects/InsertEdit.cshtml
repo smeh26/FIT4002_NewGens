@@ -1,0 +1,341 @@
+﻿@model MyNursingFuture.Cms.Models.AspectViewModel
+@{
+    ViewBag.Title = "Aspects of Practice";
+}
+<script>
+    var actionListLoaded = null;
+</script>
+
+@if (Model.ActionsList != null)
+{
+    <script>
+        actionListLoaded = @Html.Raw(Json.Encode(Model.ActionsList));
+    </script>
+}
+
+
+<h1>@(Model.Operation == "E" ? "Edit" : "Insert") Aspect of Practice</h1>
+
+@CustomHelpers.SuccessMessage(TempData)
+
+ @Html.ActionLink("Go back", "Index", "Aspects", null, new { @class = "btn btn-primary btn-back" })
+
+@using (Html.BeginForm("InsertEdit", "Aspects", FormMethod.Post, new { id = "form-post", @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.AspectId)
+    @Html.HiddenFor(x => x.Operation)
+
+    @Html.EditorFor(x => x.Title)
+    @Html.EditorFor(x => x.DomainId, "SelectList", new { List = new SelectList(ViewBag.Domains, "DomainId", "Name") } )
+    @Html.EditorFor(x => x.Text, "RichText")
+    @Html.EditorFor(x => x.Examples, "RichText")
+    @Html.EditorFor(x => x.OnlineResources, "RichText")
+    @Html.EditorFor(x => x.FurtherEducation, "RichText")
+    @Html.EditorFor(x => x.PeopleContact, "RichText")
+    @Html.EditorFor(x => x.Levels, "RichText")
+    @Html.HiddenFor(x => x.ActionsListJson)
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <button class="btn btn-primary pull-right" onclick="showActionsModal()">Add Actions</button>
+        <h4>Actions</h4>
+    </div>
+    <div class="panel-body">
+        <div class="alert alert-danger" style="display: none" id="action-autocomplete-error">An action must be selected</div>
+
+        <table class="table table-striped table-hover">
+
+            <thead>
+                <tr>
+                    <th>Level Name</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="actions-list"></tbody>
+        </table>
+
+    </div>
+</div>
+
+<button class="btn btn-primary" onclick="saveAspect();">Save Aspect</button>
+
+
+<div class="modal fade" id="modal-actions" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Add Action
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div col-xs-12>Add existing action <span style="display: none" id="modal-action-autocomplete-error"> *An action must be selected</span></div>
+                        <div class="col-xs-6">
+                            <label>Action Title</label>
+                            <input type="text" id="modal-action-autocomplete" class="form-control" />
+                            <input type="hidden" id="modal-action-autocomplete-selected" class="form-control" value="" />
+                        </div>
+                        <div class="col-xs-6">
+                            <label>Level</label>
+                            <select class="form-control" id="select-existing-action-level">
+                                <option value="0">Foundation level</option>
+                                <option value="1">Intermediate level</option>
+                                <option value="2">Advanced level</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <br />
+                    <span style="display: none" id="modal-action-added-error"> *Action already added</span>
+                    <button class="btn" onclick="addExistingAction()">Add action</button>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div col-xs-12>Create an Action<span style="display: none" i id="modal-action-title-error"> *Title required</span></div>
+                        <div class="col-xs-6">
+                            <label>New Action Title</label>
+                            <input type="text" id="modal-action-title" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Text</label>
+                            <span id="modal-action-text-error" style="display: none"> *Text required</span>
+                            <textarea type="text" id="modal-action-text">
+                            </textarea>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label>Level</label>
+                            <select class="form-control" id="select-created-action-level">
+                                <option value="0">Foundation level</option>
+                                <option value="1">Intermediate level</option>
+                                <option value="2">Advanced level</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label>Type</label>
+                            @Html.DropDownList("modal-type", new SelectList(ViewBag.ListTypes, "Value", "Text"), new { id = "modal-action-type", @class = "form-control" })
+                        </div>
+                        <div class="col-xs-6 form-group">
+                            <button class="btn" onclick="addCreateAction()">Create and Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        var listActions = [];
+        var renderIndex = 0;
+
+        function saveAspect() {
+            var list = [];
+            for (var i = 0; i < listActions.length; i++) {
+                list.push(listActions[i].action);
+            }
+            $("#ActionsListJson").val(JSON.stringify(list));
+            $("#form-post").submit();
+        }
+
+        function showActionsModal() {
+            $("#modal-action-autocomplete-selected").val("");
+            $("#modal-action-autocomplete").val("");
+            $("#modal-action-title").val("");
+            //$("#modal-action-text").trumbowyg('html',"");
+            $("#modal-action-autocomplete-error").hide();
+            $("#modal-action-title-error").hide();
+            $("#modal-action-text-error").hide();
+            $("#modal-actions").modal("show");
+        }
+
+        function addExistingAction() {
+            $("#modal-action-autocomplete-error").hide();
+            $("#modal-action-added-error").hide();
+            var existingAction = $("#modal-action-autocomplete-selected").val();
+            if (existingAction == "") {
+                $("#modal-action-autocomplete-error").show();
+                return;
+            }
+            var item = JSON.parse(existingAction);
+
+            for (var i = 0; i < listActions.length; i++) {
+                if (listActions[i].action.ActionId == item.ActionId && !listActions[i].action.Removed) {
+                    $("#modal-action-added-error").show();
+                    return;
+                }
+            }
+
+            item.LevelAction = $("#select-existing-action-level").val();
+            item.LevelName = $("#select-existing-action-level option:selected").text();
+            addAction(item);
+            $("#modal-actions").modal("hide");
+        }
+
+        function addCreateAction() {
+            $("#modal-action-title-error").hide();
+            $("#modal-action-text-error").hide();
+
+            var title = $("#modal-action-title").val();
+            var text = $("#modal-action-text").val();
+            var type = $("#modal-action-type").val();
+            if (title == "") {
+                $("#modal-action-title-error").show();
+                return;
+            }
+
+            if (text == "") {
+                $("#modal-action-text-error").show();
+                return;
+            }
+
+            var item = { ActionId: 0, Text: text, Created: true, Title: title, Type: type };
+            item.LevelAction = $("#select-created-action-level").val();
+            item.LevelName = $("#select-created-action-level option:selected").text();
+            addAction(item);
+            $("#modal-actions").modal("hide");
+        }
+
+
+        function addAction(item) {
+            var template = $('#action-template').html();
+            item.Index = renderIndex;
+            var rendered = Mustache.render(template, item);
+            listActions.push({ action: item, dom: rendered });
+            renderActions();
+            renderIndex++;
+        };
+
+        function renderActions() {
+            var actionList = $("#actions-list");
+            actionList.html("");
+            listActions.sort(function (a, b) {
+                return a.action.LevelAction - b.action.LevelAction;
+            });
+            var item = null;
+            for (var i = 0; i < listActions.length; i++) {
+
+                item = listActions[i];
+                if (item.action.Removed)
+                    continue;
+                actionList.append(item.dom);
+            }
+        }
+
+        function removeAction(index) {
+            var item = null;
+            for (var i = listActions.length - 1; i >= 0; i--) {
+                item = listActions[i];
+                if (item.action.Index == index) {
+                    if (item.action.Loaded) {
+                        item.action.Removed = true;
+                        break;
+                    }
+                    listActions.splice(i, 1);
+                    break;
+                }
+            }
+            renderActions();
+        }
+
+
+        $(document).ready(function () {
+
+            if (actionListLoaded != null) {
+                var ac;
+                for (var i = 0; i < actionListLoaded.length; i++) {
+                    ac = actionListLoaded[i];
+                    ac.Loaded = true;
+                    switch (ac.LevelAction) {
+                        case 0:
+                            ac.LevelName = "Foundation level";
+                            break;
+                        case 1:
+                            ac.LevelName = "Intermediate level";
+                            break;
+                        case 2:
+                            ac.LevelName = "Advanced level";
+                            break;
+                    }
+                    addAction(ac);
+                }
+            }
+
+            var modalAc = $("#modal-action-autocomplete");
+            modalAc.autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        dataType: "json",
+                        type: 'Post',
+                        url: aplicationPath + '/Aspects/GetAction',
+                        data: { name: request.term },
+                        success: function (data) {
+                            if (data.Success) {
+                                var list = data.Entity;
+                                response($.map(list,
+                                    function (item) {
+                                        return {
+                                            label: item.Title,
+                                            value: item.ActionId,
+                                            type: item.Type
+                                        };
+                                    })
+                                );
+                            }
+
+                        },
+                        error: function (data) {
+                        }
+                    });
+                },
+                minLength: 3,
+                focus: function (event, ui) {
+                    event.preventDefault();
+                    modalAc.val(ui.item.label);
+                },
+                select: function (event, ui) {
+                    event.preventDefault();
+                    var item = ui.item || null;
+                    if (item !== null) {
+                        modalAc.val(item.label);
+                        var action = { ActionId: item.value, Title: item.label, Created: false, Added: true, Type: item.type };
+                        $("#modal-action-autocomplete-selected").val(JSON.stringify(action));
+                    }
+                },
+                appendTo: "#modal-actions"
+            });
+        });
+
+    </script>
+
+    <script id="action-template" type="x-tmpl-mustache">
+        <tr>
+            <td>
+                {{LevelName}}
+            </td>
+            <td>
+                {{Title}}
+            </td>
+            <td>
+                {{Type}}
+            </td>
+            <td>
+                <button class="btn delete-btn" onclick="removeAction({{Index}})">X</button>
+            </td>
+        </tr>
+    </script>
+
+}
+
+

@@ -1,0 +1,659 @@
+﻿@using System.Web.UI.WebControls
+@using MyNursingFuture.BL.Managers
+@model MyNursingFuture.Cms.Models.ContentItemViewModel
+@{
+    ViewBag.Title = Model.Operation == "E"?"Edit Content Item":"Insert new Content Item";
+}
+<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-lg-12">
+        @if (ViewBag.Previous.ToString() == "ARTICLE")
+        {
+            <span>@Html.ActionLink("Go back", "Edit", "Articles", new { id = Model.ArticleId }, new { @class = "btn inverse pull-right" })</span>
+        }
+        else
+        {
+            @Html.ActionLink("Go back", "Edit", "Sections", new { id = Model.SectionId }, new { @class = "btn inverse pull-right" })
+        }
+    </div>
+</div>
+
+
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@using (Html.BeginForm("InsertEdit", "ContentItems", FormMethod.Post, new {id = "form-post", @enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x=>x.SectionId)
+    @Html.HiddenFor(x => x.ArticleId)
+    @Html.HiddenFor(x=>x.Type)
+    @Html.HiddenFor(x=>x.Operation)
+    @Html.HiddenFor(x=>x.ContentItemId)
+
+
+    <div class="form-group">
+        @Html.LabelFor(x=>x.Name)
+        @Html.TextBoxFor(x=>x.Name, new { @class = "form-control" })
+        <span class="error-message warning" id="name-error" style="display: none">Name is required</span>
+    </div>
+    <div class="form-group">
+        <label>Title Image</label>
+        @CustomHelpers.ImageHelper("TitleImagePosted", "TitleImage", Model.TitleImage)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x=>x.Title)
+        @Html.TextBoxFor(x=>x.Title, new { @class = "form-control" })
+        <span class="error-message warning" id="title-error" style="display: none">Title is required</span>
+    </div>    
+    <div class="form-group">
+        <label>Image</label>
+        @CustomHelpers.ImageHelper("ImagePosted", "Image", Model.Image)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.Text)
+        @Html.TextAreaFor(x => x.Text, new{@class= "form-control"})
+        <span class="error-message warning" id="text-error" style="display: none">Text is required</span>
+    </div>
+
+    <!--Text Link-->
+    var nameText = "";
+    var href = "";
+    var type = "";
+    if (!string.IsNullOrEmpty(Model.Link))
+    {
+        var linkObj = (Json.Decode(Model.Link));
+        nameText = linkObj.text;
+        href = linkObj.href;
+        type = linkObj.type;
+    }
+    var showTextLink = Model.Link != null;
+
+
+    <div class="form-group">
+        <label>Text Link</label>
+        <input type="checkbox" id="text-link-check" @(showTextLink?"checked":"")/>
+    </div>
+    
+    <div id="text-link" class="form-group" style="display: @(showTextLink?"block":"none")" >
+        @Html.HiddenFor(x=>x.Link)
+        <div class="form-group">
+            <label>Link Text</label>
+            <input type="text" value="@nameText" id="name-text-link"/>
+            <span class="error-message warning" id="name-link-text-error" style="display: none">Text for the link is required</span>
+        </div>
+
+        <div class="row text-link-select" >
+            <div class="col-sm-2">
+                <input type="checkbox" value="text" name="text-link-group-check" @(type == "text" ? "checked":"")/>
+                Custom URL
+            </div>
+            <div class="col-sm-6">
+                @if (type == "text")
+                {
+                    <input type="text" value="@href"/>
+                }
+                else
+                {
+                    <input type="text" value="" />
+                }
+
+                <span class="error-message warning" id="text-link-text-error" style="display: none">An URL for the text link is required</span>
+            </div>
+        </div>
+
+        <div class="row sections-link-select">
+            <div class="col-sm-2">
+                <input type="checkbox" value="sections" name="text-link-group-check"  @(type == "sections"?"checked":"") />
+                Sections
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.SECTION.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == href)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row articles-link-select">
+
+            <div class="col-sm-2">
+                <input type="checkbox" value="articles" name="text-link-group-check" @(type == "articles"?"checked":"") />
+                Articles
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.ARTICLE.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == href)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row sectors-link-select">
+
+            <div class="col-sm-2">
+                <input type="checkbox" value="sectors" name="text-link-group-check" @(type == "sectors" ? "checked":"") />
+                Sectors
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.SECTOR.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == href)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row roles-link-select">
+
+            <div class="col-sm-2">
+                <input type="checkbox" value="roles" name="text-link-group-check" @(type == "roles" ? "checked":"") />
+                Roles
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.ROLE.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == href)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row domains-link-select">
+            <div class="col-sm-2">
+                <input type="checkbox" value="domains"  name="text-link-group-check" @(type == "domains" ? "checked":"")/>
+                Domains
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.DOMAIN.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == href)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row aspects-link-select">
+            <div class="col-sm-2"> 
+                <input type="checkbox" value="aspects" name="text-link-group-check" @(type == "aspects" ? "checked":"") />
+                Aspects
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.ASPECT.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == href)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+    </div>
+    <!--End Text Link-->
+
+
+    <!--Button Link-->
+
+    var nameTextButton = "";
+    var hrefButton = "";
+    var typeButton = "";
+    if (!string.IsNullOrEmpty(Model.ButtonLink))
+    {
+        var linkObj = (Json.Decode(Model.ButtonLink));
+        nameTextButton = linkObj.text;
+        hrefButton = linkObj.href; 
+        typeButton = linkObj.type;
+    }
+    var showTextLinkButton = Model.ButtonLink != null;
+
+
+    <div class="form-group">
+        <label>Button Link</label>
+        <input type="checkbox" id="button-link-check" @(showTextLinkButton ? "checked":"")/>
+    </div>
+    
+    <div id="button-link" class="form-group" style="display: @(showTextLinkButton?"block":"none")" >
+        @Html.HiddenFor(x=>x.ButtonLink)
+        <div class="form-group">
+            <label>Link Text</label>
+            <input type="text" value="@nameTextButton" id="name-text-link-button"/>
+            <span class="error-message warning" id="name-link-button-text-error" style="display: none">Text for the link is required</span>
+        </div>
+
+        <div class="row text-link-select" >
+            <div class="col-sm-2">
+                <input type="checkbox" value="text" name="text-link-button-group-check" @(typeButton == "text" ? "checked":"")/>
+                Custom URL
+            </div>
+            <div class="col-sm-6">
+                @if (typeButton == "text")
+                {
+                    <input type="text" value="@hrefButton" />
+                }
+                else
+                {
+                    <input type="text" value="" />
+                }
+                <span class="error-message warning" id="text-link-button-text-error" style="display: none">An URL for the text link is required</span>
+            </div>
+        </div>
+
+        <div class="row sections-link-select">
+            <div class="col-sm-2">
+                <input type="checkbox" value="sections" name="text-link-button-group-check"  @(typeButton == "sections" ? "checked":"")/>
+                Sections
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.SECTION.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == hrefButton)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row articles-link-select">
+
+            <div class="col-sm-2">
+                <input type="checkbox" value="articles" name="text-link-button-group-check" @(typeButton == "articles" ? "checked":"") />
+                Articles
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.ARTICLE.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == hrefButton)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row sectors-link-select">
+
+            <div class="col-sm-2">
+                <input type="checkbox" value="sectors" name="text-link-button-group-check" @(typeButton == "sectors" ? "checked":"") />
+                Sectors
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.SECTOR.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == hrefButton)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row roles-link-select">
+
+            <div class="col-sm-2">
+                <input type="checkbox" value="roles" name="text-link-button-group-check" @(typeButton == "roles" ? "checked":"") />
+                Roles
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.ROLE.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == hrefButton)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row domains-link-select">
+            <div class="col-sm-2">
+                <input type="checkbox" value="domains"  name="text-link-button-group-check" @(typeButton == "domains" ? "checked":"")/>
+                Domains
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.DOMAIN.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == hrefButton)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+
+        <div class="row aspects-link-select">
+            <div class="col-sm-2"> 
+                <input type="checkbox" value="aspects" name="text-link-button-group-check" @(typeButton == "aspects" ? "checked":"") />
+                Aspects
+            </div>
+            <div class="col-sm-4">
+                <select>
+                    @foreach (var item in Model.Links)
+                    {
+                        if (item.Type == LinksTypes.ASPECT.ToString())
+                        {
+                            var selected = "";
+                            if (item.Href == hrefButton)
+                            {
+                                selected = "selected";
+                            }
+                            <option @selected value="@item.Href">@item.Name</option>
+                        }
+                    }
+                </select>
+
+            </div>
+        </div>
+    </div>
+
+    <!--End Button Link-->
+    
+    <div class="row" id="error-div">
+        
+    </div>    
+}
+<button onclick="submitForm();" class="btn btn-default">Save</button>
+
+@Html.Partial("ContentItems/_ImagesLoader")
+
+@section scripts{
+
+    <script src="~/Content/js/custom/loadWysiwyg.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("input[name='text-link-group-check']").click(function () {
+                var checked = $(this).is(":checked");
+                $("input[name='text-link-group-check']").each(function(i, item) {
+                    $(item).prop("checked", false);
+                });
+                $(this).prop("checked", checked);
+            });
+            $("#text-link-check").click(function() {
+                var checked = $(this).is(":checked");
+                if (checked) {
+                    $("#text-link").show(100);
+                } else {
+                    $("#text-link").hide(100);
+                }
+            });
+
+
+            $("input[name='text-link-button-group-check']").click(function () {
+                var checked = $(this).is(":checked");
+                $("input[name='text-link-button-group-check']").each(function (i, item) {
+                    $(item).prop("checked", false);
+                });
+                $(this).prop("checked", checked);
+            });
+            $("#button-link-check").click(function() {
+                var checked = $(this).is(":checked");
+                if (checked) {
+                    $("#button-link").show(100);
+                } else {
+                    $("#button-link").hide(100);
+                }
+            });
+
+        });
+
+        function submitForm() {
+            if (!validateForm()) {
+                return false;
+            }
+            $("#form-post").submit();
+        }
+
+        function validateForm() {
+            $(".error-message").hide();
+
+            //var name = $("#Name").val();
+            //var title = $("#Title").val();
+            //var text = $("#Text").val();
+            //if (name === "" || name == null) {
+            //    $("#name-error").show();
+            //    return false;
+            //}
+            //if (title === "" || title == null) {
+            //    $("#title-error").show();
+            //    return false;
+            //}
+            //if (text === "" || text == null) {
+            //    $("#text-error").show();
+            //    return false;
+            //}
+
+            if (!validateTextLink()) {
+                return false;
+            }
+            if (!validateButtonLink()) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateTextLink() {
+            var checkTextLink = $("#text-link-check").is(":checked");
+            if (checkTextLink) {
+                var textLink = {};
+                var error = false;
+                var textLinkName = $("#name-text-link").val();
+
+                if (textLinkName === "") {
+                    $("#name-link-text-error").show();
+                    return false;
+                }
+
+                textLink.text = textLinkName;
+                var href = "";
+                $("#text-link input[name='text-link-group-check']").each(function(i, item) {
+                    var itemQ = $(item);
+                    if (itemQ.is(":checked")) {
+                        var chkVal = itemQ.val();
+                    
+                        switch (chkVal) {
+                        case "text":
+                            href = $("#text-link .text-link-select input[type='text']").val();
+                            if (href === "" || href == null) {
+                                $("#text-link-text-error").show();
+                                error = true;
+                            }
+                            textLink.type = "text";
+                            break;
+                        case "sections":
+                            href = $("#text-link .sections-link-select  select").val();
+                            textLink.type = "sections";
+                            break;
+                        case "articles":
+                            href = $("#text-link  .articles-link-select  select").val();
+                            textLink.type = "articles";
+                            break;
+                        case "roles":
+                            href = $("#text-link  .roles-link-select  select").val();
+                            textLink.type = "roles";
+                            break;
+                        case "domains":
+                            href = $("#text-link  .domains-link-select  select").val();
+                            textLink.type = "domains";
+                            break;
+                        case "aspects":
+                            href = $("#text-link  .aspects-link-select  select").val();
+                            textLink.type = "aspects";
+                            break;
+                        }
+                        textLink.href = href;
+                    }
+                });
+                if (href === "") {
+                    return false;
+                }
+                $("#Link").val(JSON.stringify(textLink));
+            } else {
+                $("#Link").val("");
+            }
+            return true;
+        }
+
+        function validateButtonLink() {
+            var checkTextLink = $("#button-link-check").is(":checked");
+            if (checkTextLink) {
+                var textLink = {};
+                var textLinkName = $("#name-text-link-button").val();
+
+                if (textLinkName === "") {
+                    $("#name-link-button-text-error").show();
+                    return false;
+                }
+
+                textLink.text = textLinkName;
+                var href = "";
+                $("#button-link input[name='text-link-button-group-check']").each(function(i, item) {
+                    var itemQ = $(item);
+                    if (itemQ.is(":checked")) {
+                        var chkVal = itemQ.val();
+                    
+                        switch (chkVal) {
+                        case "text":
+                            href = $("#button-link .text-link-select input[type='text']").val();
+                            if (href === "" || href == null) {
+                                $("#text-link-button-text-error").show();
+                            }
+                            textLink.type = "text";
+                            break;
+                        case "sections":
+                            href = $("#button-link .sections-link-select  select").val();
+                            textLink.type = "sections";
+                            break;
+                        case "articles":
+                            href = $("#button-link  .articles-link-select  select").val();
+                            textLink.type = "articles";
+                            break;
+                        case "roles":
+                            href = $("#button-link  .roles-link-select  select").val();
+                            textLink.type = "roles";
+                            break;
+                        case "domains":
+                            href = $("#button-link .domains-link-select  select").val();
+                            textLink.type = "domains";
+                            break;
+                        case "aspects":
+                            href = $("#button-link  .aspects-link-select  select").val();
+                            textLink.type = "aspects";
+                            break;
+                        }
+                        textLink.href = href;
+                    }
+                });
+                if (href === "") {
+                    return false;
+                }
+                $("#ButtonLink").val(JSON.stringify(textLink));
+            } else {
+                $("#ButtonLink").val("");
+            }
+            return true;
+        }
+    </script>
+}
+
+
+
+

@@ -1,0 +1,103 @@
+﻿<div class="modal fade" id="images-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="padding:5px">
+            <div id="images-loaded" class="row" style="min-height:300px; overflow-x: hidden;  overflow-y: scroll;">
+
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <button class="btn" onclick="loadImages()">Show more</button>
+                </div>
+                <div class="col-sm-6">
+                    <button class="btn inverse" onclick="$('#images-modal').modal('hide');">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var listImages = [];
+    var currentRow = 1;
+    var previousRow = 0;
+    var currentHiddenElement = null;
+    var currentImageElement = null;
+    var imgDiv = null;
+    var currentFileInput = null;
+    function openModalImage(hiddenElement, imageElement, imageDiv, fileInput) {
+
+        $("#images-modal").modal("show");
+        currentHiddenElement = $("#" + hiddenElement);
+        currentImageElement = $("#" + imageElement);
+        imgDiv = $("#" + imageDiv);
+        currentFileInput = $("#" + fileInput);
+        if (listImages.length < 1)
+            loadImages();
+
+    }
+
+    function openModalImage(hiddenElement, imageElement, imageDiv, fileInput) {
+
+        $("#images-modal").modal("show");
+        currentHiddenElement = $("#" + hiddenElement);
+        currentImageElement = $("#" + imageElement);
+        imgDiv = $("#" + imageDiv);
+        currentFileInput = $("#" + fileInput);
+        if (listImages.length < 1)
+            loadImages();
+
+    }
+    function loadImages() {
+
+        function renderImages() {
+            $("#images-loaded").html("");
+            var template = $('#image-template').html();
+            var rendered = Mustache.render(template, { images: listImages });
+            $("#images-loaded").html(rendered);
+        }
+
+        if (previousRow == currentRow)
+            return;
+
+        $.ajax({
+            dataType: "json",
+            type: 'Post',
+            url: aplicationPath + '/Images/Get',
+            data: { row: currentRow },
+            success: function (data) {
+                if (data.Success) {
+                    var list = data.Entity;
+                    for (var i = 0; i < list.length; i++) {
+                        var item = list[i];
+                        item.aplicationPath = aplicationPath;
+                        listImages.push(list[i]);
+                    }
+                    renderImages();
+                    previousRow = currentRow;
+                    if (list.length > 5)
+                        currentRow++;
+                }
+
+            },
+            error: function (data) {
+            }
+        });
+    }
+
+    function updateImageElement(name) {
+        currentHiddenElement.val(name);
+        currentFileInput.wrap('<form>').closest('form').get(0).reset();
+        currentFileInput.unwrap();
+        currentImageElement.attr('src', aplicationPath + "/Content/img/Uploads/" + name);
+        imgDiv.show();
+        $("#images-modal").modal("hide");
+    }
+
+</script>
+
+<script id="image-template" type="x-tmpl-mustache">
+    {{#images}}
+    <div class="col-sm-4" style="margin-top: 5px;">
+        <img src="{{aplicationPath}}/Content/img/Uploads/{{Name}}" onclick="updateImageElement('{{Name}}')" style="cursor:pointer; min-width: 100%" />
+    </div>
+    {{/images}}
+</script>

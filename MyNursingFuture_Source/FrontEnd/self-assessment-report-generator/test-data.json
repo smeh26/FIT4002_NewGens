@@ -1,0 +1,510 @@
+{
+  "name": "test",
+  "date": "06 Aug 2017",
+  "domainNames": {
+    "1": "Clinical Care",
+    "2": "Education",
+    "3": "Research",
+    "4": "Optimising health systems",
+    "5": "Leadership"
+  },
+  "postcards": [
+    {
+      "imageFile": null,
+      "imagePath": null,
+      "postCardId": 4,
+      "text": "One thing nurses across primary health care have in common is...\r\npassion for looking after people in the community.",
+      "image": null
+    },
+    {
+      "imageFile": null,
+      "imagePath": null,
+      "postCardId": 2,
+      "text": "The next step in my nursing journey is... \r\nto complete my post graduate degree in rural and remote health, specialising in primary health care, to deliver the best possible care!",
+      "image": null
+    },
+    {
+      "imageFile": null,
+      "imagePath": null,
+      "postCardId": 3,
+      "text": "I feel valued as a nurse when...\r\npatients call & want to speak with me.",
+      "image": null
+    },
+    {
+      "imageFile": null,
+      "imagePath": null,
+      "postCardId": 8,
+      "text": "I feel valued as a nurse when...\r\nI see or hear about a patient who has changed (positive change) due to an intervention I did. LOVE IT!",
+      "image": null
+    },
+    {
+      "imageFile": null,
+      "imagePath": null,
+      "postCardId": 5,
+      "text": "I feel valued as a nurse when...\r\npatients and families express their thanks for the care our practice provides as a whole team.",
+      "image": null
+    },
+    {
+      "imageFile": null,
+      "imagePath": null,
+      "postCardId": 6,
+      "text": "I feel valued as a nurse when...\r\nmy opinion is valued and respected.",
+      "image": null
+    },
+    {
+      "imageFile": null,
+      "imagePath": null,
+      "postCardId": 7,
+      "text": "I feel valued as a nurse when...\r\nmy patients tell me how much I've helped them and thank me for my work as a nurse - often through Education and translating medical jargon into something they can understand.",
+      "image": null
+    }
+  ],
+  "aspects": {
+    "1": [
+      {
+        "aspectId": 5,
+        "answer": 0.1,
+        "answerText": "I'm learning to use critical thinking to analyse evidence in clinical practice.",
+        "name": "Accountability and responsibility",
+        "definition": "Works within scope of practice, while exercising judgment about actions and accepting professional accountability and responsibility",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 1,
+        "answer": 0.1,
+        "answerText": "As part of the interdisciplinary primary health care team, I'm learning how to determine the health needs of individuals.",
+        "name": "Assessment and Management",
+        "definition": "Applies evidence-based clinical skills in nursing assessment and management to meet the needs of individuals accessing care",
+        "actionsToGrow": [
+          {
+            "text": "Review the care provided to a specific \"at risk\" patient cohort in your area to ensure care delivery is aligned with current clinical guidelines"
+          },
+          {
+            "text": "Access to care"
+          },
+          {
+            "text": "Coordinate and manage a Nurse clinic in your area of practice"
+          },
+          {
+            "text": "Incorporate evidence-based tools into your care delivery"
+          }
+        ]
+      },
+      {
+        "aspectId": 8,
+        "answer": 1,
+        "answerText": "I lead by example with regards to adopting a culturally safe approach to delivering primary health care for Aboriginal and Torres Strait Islander people to support and encourage attendance.",
+        "name": "Culturally safe practice",
+        "definition": "Practices culturally safe care for all Aboriginal and Torres Strait Islander people accessing care",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 9,
+        "answer": 0.5,
+        "answerText": "I confidently take an active role in providing culturally safe care for culturally and linguistically diverse people.",
+        "name": "Culturally safe practice (2)",
+        "definition": "Practice culturally safe care for all culturally and linguistically diverse people accessing care",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 3,
+        "answer": 0.5,
+        "answerText": "I confidently utilise tools to monitor the delivery and quality of my care to the individual accessing care and seek support when required.",
+        "name": "Evaluation of care",
+        "definition": "Applies evidence-based clinical skills to evaluate the delivery of primary health care nursing to assess the impact on individuals accessing care",
+        "actionsToGrow": [
+          {
+            "text": "LIsten to a presentation describing consumer satisfaction"
+          },
+          {
+            "text": "Apply validated tools when implementing and evaluating care delivery"
+          },
+          {
+            "text": "Lead a patient evaluation initiative"
+          },
+          {
+            "text": "Support your team to apply validated tools"
+          }
+        ]
+      },
+      {
+        "aspectId": 6,
+        "answer": 0.1,
+        "answerText": "I'm learning to recognise the importance of health literacy as a part of culturally safe care.",
+        "name": "Health literacy",
+        "definition": "Applies a health literacy approach to improve the individual's engagement in their health and communication between the individual and primary health care team",
+        "actionsToGrow": [
+          {
+            "text": "Review and improve health literacy"
+          },
+          {
+            "text": "Review your organisation’s policy on health literacy"
+          },
+          {
+            "text": "Ensure members of your health care team are aware of culturally appropriate organisations"
+          },
+          {
+            "text": "Teach other members of your health care team"
+          }
+        ]
+      },
+      {
+        "aspectId": 10,
+        "answer": 0.5,
+        "answerText": "I have the confidence to participate in performance appraisals of myself and others to improve clinical practice.",
+        "name": "Personal Reflection",
+        "definition": "Demonstrates ability to undertake personal reflection of clinical practice",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 2,
+        "answer": 0.1,
+        "answerText": "I'm learning to develop and apply person-centred care plans with clear objectives.",
+        "name": "Planning care",
+        "definition": "Applies evidence-based clinical skills in planning nursing care to meet the needs of individuals accessing care",
+        "actionsToGrow": [
+          {
+            "text": "Review the care provided to a specific \"at risk\" patient cohort in your area to ensure care delivery is aligned with current clinical guidelines"
+          },
+          {
+            "text": "Consider post graduate qualifications"
+          },
+          {
+            "text": "Seek opportunities to disseminate outcomes of population health approaches within the primary health care sector"
+          },
+          {
+            "text": "Access resources"
+          }
+        ]
+      },
+      {
+        "aspectId": 4,
+        "answer": 0.5,
+        "answerText": "I'm confident to be a part of relevant public health strategies and work collaboratively to improve health needs and avoid hospitalisation.",
+        "name": "Population Health",
+        "definition": "Alignment of competence and clinical skills with population health needs to deliver targeted public health, health promotion and prevention to address the needs of the community",
+        "actionsToGrow": [
+          {
+            "text": "Population Health for Nurses in General Practice, APNA online module"
+          },
+          {
+            "text": "Increase knowledge of local population health needs"
+          },
+          {
+            "text": "Collaborate with your PHN"
+          },
+          {
+            "text": "Increase knowledge of local population health needs"
+          }
+        ]
+      },
+      {
+        "aspectId": 11,
+        "answer": 1,
+        "answerText": "I lead by coordinating and managing interdisciplinary collaboration to improve the individual's health outcomes.",
+        "name": "Teamwork",
+        "definition": "Works as part of a primary health care team, utilising the knowledge and skills to deliver person-centred nursing care",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 12,
+        "answer": 0.5,
+        "answerText": "I'm confidently using my skills to identify, implement and evaluate the use of new technologies in health care delivery.",
+        "name": "Tech Literacy",
+        "definition": "Utilises information technology, clinical software and decision support tools to underpin health care delivery",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 7,
+        "answer": 1,
+        "answerText": "I lead the development of quality improvement strategies to ensure they reflect a values-based approach to care. ",
+        "name": "Values-based Care",
+        "definition": "Promote and influence others to incorporate non-judgmental, values-based care into clinical practice",
+        "actionsToGrow": []
+      }
+    ],
+    "2": [
+      {
+        "aspectId": 16,
+        "answer": 0.1,
+        "answerText": "I'm learning to work with the community to identify their healthcare needs. ",
+        "name": "Community education",
+        "definition": "Addresses community health and support needs through collaboration with the community and the provision of information appropriate to the needs of the community",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 15,
+        "answer": 0.5,
+        "answerText": "I confidently develop a positive learning environment for students and members of the primary health care team, giving and receiving feedback in an open, honest and constructive manner",
+        "name": "Learning environment",
+        "definition": "Facilitates and actively engages in cultivating an environment that improves learning",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 14,
+        "answer": 1,
+        "answerText": "I lead and guide members of the primary health care team by providing relevant formal education.  ",
+        "name": "Learning, teaching and assessment",
+        "definition": "Incorporates learning, teaching and assessment into nursing role",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 13,
+        "answer": 1,
+        "answerText": "I act as a leader by continually undertaking appropriate education and skill development to expand and maintain an advanced scope of practice.",
+        "name": "Scope of Practice",
+        "definition": "Optimises scope of practice through tailored education to ensure competence and confidence in area of practice",
+        "actionsToGrow": [
+          {
+            "text": "Consider joining your local APNA Nurse Network"
+          },
+          {
+            "text": "Consider post graduate qualifications"
+          },
+          {
+            "text": "Online Learning Module"
+          },
+          {
+            "text": "Consider the introduction of a model of care, based on best practice"
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "aspectId": 20,
+        "answer": 1,
+        "answerText": "I lead by ensuring that evidence is integrated into the delivery of primary health care",
+        "name": "Evidence-based practice",
+        "definition": "Use evidence to underpin all nursing practice",
+        "actionsToGrow": [
+          {
+            "text": "Consider post graduate qualifications"
+          },
+          {
+            "text": "The development of ORACLe"
+          },
+          {
+            "text": "Contact national bodies to obtain current evidence-based clinical guidelines"
+          }
+        ]
+      },
+      {
+        "aspectId": 19,
+        "answer": 1,
+        "answerText": "I lead by identifying gaps in evidence and seek resources for evaluation or research activities.",
+        "name": "Finding resources and support",
+        "definition": "Identify opportunities and/or funding for quality improvement, research and evaluation",
+        "actionsToGrow": [
+          {
+            "text": "Consider joining your local APNA Nurse Network"
+          },
+          {
+            "text": "Consider post graduate qualifications"
+          },
+          {
+            "text": "Watch PHCRIS video guides"
+          },
+          {
+            "text": "Explore Research Profiles"
+          }
+        ]
+      },
+      {
+        "aspectId": 17,
+        "answer": 1,
+        "answerText": "I lead quality improvement activities within the primary health care team ",
+        "name": "Quality Improvement",
+        "definition": "Supports a culture of continuous quality improvement in all aspects of service delivery to achieve enhanced health outcomes",
+        "actionsToGrow": [
+          {
+            "text": "Develop partnerships"
+          },
+          {
+            "text": "Become familiar with quality improvement frameworks"
+          },
+          {
+            "text": "Access training programs"
+          },
+          {
+            "text": "Participate in nurse networks"
+          }
+        ]
+      },
+      {
+        "aspectId": 18,
+        "answer": 1,
+        "answerText": "I lead by ensuring frameworks for research governance are applied appropriately. ",
+        "name": "Research and evaluation",
+        "definition": "Engage in research and evaluation",
+        "actionsToGrow": [
+          {
+            "text": "Consider post graduate qualifications"
+          },
+          {
+            "text": "Guides for understanding research"
+          },
+          {
+            "text": "PHCRIS video guides"
+          },
+          {
+            "text": "Explore Research Profiles"
+          }
+        ]
+      }
+    ],
+    "4": [
+      {
+        "aspectId": 21,
+        "answer": 0.5,
+        "answerText": "I'm confident in contributing to the ongoing development of local care pathways and encourage others to do so.",
+        "name": "Care coordination",
+        "definition": "Develops, supports and implements models of care coordination which improve care delivery",
+        "actionsToGrow": [
+          {
+            "text": "Consider post graduate qualifications"
+          },
+          {
+            "text": "The development of ORACLe"
+          },
+          {
+            "text": "Contact national bodies to obtain current evidence-based clinical guidelines"
+          }
+        ]
+      },
+      {
+        "aspectId": 25,
+        "answer": 1,
+        "answerText": "I lead by using change management theories to create an environment for positive change.",
+        "name": "Drive change",
+        "definition": "Act as a driver for change in clinical practice and systems",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 22,
+        "answer": 1,
+        "answerText": "I lead by providing constructive feedback to my primary health care colleagues on their communication styles. ",
+        "name": "Effective communication",
+        "definition": "Engages in and facilitates effective communication to optimise the functioning of interdisciplinary primary health care teams",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 23,
+        "answer": 1,
+        "answerText": "I lead by developing and implementing innovative approaches to effective teamwork. ",
+        "name": "Effective teamwork",
+        "definition": "Supports a culture of effective teamwork",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 24,
+        "answer": 1,
+        "answerText": "I lead the development of guidelines, policies and procedures to deliver quality care.",
+        "name": "Policies and procedures",
+        "definition": "Develops, implements or reviews policies and procedures",
+        "actionsToGrow": []
+      }
+    ],
+    "5": [
+      {
+        "aspectId": 30,
+        "answer": 0.1,
+        "answerText": "I'm learning to identify an area of professional interest and provide relevant insights.",
+        "name": "Being a resource",
+        "definition": "Acts as a resource for professional organisations, the community, committees and other health professionals outside own setting",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 26,
+        "answer": 1,
+        "answerText": "I lead and guide the establishment of professional networks that promote the exchange of knowledge, skills and resources.",
+        "name": "Leadership",
+        "definition": "Engages in professional and organisational leadership within and beyond own setting",
+        "actionsToGrow": [
+          {
+            "text": "Consider post graduate qualifications"
+          },
+          {
+            "text": "A leadership framework for nurses that incorporates the five elements of leadership in a caring environment"
+          },
+          {
+            "text": "Primary Health Care Research and information service (PHCRIS), fact sheets"
+          },
+          {
+            "text": "Seek opportunities within your organization to participate in projects focused on clinical leadership"
+          }
+        ]
+      },
+      {
+        "aspectId": 27,
+        "answer": 0.5,
+        "answerText": "I'm confident to share information relevant to Student Nurses, Enrolled Nurses and Registered Nurses through existing networks.",
+        "name": "Professional relationships",
+        "definition": "Actively builds and maintains professional relationships with other nurses to contribute to the development of the profession",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 29,
+        "answer": 0.5,
+        "answerText": "I'm confident to engage and recruit others to advocate for the role of the primary health care nurse.",
+        "name": "Promote nursing",
+        "definition": "Actively promotes the role of the nurse in primary health care",
+        "actionsToGrow": []
+      },
+      {
+        "aspectId": 28,
+        "answer": 1,
+        "answerText": "I lead through the presentation of research findings in peer reviewed journals and conferences.",
+        "name": "Share knowledge",
+        "definition": "Disseminates nursing knowledge to health professionals beyond own setting",
+        "actionsToGrow": []
+      }
+    ]
+  },
+  "domainScores": {
+    "1": 0.4916666666666667,
+    "2": 0.65,
+    "3": 1,
+    "4": 0.9,
+    "5": 0.62
+  },
+  "domainStrengths": {
+    "1": [
+      1,
+      5,
+      6,
+      2
+    ],
+    "2": [
+      16,
+      15,
+      13,
+      14
+    ],
+    "3": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "4": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "5": [
+      30,
+      27,
+      29,
+      26
+    ]
+  },
+  "topActions": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [],
+    "5": []
+  }
+}

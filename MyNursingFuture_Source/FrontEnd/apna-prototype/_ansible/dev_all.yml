@@ -1,0 +1,19 @@
+---
+- name: provision and deploy LEMP dev server
+  hosts: dev-server
+  remote_user: vagrant
+  become: true
+  become_method: sudo
+
+  vars_files:
+    - vars/dev.yml
+
+  roles:
+    - common
+    - ssh
+    - php
+    - composer
+    - nginx
+    - letsencrypt
+    - mysql
+#    - deploy-symfony

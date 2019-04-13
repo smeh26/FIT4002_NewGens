@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome to My Nursing Future</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+    <style>
+        h1{
+            font-family:'Arial', 'sans-serif';
+        }
+        h3{
+            font-family:'Arial', 'sans-serif';
+            font-weight: lighter;
+            font-style: italic;
+        }
+        a{ text-decoration: none; color:#525456}
+    </style>
+</head>
+<body style="padding:0;margin:0; font-family:'Montserrat', 'Arial', 'sans-serif'; color:#525456">
+    <div style="width: 100%; position:absolute; top:0; ">
+        <img src="@ContentUrl/assets/email/top-header.png" width="100%" alt="">    
+    </div>
+    <div style="width:100%; text-align:center; padding-top:40px; padding-bottom: 40px; background-image:url('@ContentUrl/assets/email/Group.png'); background-size: 100%; background-repeat: no-repeat">
+        <img src="@ContentUrl/assets/email/titlemnf.png" width="50%"  style="max-width:450px"   alt="">
+    </div>
+    <div style="text-align:center;">
+        <div style="max-width:80%; text-align:left; display:inline-block" >
+            <h1>Welcome to My Nursing Future!</h1>
+            <img src="@ContentUrl/assets/email/separator.png" width="20%"alt="">
+            <br /><br />
+            <p><b>APNA are thrilled that you have decided to explore the world of primary health care nursing. My Nursing Future will provide you with guidance, knowledge and helpful contacts and resources to grow your primary health care nursing career.</b></p>
+            <h3>Here’s a quick guide to help you get started!</h2>
+            <h2><a href="@WebSite/sections/2" target="_blank">Career quiz<a></h2>
+            <p>Ever wanted to know where you could excel in the world of primary health care nursing? Take our career quiz. This matches your career aspirations to suitable primary health care settings. A short 5 minute quiz that will open your mind to the possibilities of nursing in primary health care.</p>
+            <h2><a href="@WebSite/sections/3" target="_blank">Self-assessment<a></h2>
+            <p>For those nurses out there already working in primary health care, have you ever felt under-valued? Under-utilised? Not sure where to start when planning your CPD? Well we have the answer for you! Take the self-assessment and discover your strengths and areas to grow in relation to your practice. Receive a personalised report that provides you with a breakdown of your strengths, and provides suggestions on new approaches to continue your professional growth. Use this report to plan your CPD, demonstrate to your employer your worth or even to help you understand how crucial your skills and knowledge are to the team. You will also receive a CPD certificate for undertaking this professional reflective activity.</p>
+            <h2><a href="@WebSite/sectors" target="_blank">Sectors in Primary Health Care<a></h2>
+            <p>Discover the different areas of primary health care nursing by clicking away on the sector profile pages. See what it is like to work in correctional health, general practice, community health, refugee health, residential care, Aboriginal Medical Health Services and many more by viewing the primary health care nursing videos. You will also have access to the necessary resources and contacts on how to get involved in these areas of primary health care, and you can also view the latest career opportunities.</p>
+            <h2><a href="@WebSite/sections/9" target="_blank">Career advice<a></h2>
+            <p>Filled with a number of different ideas and templates on how to develop your CV, expand your professional network, promoting your worth to your employer, working in a team environment, where to access further education and many more!
+            Get started and grow your career in primary health care nursing.</p>
+            <p>The APNA Team!</p>
+            <div style="text-align: center">
+                <br />
+                <a href="@WebSite">
+                    <img src="@ContentUrl/assets/email/getstarted.png" alt="">
+                </a>
+                <br />
+                <p>A nursing workforce initiative proudly developed by the Australian Primary Health Care Nurses Association (APNA).</p>
+                <p>Funded by the Australian Government Department of Health under the Nursing in Primary Health Care Program.</p>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

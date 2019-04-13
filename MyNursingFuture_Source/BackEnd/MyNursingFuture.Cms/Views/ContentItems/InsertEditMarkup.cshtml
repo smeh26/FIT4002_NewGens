@@ -1,0 +1,58 @@
+﻿@using System.Web.UI.WebControls
+@using MyNursingFuture.BL.Managers
+@model MyNursingFuture.Cms.Models.ContentItemViewModel
+@{
+    ViewBag.Title = Model.Operation == "E" ? "Edit Markup" : "Insert new Markup";
+}
+<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-lg-12">
+        @if (ViewBag.Previous.ToString() == "ARTICLE")
+        {
+            @Html.ActionLink("Go back", "Edit", "Articles", new { id = Model.ArticleId }, new { @class = "btn inverse pull-right" })
+        }
+        else
+        {
+            @Html.ActionLink("Go back", "Edit", "Sections", new { id = Model.SectionId }, new { @class = "btn inverse pull-right" })
+        }
+    </div>
+</div>
+
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@using (Html.BeginForm("InsertEdit", "ContentItems", FormMethod.Post, new { id = "form-post", @enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.SectionId)
+    @Html.HiddenFor(x => x.ArticleId)
+    @Html.HiddenFor(x => x.Type)
+    @Html.HiddenFor(x => x.Operation)
+    @Html.HiddenFor(x => x.ContentItemId)
+
+    <div class="form-group">
+        @Html.LabelFor(x => x.Text)
+        @Html.TextAreaFor(x => x.Text, new { @class = "form-control" })
+        <span class="error-message warning" id="text-error" style="display: none">Text is required</span>
+    </div>
+
+}
+<button onclick="submitForm();" class="btn btn-default">Save</button>
+<script>
+    function submitForm() {
+        if (!validateForm()) {
+            return false;
+        }
+        $("#form-post").submit();
+    }
+
+    function validateForm() {
+        $(".error-message").hide();
+        var text = $("#Text").val();
+        if (text === "" || text == null) {
+            $("#text-error").show();
+            return false;
+        }
+        return true;
+    }
+</script>

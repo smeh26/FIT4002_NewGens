@@ -1,0 +1,60 @@
+﻿@using System.Web.UI.WebControls
+@using MyNursingFuture.BL.Managers
+@model MyNursingFuture.Cms.Models.ContentItemViewModel
+@{
+    ViewBag.Title = Model.Operation == "E"?"Edit Content Item":"Insert new Content Item";
+}
+
+<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-lg-12">
+        @if (ViewBag.Previous.ToString() == "ARTICLE")
+        {
+            @Html.ActionLink("Go back", "Edit", "Articles", new { id = Model.ArticleId }, new { @class = "btn inverse pull-right" })
+        }
+        else
+        {
+            @Html.ActionLink("Go back", "Edit", "Sections", new { id = Model.SectionId }, new { @class = "btn inverse pull-right" })
+        }
+    </div>
+</div>
+
+
+
+@using (Html.BeginForm("InsertEdit", "ContentItems", FormMethod.Post, new {id = "form-post"}))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x=>x.SectionId)
+    @Html.HiddenFor(x => x.ArticleId)
+    @Html.HiddenFor(x=>x.Type)
+    @Html.HiddenFor(x=>x.Operation)
+    @Html.HiddenFor(x=>x.ContentItemId)
+    
+    @Html.Partial("ContentItems/_SingleLineLink", Model)
+
+
+}
+<button onclick="submitForm();" class="btn btn-default">Submit</button>
+
+<script>
+    function submitForm() {
+        if (!validateForm()) {
+            return false;
+        }
+        $("#form-post").submit();
+    }
+
+    function validateForm() {
+        $(".error-message").hide();
+        if (!validateLineLink()) {
+            return false;
+        }
+        return true;
+    }
+</script>
+
+@section scripts{
+<script src="~/Scripts/ContentItems/SingleLineLink.js"></script>
+   
+}
+

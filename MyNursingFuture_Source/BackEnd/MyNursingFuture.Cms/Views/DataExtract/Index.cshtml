@@ -1,0 +1,20 @@
+﻿@model MyNursingFuture.Cms.Models.DataExtractModel
+
+@{
+    var list = ViewBag.DataExtract;
+}
+
+<h2>Data Extract</h2>
+@Html.ActionLink("Go back", "Index", "Home", null, new { @class = "btn btn-primary btn-back" })
+
+@using (Html.BeginForm("ExportDataExtractToCSV", "DataExtract", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.EditorFor(x => x.DateStart, new { inputColumn = 4, htmlAttributes = new { placeholder = "Enter start date..." } })
+    @Html.EditorFor(x => x.DateEnd, new { inputColumn = 4, htmlAttributes = new { placeholder = "Enter end date..." } })
+    @Html.EditorFor(x => x.ExtractType, "SelectList", new { inputColumn = 4, List = ViewBag.DataExtractTypes, Placeholder = "Select Extract Type" })
+
+    <div class="form-group row">
+        <input type="submit" class="btn" value="Export" />
+    </div>
+
+}

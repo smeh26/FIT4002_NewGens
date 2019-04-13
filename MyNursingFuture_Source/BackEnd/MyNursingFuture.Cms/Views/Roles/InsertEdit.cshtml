@@ -1,0 +1,29 @@
+﻿@model MyNursingFuture.Cms.Models.RoleViewModel
+<h2>Roles</h2>
+@Html.ActionLink("Go back", "Index", null, new { @class = "btn btn-primary btn-back" })
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@using (Html.BeginForm("InsertEdit", "Roles", FormMethod.Post, new { id = "form-post", @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.RoleId)
+    @Html.HiddenFor(x => x.Operation)
+    @Html.EditorFor(x => x.Name)
+    @Html.EditorFor(x => x.LinkName)
+
+    <div class="form-group" style="margin-top: -10px; font-size: 75%">
+        <span class="col-sm-10 col-sm-offset-2 text-right text-muted">When the role is linked from another page, this link name is going to be displayed</span>
+    </div>
+
+    @Html.EditorFor(x => x.Title)
+    @Html.EditorFor(x => x.WhatIs, "RichText")
+    @Html.EditorFor(x => x.WhatIsTheirRole, "RichText")
+    @Html.EditorFor(x => x.Accountabilities, "RichText")
+    @Html.EditorFor(x => x.Examples, "RichText")
+    @Html.EditorFor(x => x.FurtherInformation, "RichText")
+    @Html.EditorFor(x => x.Pathways, "RichText")
+    @Html.EditorFor(x => x.WhatIs, "RichText")
+
+    <input type="submit" class="btn" value="Save" />
+}

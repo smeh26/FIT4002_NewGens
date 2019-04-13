@@ -1,0 +1,22 @@
+﻿
+@model MyNursingFuture.Cms.Models.ActionViewModel
+
+
+<h1>@(Model.Operation == "E" ? "Edit" : "Insert") Action</h1>
+@Html.ActionLink("Go back", "Index", null, new { @class = "btn btn-primary btn-back" })
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@using (Html.BeginForm("InsertEdit", "Actions", FormMethod.Post, new { id = "form-post", @enctype = "multipart/form-data", @class="form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.ActionId)
+    @Html.HiddenFor(x => x.Operation)
+
+    @Html.EditorFor(x => x.Title)
+    @Html.EditorFor(x => x.Type, "SelectList", new { List = new SelectList(ViewBag.ListTypes, "Value", "Text") })
+    @Html.EditorFor(x => x.Text, "RichText")
+
+
+    <button class="btn">Save</button>
+}

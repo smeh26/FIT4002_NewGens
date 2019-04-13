@@ -1,0 +1,681 @@
+﻿@model MyNursingFuture.Cms.Models.QuestionViewModel
+@{
+    ViewBag.Title = "Career Pathways ";
+    var sectorList = ViewBag.Sectors;
+
+}
+
+<script>
+    var quizId = @Html.Raw(Model.QuizId);
+
+    var reqList = null;
+    var examplesList = [];
+    var answersList = @Html.Raw(Json.Encode(Model.Answers));
+    var questionType = '@Html.Raw(Model.Type)';
+    var questionId = @Html.Raw(Model.QuestionId);
+</script>
+
+@if (!string.IsNullOrEmpty(Model.Requirements))
+{
+    <script>
+        var reqList = @Html.Raw(Model.Requirements);
+    </script>
+}
+
+@if (!string.IsNullOrEmpty(Model.Examples))
+{
+    <script>
+        var examplesList = @Html.Raw(Model.Examples);
+    </script>
+}
+
+<h2>Career Pathways Question @Model.Type</h2>
+
+@Html.ActionLink("Go back", "CareerPathWays", "Quizzes", null, new { @class = "btn btn-primary btn-back" })
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@using (Html.BeginForm("InsertEdit", "Questions", FormMethod.Post, new { id = "form-post", @class = "form-horizontal" }))
+{
+    @Html.HiddenFor(x => x.Type)
+    @Html.HiddenFor(x => x.QuestionId)
+    @Html.HiddenFor(x => x.QuizType)
+    @Html.HiddenFor(x => x.Requirements)
+    @Html.HiddenFor(x => x.Operation)
+    @Html.HiddenFor(x => x.SectorsJson)
+    @Html.HiddenFor(x => x.AnswersJson)
+    @Html.HiddenFor(x => x.AspectId)
+    @Html.HiddenFor(x => x.QuizId)
+    @Html.AntiForgeryToken()
+
+    @Html.EditorFor(x => x.Text)
+    @Html.EditorFor(x => x.SubText)
+}
+<h2>Answers</h2>
+<span class="error-message" id="error-text-answers" style="display:none">Answers text is required</span>
+@if (Model.Type != "RANGE")
+{
+    if (Model.Type == "INPUT" || Model.Type == "HYBRID")
+    {
+        <button class="btn inverse" onclick="$('#modal-answers').modal('show')">Add Answer</button>
+    }
+    else
+    {
+        <button class="btn inverse" onclick="addAnswer()">Add Answer</button>
+    }
+
+}
+<div id="answers-list">
+
+</div>
+
+<div class="row">
+    @{
+        var sectorsChecked = "";
+        var displaySectors = "none";
+        if (Model.SectorsQuestions.Any())
+        {
+            sectorsChecked = "checked";
+            displaySectors = "block";
+        }
+    }
+    <div class="col-sm-12">
+        <h3>Add sectors</h3><input id="sectors-check" type="checkbox" @sectorsChecked />
+    </div>
+    <div id="sectors-list" style="display:@(displaySectors)">
+        @foreach (var item in sectorList)
+        {
+            var divRendered = false;
+            <div class="row">
+                <div class="col-sm-3">
+                    @item.Name
+                </div>
+                @foreach (var sq in Model.SectorsQuestions)
+                {
+                    if (sq.SectorId == item.SectorId)
+                    {
+                        divRendered = true;
+                        var selSector = "";
+                        <div class="col-sm-3">
+                            <label>No Score</label>
+                            @if (sq.Value == null)
+                            {
+                                selSector = "checked";
+                            }
+                            <input class="sel-check" type="checkbox" id="sector-nv-@item.SectorId" @selSector data-val-div="sect-val-@item.SectorId" data-sector-id="@item.SectorId" />
+                        </div>
+                        <div class="col-sm-4">
+                            <label>Sector Score</label>
+                            <input type="number" id="sect-val-@item.SectorId" style="width:100px;" class="form-control" onblur="resetInputNumber(this);" value="@(sq.Value.HasValue?sq.Value.Value.ToString("0.0"):"0")" />
+                        </div>
+                    }
+
+                }
+
+                @if (!divRendered)
+                {
+                    <div class="col-sm-3 form-group">
+                        <label>No Score</label>
+                        <input type="checkbox" id="sector-nv-@item.SectorId" class="sel-check" data-sector-id="@item.SectorId" data-val-div="sect-val-@item.SectorId" />
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label class="">Sector Score</label>
+                        <input type="number" id="sect-val-@item.SectorId" style="width:100px; float:right" class="form-control" onblur="resetInputNumber(this);" value="0" />
+                    </div>
+                }
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+
+<div class="row">
+    <h2>Add Questions Requirements</h2>
+</div>
+<div class="row">
+    <div class="col-sm-6 form-group">
+        <label>Question Text</label>
+        <input type="text" id="questions-ac" class="form-control" />
+        <span class="error-message" id="question-ac-error" style="display:none">
+            *Select a question
+        </span>
+        <span class="error-message" id="question-ac-already-error" style="display:none">
+            *Question already added
+        </span>
+    </div>
+    <div class="col-sm-6 form-group">
+        <label>Question Value</label>
+        <input type="text" id="questions-ac-value" class="form-control" />
+        <span class="error-message" id="question-ac-value-error" style="display:none">
+            *Add value
+        </span>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <button class="btn inverse" onclick="selectRequirement();"> Add Requirements</button>
+    </div>
+</div>
+<div class="row text-center" style="margin-top: 5px;">
+    <div class="col-xs-4">
+        Text
+    </div>
+    <div class="col-xs-4">
+        Value
+    </div>
+</div>
+<div id="question-req-list">
+
+
+</div>
+<div class="row" style="margin-top: 5px;">
+    <div class="col-sm-12">
+        <button class="btn" onclick="submitForm()">Save</button>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="modal-answers" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Add answer
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <button class="btn inverse" onclick="addUserInputAnswer();">User input answer</button>
+                    </div>
+                    @if (Model.Type == "INPUT")
+                    {
+                        <div class="col-xs-6">
+                            <button class="btn inverse" onclick="addUserAddressAnswer();">Request user address</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-xs-6">
+                            <button class="btn inverse" onclick="addTextValueAnswer();">Text Value Data</button>
+                        </div>
+                    }
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        var selectedQuestion = null;
+        var questionsRequirements = [];
+        var indexAnswers = 0;
+        var sectorsQuestions = [];
+
+        function submitForm() {
+            var errorText = false
+            $(".answers-text").each(function (i, el) {
+                var val = $(el).val();
+                if (val == "") {
+                    $("#error-text-answers").show();
+                    errorText = true;
+                }
+            });
+            if (errorText) {
+                return;
+            }
+            $("#AnswersJson").val(JSON.stringify(answersList));
+            var checkSectors = $("#sectors-check").is(":checked");
+            if (checkSectors) {
+                $(".sel-check").each(function (i, e) {
+                    var check = $(e);
+                    var sectorId = check.data("sector-id");
+                    var divValues = check.data("val-div");
+
+
+                    var value = $("#" + divValues).val();
+
+                    if (check.is(":checked")) {
+                        value = null;
+                    }
+
+                    var sq = { QuestiondId: questionId, SectorId: sectorId, Value: value };
+
+                    sectorsQuestions.push(sq);
+                })
+                $("#SectorsJson").val(JSON.stringify(sectorsQuestions));
+            }
+            $("#Requirements").val(JSON.stringify(questionsRequirements));
+            $("#form-post").submit();
+        }
+
+
+        function addExample() {
+            examplesList.push({ Text: "", Index: indexExamples });
+            indexExamples++;
+            renderExamples();
+        }
+
+        function updateExampleText(el, index) {
+            for (var i = 0; i < examplesList.length; i++) {
+                if (examplesList[i].Index == index) {
+                    examplesList[i].Text = $(el).val();
+                }
+            }
+        }
+
+        function removeExample(index) {
+            for (var i = 0; i < examplesList.length; i++) {
+                if (examplesList[i].Index == index) {
+                    examplesList.splice(i, 1);
+                }
+            }
+            renderExamples();
+        }
+
+        function renderExamples() {
+            var ex = $("#examples-list");
+            ex.html("");
+            var template = $('#examples-template').html();
+            var rendered = Mustache.render(template, { examples: examplesList });
+            ex.html(rendered);
+        }
+
+        function addAnswer() {
+            answersList.push({ Text: "", Value: 0, Index: indexAnswers });
+            indexAnswers++;
+            renderAnswers();
+        }
+
+        function addUserInputAnswer() {
+            answersList.push({ Text: "", Value: 0, Index: indexAnswers, Type: "INPUT" });
+            indexAnswers++;
+            renderAnswers();
+            $("#modal-answers").modal('hide');
+        }
+        function addUserAddressAnswer() {
+            answersList.push({ Text: "", Value: 0, Index: indexAnswers, Type: "ADDRESS" });
+            indexAnswers++;
+            renderAnswers();
+            $("#modal-answers").modal('hide');
+        }
+
+        function updateAnswertTextValue(el, index) {
+            for (var i = 0; i < answersList.length; i++) {
+                if (answersList[i].Index == index) {
+                    answersList[i].TextValue = $(el).val();
+                }
+            }
+        }
+
+        function updateAnswerText(el, index) {
+            for (var i = 0; i < answersList.length; i++) {
+                if (answersList[i].Index == index) {
+                    answersList[i].Text = $(el).val();
+                }
+            }
+        }
+
+        function updateAnswerMatchText(el, index) {
+            for (var i = 0; i < answersList.length; i++) {
+                if (answersList[i].Index == index) {
+                    answersList[i].MatchText = $(el).val();
+                }
+            }
+        }
+
+        function removeAnswer(index) {
+            for (var i = 0; i < answersList.length; i++) {
+                if (answersList[i].Index == index) {
+                    answersList.splice(i, 1);
+                }
+            }
+            renderAnswers();
+        }
+
+        function updateAnswerValue(el, index) {
+            for (var i = 0; i < answersList.length; i++) {
+                if (answersList[i].Index == index) {
+                    var val = $(el).val();
+                    if (val == "") {
+                        val = 0;
+                    }
+                    answersList[i].Value = $(el).val();
+                }
+            }
+        }
+
+        function renderInputAnswers() {
+            var answers = $("#answers-list");
+            var rendered = "";
+            var template;
+            for (var i = 0; i < answersList.length; i++) {
+                if (answersList[i].Type == "ADDRESS") {
+                    template = $("#answer-template-address").html();
+                } else if (answersList[i].Type == "INPUT") {
+                    template = $("#answer-template-input").html();
+                } else if (answersList[i].Type == "TEXTVALUE") {
+                    template = $("#answer-template-choices-textvalue").html();
+                }
+                rendered = rendered + Mustache.render(template, { answer: answersList[i] });
+            }
+            answers.html("");
+            answers.html(rendered);
+        }
+
+        function renderAnswers() {
+            var answers = $("#answers-list");
+            var template;
+            if (questionType == "INPUT") {
+                renderInputAnswers();
+                return;
+            }
+            if (questionType == "RANGE") {
+                template = $("#answer-template-range").html();
+            }
+            else {
+                template = $("#answer-template-choices").html()
+            }
+            answers.html("");
+            var rendered = Mustache.render(template, { answers: answersList });
+            answers.html(rendered);
+        }
+
+        function selectRequirement() {
+            $("#error-message").hide();
+            if (selectedQuestion == null) {
+                $("#question-ac-error").show();
+                return;
+            }
+            var questionValue = $("#questions-ac-value").val();
+            if (questionValue == "") {
+                $("#question-ac-value-error").show();
+                return;
+            }
+
+            selectedQuestion.value = questionValue;
+            if (!addRequirement(selectedQuestion)) {
+                return;
+            }
+            renderQuestions();
+        }
+
+        function addRequirement(req) {
+            for (var i = 0; i < questionsRequirements.length; i++) {
+                if (questionsRequirements[i].questionId == req.questionId) {
+                    $("#question-ac-already-error").show();
+                    return false;
+                }
+            }
+            questionsRequirements.push(req);
+            return true;
+        }
+
+        function removeQuestion(id) {
+            var item = null;
+            for (var i = questionsRequirements.length - 1; i >= 0; i--) {
+                item = questionsRequirements[i];
+                if (item.questionId == id) {
+                    questionsRequirements.splice(i, 1);
+                    break;
+                }
+            }
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            var questions = $("#question-req-list");
+            questions.html("");
+            var template = $('#question-template').html();
+            var rendered = Mustache.render(template, { questions: questionsRequirements });
+            questions.html(rendered);
+        }
+
+        function resetInputNumber(el) {
+            var val = $(el).val();
+            if (val == "") {
+                $(el).val("0");
+            }
+        }
+
+        $(document).ready(function () {
+
+            //answers
+            if (answersList.length < 1) {
+                answersList = [];
+                if (questionType == "RANGE") {
+                    answersList.push({ Text: "", Value: 0, Index: indexAnswers, MatchText: "" });
+                    indexAnswers++;
+                    answersList.push({ Text: "", Value: 0.5, Index: indexAnswers, MatchText: "" });
+                    indexAnswers++;
+                    answersList.push({ Text: "", Value: 1, Index: indexAnswers, MatchText: "" });
+                    indexAnswers++;
+                } else if (questionType != "INPUT" && questionType != "HYBRID") {
+                    answersList.push({ Text: "", Value: 0, Index: indexAnswers, MatchText: "" });
+                    indexAnswers++;
+                }
+            }
+
+            for (var c = 0; c < answersList.length; c++) {
+                answersList[c].Index = indexAnswers;
+                indexAnswers++;
+            }
+            renderAnswers();
+            //requirements
+            if (reqList != null) {
+                var reqListDecoded = reqList;
+                for (var i = 0; i < reqListDecoded.length; i++) {
+                    addRequirement(reqListDecoded[i]);
+                }
+                renderQuestions();
+            }
+            //examples
+            if (examplesList != null) {
+                for (var e = 0; e < examplesList.length; e++) {
+                    examplesList[e].Index = indexExamples;
+                    indexExamples++;
+                }
+                renderExamples();
+            }
+
+
+            $("#sectors-check").click(function () {
+                var checked = $(this).is(":checked");
+                if (checked) {
+                    $("#sectors-list").show();
+                } else {
+                    $("#sectors-list").hide();
+                }
+            })
+
+
+            var questionAc = $("#questions-ac");
+            questionAc.autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        dataType: "json",
+                        type: 'Post',
+                        url: aplicationPath + '/Questions/GetQuestions',
+                        data: { name: request.term, id: quizId },
+                        success: function (data) {
+                            if (data.Success) {
+                                var list = data.Entity;
+                                response($.map(list,
+                                    function (item) {
+                                        return {
+                                            label: item.Text,
+                                            value: item.QuestionId
+                                        };
+                                    })
+                                );
+                            }
+
+                        },
+                        error: function (data) {
+                        }
+                    });
+                },
+                minLength: 3,
+                focus: function (event, ui) {
+                    event.preventDefault();
+                    questionAc.val(ui.item.label);
+                },
+                select: function (event, ui) {
+                    event.preventDefault();
+                    var item = ui.item || null;
+                    if (item !== null) {
+                        questionAc.val(item.label);
+                        selectedQuestion = { text: item.label, questionId: item.value };
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script id="question-template" type="x-tmpl-mustache">
+        {{#questions}}
+        <div class="row text-center" style="margin-top: 5px;">
+            <div class="col-xs-4">
+                {{text}}
+            </div>
+            <div class="col-xs-4">
+                {{value}}
+            </div>
+            <div class="col-xs-4">
+                <button class="btn delete-btn" onclick="removeQuestion({{questionId}})">X</button>
+            </div>
+        </div>
+        {{/questions}}
+
+    </script>
+
+    <script id="answer-template-range" type="x-tmpl-mustache">
+        {{#answers}}
+
+        <div class="group-border" style="margin-top: 8px;">
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-xs-12">
+                    <textarea style="height:100px;" class="form-control answers-text" onchange="updateAnswerText(this, {{Index}})">{{Text}}</textarea>
+                </div>
+                <div class="col-xs-12">
+                    <label>Match Text</label>
+                    <input type="text" value="{{MatchText}}" class="form-control" onchange="updateAnswerMatchText(this, {{Index}})" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3 form-group">
+                    <span>Value:</span><span> {{Value}}</span>
+                </div>
+            </div>
+        </div>
+        {{/answers}}
+    </script>
+
+    <script id="examples-template" type="x-tmpl-mustache">
+        {{#examples}}
+        <div class="row text-center" style="margin-top: 5px;">
+            <div class="col-xs-3">
+                <input type="text" class="form-control" onchange="updateExampleText(this, {{Index}})" value="{{Text}}" />
+            </div>
+            <div class="col-xs-6">
+                <button class="btn delete-btn" onclick="removeExample({{Index}})">X</button>
+            </div>
+        </div>
+        {{/examples}}
+    </script>
+
+    <script id="answer-template-choices" type="x-tmpl-mustache">
+        {{#answers}}
+        <div class="group-border" style="margin-top: 8px;">
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-xs-12">
+                    <textarea style="height:100px;" class="form-control answers-text" onchange="updateAnswerText(this, {{Index}})">{{Text}}</textarea>
+                </div>
+                <div class="col-xs-12">
+                    <label>Match Text</label>
+                    <input type="text" value="{{MatchText}}" class="form-control" onchange="updateAnswerMatchText(this, {{Index}})" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-2">
+                    <span>Value:</span>
+                    <input type="number" style="width:80px; float:right" value="{{Value}}" onchange="updateAnswerValue(this, {{Index}})" onblur="resetInputNumber(this);" class="form-control" />
+                </div>
+                <div class="col-xs-3 form-group">
+                    <button class="btn delete-btn" onclick="removeAnswer({{Index}})">X</button>
+                </div>
+            </div>
+        </div>
+
+        {{/answers}}
+    </script>
+
+    <script id="answer-template-address" type="x-tmpl-mustache">
+        {{#answer}}
+        <div class="group-border" style="margin-top: 8px;">
+            <div class="row">
+                <div class="col-xs-2">
+                    <label>Address user Question</label>
+                </div>
+                <div class="col-xs-3 form-group">
+                    <button class="btn delete-btn" onclick="removeAnswer({{Index}})">X</button>
+                </div>
+            </div>
+        </div>
+        {{/answer}}
+    </script>
+
+    <script id="answer-template-input" type="x-tmpl-mustache">
+        {{#answer}}
+        <div class="group-border" style="margin-top: 8px;">
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-xs-12">
+                    <label>Answer Label</label>
+                    <input type="text" class="form-control answers-text" onchange="updateAnswerText(this, {{Index}})" value="{{Text}}" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3 form-group">
+                    <button class="btn delete-btn" onclick="removeAnswer({{Index}})">X</button>
+                </div>
+            </div>
+        </div>
+        {{/answer}}
+    </script>
+
+    <script id="answer-template-choices-textvalue" type="x-tmpl-mustache">
+        {{#answer}}
+        <div class="group-border" style="margin-top: 8px;">
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-xs-12">
+                    <label>Answer Label</label>
+                    <input type="text" class="form-control answers-text" onchange="updateAnswerText(this, {{Index}})" value="{{Text}}" />
+                </div>
+                <div class="col-xs-12">
+                    <label>Match Text</label>
+                    <input type="text" value="{{MatchText}}" class="form-control" onchange="updateAnswerMatchText(this, {{Index}})" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-2">
+                    <span>Value:</span>
+                    <input type="text" style="width:80px; float:right" value="{{TextValue}}" onchange="updateAnswertTextValue(this, {{Index}})" class="form-control" />
+                </div>
+                <div class="col-xs-3 form-group">
+                    <button class="btn delete-btn" onclick="removeAnswer({{Index}})">X</button>
+                </div>
+            </div>
+        </div>
+        {{/answer}}
+    </script>
+}

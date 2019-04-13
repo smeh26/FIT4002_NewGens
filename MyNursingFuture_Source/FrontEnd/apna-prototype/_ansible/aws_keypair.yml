@@ -1,0 +1,25 @@
+---
+- name: launch prod instances
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  vars_files:
+    - "vars/{{ env }}.yml"
+
+  tasks:
+
+    - name: create key pair
+      local_action:
+        module: ec2_key
+        region: "{{ region }}"
+        name: "{{ keyname }}"
+        state: present
+      register: mykey
+
+    - name: save private key
+      copy:
+        content: "{{ mykey.key.private_key }}"
+        dest:  "~/.ssh/{{ keyname }}.pem"
+        mode: 0600
+      when: mykey.changed

@@ -1,0 +1,309 @@
+﻿@model MyNursingFuture.Cms.Models.SectorViewViewModel
+
+<h1>Sector Framework View @Model.Type</h1>
+
+@Html.ActionLink("Go back", "Edit", "Sectors", new{id = Model.SectorId}, null)
+
+<script>
+    var careerPathways = null;
+    var educationOpportunities = null;
+</script>
+@if (!String.IsNullOrEmpty(Model.CareerPathways))
+{
+    <script>
+        careerPathways = @Html.Raw(Model.CareerPathways);
+    </script>
+}
+@if (!String.IsNullOrEmpty(Model.EducationOpportunities))
+{
+    <script>
+        educationOpportunities = @Html.Raw(Model.EducationOpportunities);
+    </script>
+}
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@using (Html.BeginForm("Edit","SectorViews", FormMethod.Post, new {id = "form-post" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.SectorId)
+    @Html.HiddenFor(x => x.SectorViewId)
+    @Html.HiddenFor(x => x.Type)
+    @Html.HiddenFor(x => x.Framework)
+
+    <div class="form-group">
+        <div class="row">
+            @*@Html.TextAreaFor(x => x.Intro, new { @class = "form-control" })*@
+            @Html.EditorFor(x => x.Intro, "RichText", new { Configuration = @"{
+            resetCss: true,
+            btns: [
+            ['viewHTML'],
+            ['formatting'],
+            'btnGrp-semantic',
+            ['superscript', 'subscript'],
+            ['link'],
+            ['insertImage'],
+            'btnGrp-justify',
+            'btnGrp-lists',
+            ['horizontalRule'],
+            ['removeformat'],
+            ['fullscreen']
+            ]
+            }" })
+            @Html.ValidationMessageFor(x => x.Intro)
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                <button class="btn inverse" onclick="event.preventDefault(); showVideosModal('Video', 'video-div');">Select Video</button>
+            </div>
+            <div class="col-xs-2">
+                <button class="btn inverse" onclick="event.preventDefault(); deleteVideo()">Delete Video</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12" id="video-div">
+                @if (!string.IsNullOrEmpty(Model.Video))
+                {
+                    <iframe type="text/html" width="640" height="380" src="https://www.youtube.com/embed/@(Model.Video)?autoplay=0" frameborder="0"></iframe>
+                }
+            </div>
+            @Html.HiddenFor(x => x.Video)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.MoreStories)
+        @Html.TextAreaFor(x => x.MoreStories, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.WorkEnvironments)
+        @Html.TextAreaFor(x => x.WorkEnvironments, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        <div class="row">
+            @*@Html.LabelFor(x => x.OnlineResources)
+            @Html.TextAreaFor(x => x.OnlineResources, new { @class = "form-control" })*@
+            @Html.EditorFor(x => x.OnlineResources, "RichText", new { Configuration = @"{
+            resetCss: true,
+            btns: [
+            ['viewHTML'],
+            ['formatting'],
+            'btnGrp-semantic',
+            ['superscript', 'subscript'],
+            ['link'],
+            ['insertImage'],
+            'btnGrp-justify',
+            'btnGrp-lists',
+            ['horizontalRule'],
+            ['removeformat'],
+            ['fullscreen']
+            ]
+            }" })
+        </div>
+    </div>
+    @Html.HiddenFor(x=>x.CareerPathways)
+    
+
+
+    <div class="form-group ">
+        <h3>Career Pathways</h3>
+        <div class="group-border">
+            <div class="row">
+                <div class="col-sm-12"><b>Level 0</b></div>
+                <div class="col-sm-12"><label>Title</label> <input type="text" class="form-control" id="path-0-title" /></div>
+                <div class="col-sm-12"><label>Text</label> <textarea class="form-control" maxlength="1000" id="path-0-text"></textarea></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12"><b>Level 1</b></div>
+                <div class="col-sm-12"><label>Title</label> <input type="text" class="form-control" id="path-1-title" /></div>
+                <div class="col-sm-12"><label>Text</label> <textarea class="form-control" maxlength="1000" id="path-1-text"></textarea></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12"><b>Level 2</b></div>
+                <div class="col-sm-12"><label>Title</label> <input type="text" class="form-control" id="path-2-title" /></div>
+                <div class="col-sm-12"><label>Text</label> <textarea class="form-control" maxlength="1000" id="path-2-text"></textarea></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(x => x.CareerOpportunities)
+        @Html.TextAreaFor(x => x.CareerOpportunities, new { @class = "form-control" })*@
+        @Html.EditorFor(x => x.CareerOpportunities, "RichText", new { Configuration = @"{
+            resetCss: true,
+            btns: [
+            ['viewHTML'],
+            ['formatting'],
+            'btnGrp-semantic',
+            ['superscript', 'subscript'],
+            ['link'],
+            ['insertImage'],
+            'btnGrp-justify',
+            'btnGrp-lists',
+            ['horizontalRule'],
+            ['removeformat'],
+            ['fullscreen']
+            ]
+            }" })
+    </div>
+    <div class="form-group">
+        
+        
+    </div>
+
+    <div class="form-group ">
+        <h3>@Html.LabelFor(x => x.EducationOpportunities)</h3>
+        <div class="group-border">
+            <div class="row">
+                <div class="col-sm-12"><b>Level 0</b></div>
+                <div class="col-sm-12"><label>Text</label> <textarea class="form-control" maxlength="1000" id="educ-0-text"></textarea></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12"><b>Level 1</b></div>
+                <div class="col-sm-12"><label>Text</label> <textarea class="form-control" maxlength="1000" id="educ-1-text"></textarea></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12"><b>Level 2</b></div>
+                <div class="col-sm-12"><label>Text</label> <textarea class="form-control" maxlength="1000" id="educ-2-text"></textarea></div>
+            </div>
+        </div>
+        @Html.HiddenFor(x => x.EducationOpportunities)
+    </div>
+
+
+    <div class="form-group">
+        @*@Html.LabelFor(x => x.ContactText)
+        @Html.TextAreaFor(x => x.ContactText, new { @class = "form-control" })*@
+        @Html.EditorFor(x => x.ContactText, "RichText", new { Configuration = @"{
+            resetCss: true,
+            btns: [
+            ['viewHTML'],
+            ['formatting'],
+            'btnGrp-semantic',
+            ['superscript', 'subscript'],
+            ['link'],
+            ['insertImage'],
+            'btnGrp-justify',
+            'btnGrp-lists',
+            ['horizontalRule'],
+            ['removeformat'],
+            ['fullscreen']
+            ]
+            }" })
+    </div>
+}
+<input type="button" value="Save" class="btn" onclick="submitForm();"/>
+
+@Html.Partial("ContentItems/_VideosLoader")
+@section scripts{
+
+    <script src="~/Scripts/ContentItems/youtube.js"></script>
+
+    
+    <script>
+        $(document).ready(function() {
+            if (careerPathways !== null) {
+                var item;
+                for (var i = 0; i < careerPathways.length; i++) {
+                    item = careerPathways[i];
+                    switch (item.level) {
+                    case 0:
+                        $("#path-0-title").val(item.title);
+                        $("#path-0-text").val(item.text);
+                        break;
+                    case 1:
+                        $("#path-1-title").val(item.title);
+                        $("#path-1-text").val(item.text);
+                        break;
+                    case 2:
+                        $("#path-2-title").val(item.title);
+                        $("#path-2-text").val(item.text);
+                        break;
+                    }
+                }
+            }
+            if (educationOpportunities !== null) {
+                var item;
+                for (var i = 0; i < educationOpportunities.length; i++) {
+                    item = educationOpportunities[i];
+                    switch (item.level) {
+                        case 0:
+                            $("#educ-0-text").val(item.text);
+                            break;
+                        case 1:
+                            $("#educ-1-text").val(item.text);
+                            break;
+                        case 2:
+                            $("#educ-2-text").val(item.text);
+                            break;
+                    }
+                }
+            }
+        });
+
+        function submitForm() {
+            var pathways = [];
+            pathways.push({
+                'level': 0,
+                'title': $("#path-0-title").val(),
+                'text': $("#path-0-text").val()
+            });
+            pathways.push({
+                'level': 1,
+                'title': $("#path-1-title").val(),
+                'text': $("#path-1-text").val()
+            });
+            pathways.push({
+                'level': 2,
+                'title': $("#path-2-title").val(),
+                'text': $("#path-2-text").val()
+            });
+
+            var educList = [];
+            educList.push({
+                'level': 0,
+                'text': $("#educ-0-text").val()
+            });
+            educList.push({
+                'level': 1,
+                'text': $("#educ-1-text").val()
+            });
+            educList.push({
+                'level': 2,
+                'text': $("#educ-2-text").val()
+            });
+
+
+            $("#CareerPathways").val(JSON.stringify(pathways));
+            $("#EducationOpportunities").val(JSON.stringify(educList));
+            $("#form-post").submit();
+        }
+
+        function deleteVideo() {
+            $("#video-div").hide();
+            $("#Video").val('');
+        }
+
+        // Load editor on sub sections
+
+        $('.richtextedit').trumbowyg({
+            resetCss: true,
+            btns: [
+            ['viewHTML'],
+            ['formatting'],
+            'btnGrp-semantic',
+            ['superscript', 'subscript'],
+            ['link'],
+            ['insertImage'],
+            'btnGrp-justify',
+            'btnGrp-lists',
+            ['horizontalRule'],
+            ['removeformat'],
+            ['fullscreen']
+            ]
+        });
+
+    </script>
+}

@@ -1,0 +1,19 @@
+﻿@using MyNursingFuture.BL.Entities;
+
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+    ViewBag.EntityName = "Endorsed Logo";
+}
+
+@section ColumnLabels {
+    <th>Name</th>
+}
+
+@foreach (EndorsedLogoEntity item in ViewBag.EndorsedLogos)
+{
+    <tr>
+        <td>@item.Name</td>
+        <td>@CustomHelpers.EditActionButton(item.EndorsedLogoId)
+        @CustomHelpers.DeleteActionButton(item.EndorsedLogoId)</td>
+    </tr>
+}

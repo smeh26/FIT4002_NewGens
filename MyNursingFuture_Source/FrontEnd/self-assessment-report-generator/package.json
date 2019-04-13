@@ -1,0 +1,22 @@
+{
+  "name": "self-assessment-report-generator",
+  "version": "1.0.0",
+  "description": "APNA My Nursing Future Self Assessment Report PDF Generator",
+  "main": "generate.js",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "json2csv": "^3.11.1",
+    "msnodesqlv8": "^0.3.2",
+    "mssql": "^4.0.4",
+    "pug": "^2.0.0-rc.2",
+    "wkhtmltopdf": "^0.3.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

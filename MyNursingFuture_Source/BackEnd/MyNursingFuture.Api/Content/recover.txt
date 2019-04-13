@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome to My Nursing Future</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+    <style>
+        h1{
+            font-family:'Arial', 'sans-serif';
+        }
+        h3{
+            font-family:'Arial', 'sans-serif';
+            font-weight: lighter;
+            font-style: italic;
+        }
+        a{ text-decoration: none; color:#525456}
+    </style>
+</head>
+<body style="padding:0;margin:0; font-family:'Montserrat', 'Arial', 'sans-serif'; color:#525456">
+    <div style="width: 100%; position:absolute; top:0; ">
+        <img src="@ContentUrl/assets/email/top-header.png" width="100%" alt="">    
+    </div>
+    <div style="width:100%; text-align:center; padding-top:40px; padding-bottom: 40px; background-image:url('@ContentUrl/assets/email/Group.png'); background-size: 100%; background-repeat: no-repeat">
+        <img src="@ContentUrl/assets/email/titlemnf.png" width="50%"  style="max-width:450px"   alt="">
+    </div>
+    <div style="text-align:center;">
+        <div style="max-width:80%; text-align:left; display:inline-block" >
+            <h1>Reset Password Requested</h1>
+            <img src="@ContentUrl/assets/email/separator.png" width="20%"alt="">
+            <br /><br />
+            <p>
+                Someone requested to reset your My Nursing Future account password. If it wasn't you, please ignore this e-mail and no changes will be made to your account. However, if you have requested to reset your password, please click the link below. You will be redirected to the My Nursing Future password reset form.
+            </p>
+            <p style="text-align: center; font-size:1.5em; text-decoration: underline;">
+				<a href="@WebSite/?resetToken=@RecoverToken">Reset Password</a>
+			</p>
+            <div style="text-align: center">
+                <p>A nursing workforce initiative proudly developed by the Australian Primary Health Care Nurses Association (APNA).</p>
+                <p>Funded by the Australian Government Department of Health under the Nursing in Primary Health Care Program.</p>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
+

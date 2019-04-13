@@ -1,0 +1,23 @@
+﻿@model MyNursingFuture.Cms.Models.DefinitionViewModel
+@{
+    ViewBag.Title = "My Nursing Future - Administration";
+}
+
+<h1>@(Model.Operation == "E" ? "Edit" : "Insert") Definition</h1>
+
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@Html.ActionLink("Go back", "Index", null, new { @class = "btn btn-primary btn-back" })
+
+@using (Html.BeginForm("InsertEdit", "Definitions", FormMethod.Post, new { id = "form-post", @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.DefinitionId)
+    @Html.HiddenFor(x => x.Operation)
+
+    @Html.EditorFor(x => x.Name)
+    @Html.EditorFor(x => x.Text, "RichText")
+
+    <button class="btn">Save</button>
+}

@@ -1,0 +1,26 @@
+﻿@using MyNursingFuture.BL.Entities
+@{ 
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+}
+
+@section ColumnLabels {
+    <th>Type</th>
+    <th>Title</th>
+    <th>Position</th>
+}
+
+@foreach (DomainEntity item in ViewBag.Domains)
+{
+    <tr>
+        <td>
+            @item.Name
+        </td>
+        <td>@item.Title</td>
+        <td>
+            @CustomHelpers.UpdatePositionControl(item.DomainId, item.Position, "Domains")
+        </td>
+        <td>@CustomHelpers.EditActionButton(item.DomainId)</td>
+    </tr>
+}
+
+

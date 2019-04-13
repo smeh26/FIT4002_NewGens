@@ -1,0 +1,15 @@
+﻿@{
+    var defaultHtmlAttributesObject = new { @class = "form-control" };
+    var htmlAttributesObject = ViewData["htmlAttributes"] ?? new { };
+    var htmlAttributes = Html.MergeHtmlAttributes(htmlAttributesObject, defaultHtmlAttributesObject);
+
+    var labelColumn = ViewBag.labelColumn ?? 2;
+}
+
+<div class="form-group @(ViewBag.@class)">
+    @Html.Label("", new { @class = "control-label col-sm-" + labelColumn })
+    <div class="col-sm-@(ViewBag.inputColumn ?? (12 - labelColumn))">
+        @RenderBody()
+        @Html.ValidationMessage("")
+    </div>
+</div>

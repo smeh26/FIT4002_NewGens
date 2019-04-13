@@ -1,0 +1,27 @@
+﻿@using MyNursingFuture.Util
+@using MyNursingFuture.DL.Models
+@using MyNursingFuture.BL.Entities
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+    
+}
+
+@section Actions {}
+
+@section ColumnLabels {
+    <th>Title</th>
+    <th>Type</th>
+}
+
+@foreach (EmailEntity item in ViewBag.Emails)
+{
+    <tr>
+        <td>
+            @item.Title
+        </td>
+        <td>@(TypeHelper.Get<EmailType>(item.Type).Description)</td>
+        <td>@CustomHelpers.EditActionButton(item.EmailId)</td>
+    </tr>
+}
+
+

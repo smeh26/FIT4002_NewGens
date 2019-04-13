@@ -1,0 +1,84 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@CustomHelpers.SuccessMessage(TempData)
+
+<div class="row">
+    <div class="col-lg-10 col-lg-offset-1">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Sections
+            </div>
+            <div class="panel-body text-center">
+                @*<div class="col-sm-12">@Html.ActionLink("Home", "Index", "Sections", new { @class = "btn btn-primary" })</div>
+
+        <div class="col-sm-4 col-md-3">@Html.ActionLink("Why primary health care?","Index","Sections",new{@class="btn btn-primary"})</div>
+        <div class="col-sm-4 col-md-3">@Html.ActionLink("Explore sectors & roles", "Index", "Sectors", new { @class = "btn btn-primary" })</div>
+        <div class="col-sm-4 col-md-3">@Html.ActionLink("Explore the framework", "Index", "Roles", new { @class = "btn btn-primary" })</div>
+        <div class="col-sm-4 col-md-3">@Html.ActionLink("Career Advice", "Index", "Domains", new { @class = "btn btn-primary" })</div>
+        <div class="col-sm-4 col-md-3">@Html.ActionLink("About Career & Education", "Index", "Domains", new { @class = "btn btn-primary" })</div>
+        <div class="col-sm-4 col-md-3">@Html.ActionLink("Contact Us", "Index", "Domains", new { @class = "btn btn-primary" })</div>*@
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("All Sections...", "Index", "Sections", null, new { @class = "btn btn-primary" })</div>
+            </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Articles
+            </div>
+            <div class="panel-body text-center">
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Articles", "Index", "Articles", null, new { @class = "btn btn-primary" })</div>
+              @*<div class="col-sm-4 col-md-3">@Html.ActionLink("Categories", "Index", "Categories",null, new { @class = "btn btn-primary" })</div>*@
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Reasons", "ArticleReasons", "Articles", null, new { @class = "btn btn-primary" })</div>
+            </div>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Framework
+            </div>
+            <div class="panel-body text-center">
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Domains", "Index", "Domains", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Aspects of Practice", "Index", "Aspects", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Actions", "Index", "Actions", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Sectors", "Index", "Sectors", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Roles", "Index", "Roles", null, new { @class = "btn btn-primary" })</div>
+            </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Quizzes
+            </div>
+            <div class="panel-body text-center">
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Career Pathway", "CareerPathWays", "Quizzes", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Self-assessment", "SelfAssessment", "Quizzes", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("About you", "Aboutyou", "Quizzes", null, new { @class = "btn btn-primary" })</div>
+            </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Configuration
+            </div>
+            <div class="panel-body text-center">
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Post Cards", "Index", "PostCards", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Endorsed Logos", "Index", "EndorsedLogos", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Definitions", "Index", "Definitions", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Menus", "Index", "Menus", null, new { @class = "btn btn-primary" })</div>
+
+            </div>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Administration
+            </div>
+            <div class="panel-body text-center">
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Administrators", "Index", "Administrators", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Changes Log", "Index", "LogChanges", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Data Extract", "Index", "DataExtract", null, new { @class = "btn btn-primary" })</div>
+                <div class="col-sm-4 col-md-3">@Html.ActionLink("Emails", "Index", "Emails", null, new { @class = "btn btn-primary" })</div>
+
+            </div>
+        </div>
+    </div>
+</div>

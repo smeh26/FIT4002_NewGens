@@ -1,0 +1,26 @@
+---
+- name: provision web instances
+  hosts: "tag_domain_{{ domain_tag }}:&tag_environment_{{ env }}"
+  remote_user: ubuntu
+  become: true
+  become_method: sudo
+  gather_facts: no
+
+  vars_files:
+    - "vars/{{ env }}.yml"
+
+  pre_tasks:
+    - name: update apt cache
+      raw: sudo apt-get update
+
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+
+  roles:
+    - common
+    - ssh
+    - php
+    - composer
+    - nginx
+    - letsencrypt
+    - mysql

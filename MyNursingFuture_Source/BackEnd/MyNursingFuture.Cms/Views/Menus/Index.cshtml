@@ -1,0 +1,21 @@
+﻿@using MyNursingFuture.BL.Entities;
+
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+    ViewBag.EntityName = "Menu";
+}
+
+@section Actions { }
+
+@section ColumnLabels {
+    <th>Type</th>
+}
+
+<tr>
+    <td>Menu Top</td>
+    <td>@Html.ActionLink("Edit", "Edit", new { menuType = "TOP" }, new { @class = "btn btn-sm btn-info" })</td>
+</tr>
+<tr>
+    <td>Menu Bottom</td>
+    <td>@Html.ActionLink("Edit", "Edit", new { menuType = "BOT" }, new { @class = "btn btn-sm btn-info" })</td>
+</tr>

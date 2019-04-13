@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My Nursing Future</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <script>
+        var aplicationPath = @Html.Raw(Json.Encode(Request.ApplicationPath));
+
+
+        if (aplicationPath == "/") {
+            aplicationPath = "";
+        }
+    </script>
+</head>
+<body class="page-@((ViewContext.RouteData.Values["controller"] as string).ToLowerInvariant()) page-action-@((ViewContext.RouteData.Values["action"] as string).ToLowerInvariant())">
+    <header>
+        <h3>My Nursing Future - Administration</h3>
+        @if (HttpContext.Current.Session["AdminUser"] != null)
+        {
+            @Html.ActionLink("Logout", "Logout", "Login", null, new { @style = "right:250px;" })
+        }
+        <a href="#">Visit Site</a>
+    </header>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My Nursing Future</p>
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/cms")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    @Html.RenderScripts()
+</body>
+</html>

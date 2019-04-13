@@ -1,0 +1,20 @@
+---
+- name: clone certbot
+  git:
+    repo: https://github.com/certbot/certbot.git
+    dest: /opt/certbot
+    version: master
+    update: yes
+
+- name: ensure certbot-auto is executable
+  file:
+    path: "/opt/certbot/certbot-auto"
+    mode: 0755
+
+- name: letsencrypt cert exists
+  stat: path=/etc/letsencrypt/live/{{ site_url }}/fullchain.pem
+  register: letsencrypt
+
+- name: setup nginx server config
+  template: src=letsencrypt.cron.txt dest=/etc/cron.monthly/letsencrypt mode=0755
+  when: letsencrypt.stat.exists == True

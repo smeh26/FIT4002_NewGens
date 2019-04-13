@@ -1,0 +1,19 @@
+---
+- name: install vim
+  apt: pkg=vim state=latest
+  
+- name: install curl
+  apt:  pkg=curl state=latest
+
+- name: install git
+  apt:  pkg=git state=latest
+
+#- name: install mysql-client
+#  apt:  pkg=mysql-client state=latest
+
+- name: install unzip
+  apt:  pkg=unzip state=latest
+
+- name: Set timezone variables
+  command: timedatectl set-timezone {{ php_date_timezone }}
+  notify: update timezone

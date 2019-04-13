@@ -1,0 +1,57 @@
+﻿@model MyNursingFuture.Cms.Models.AdministratorViewModel
+@{
+    ViewBag.Title = "My Nursing Future - Administration";
+}
+
+<h1>@(Model.Operation == "E" ? "Edit" : "Insert") Administrator</h1>
+
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@Html.ActionLink("Go back", "Index", null, new { @class = "btn btn-primary btn-back" })
+
+@using (Html.BeginForm("InsertEdit", "Administrators", FormMethod.Post, new { id = "form-post", @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.AdministratorId)
+    @Html.HiddenFor(x => x.Operation)
+
+    if (Model.Operation == "E")
+    {
+        @Html.EditorFor(x => x.Username, new { htmlAttributes = new { @readonly = true } })
+    }
+    else
+    {
+        @Html.EditorFor(x => x.Username)
+    }
+    @Html.EditorFor(x => x.Name)
+    @Html.EditorFor(x => x.Password)
+
+    <div class="form-group">
+        <span class="col-sm-10 col-sm-offset-2 error-message" style="display:none;" id="password-error">Password length invalid</span>
+    </div>
+}
+<div class="row">
+    <button class="btn" onclick="submitForm();">Save</button>
+</div>
+
+
+@section scripts{
+
+    <script>
+        var operation = '@Html.Raw(Model.Operation)';
+        function submitForm() {
+            var password = $("#Password").val();
+            if (operation == 'E') {
+                if (password.length < 6 && password.length > 0) {
+                    $("#password-error").show();
+                    return;
+                }
+            } else if (password.length < 6) {
+                $("#password-error").show();
+                return;
+            }
+            $("#form-post").submit();
+        }
+    </script>
+}

@@ -1,0 +1,63 @@
+<mjml>
+  <mj-head>
+    <mj-font name="Montserrat-Bold" href="../src/styles/fonts/Montserrat-Bold.svg" />
+    <mj-font name="SFUIDisplay-Light" href="../src/styles/fonts/SFUIDisplay-Light.svg" />
+    
+  </mj-head>
+  <mj-body>
+    <mj-container>
+
+      <!-- Header -->
+      <mj-section padding-bottom="0" background-color="#52CBCB">
+        <mj-column width="100%">
+            <mj-text align="center" font-size="16" color="white" font-family="Montserrat-Bold, Arial Black, Arial, sans-serif" font-weight="700">
+             My Nursing Future
+            </mj-text>
+            <mj-divider
+                padding-top="20"
+                padding-bottom="0"
+                padding-left="0"
+                padding-right="0"
+                border-width="1px"
+                border-color="#f8f8f8"/>
+        </mj-column>
+      </mj-section>
+
+      <!-- Banner -->
+      <mj-section padding-bottom="0" background-color="#fffff">
+        <mj-column width="100%">
+          <mj-text align="center" font-size="20" color="#424447" font-family="SFUIDisplay-Light, Helvetica Neue, Arial, sans-serif" font-weight="200">
+          Welcome {name}.
+            </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <!-- Content -->
+      <mj-section>
+        <mj-column>
+          <mj-text align="center" font-size="16" color="#424447" font-family="SFUIDisplay-Light, Helvetica Neue, Arial, sans-serif" font-weight="200">
+            Thanks for signing up.
+          </mj-text>
+          <mj-image width="350" src="./img/mnf_logo_animated.gif" />
+        </mj-column>
+      </mj-section>
+
+      <!-- Social/Footer -->
+      <mj-section padding-bottom="0" background-color="#00AEE4">
+        <mj-column width="100%">
+            <mj-text align="center" font-size="16" color="white" font-family="SFUIDisplay-Light, Helvetica Neue, Arial, sans-serif" font-weight="200">
+              Links Links Links
+            </mj-text>
+            <mj-divider
+                padding-top="10"
+                padding-bottom="0"
+                padding-left="0"
+                padding-right="0"
+                border-width="1px"
+            border-color="#00AEE4"/>
+        </mj-column>
+      </mj-section>
+
+    </mj-container>
+  </mj-body>
+</mjml>

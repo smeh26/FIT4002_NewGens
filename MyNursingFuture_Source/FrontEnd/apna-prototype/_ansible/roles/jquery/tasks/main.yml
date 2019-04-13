@@ -1,0 +1,32 @@
+---
+- name: install npm
+  apt: pkg=npm state=latest
+
+- name: setup node symlink
+  file: src=/usr/bin/nodejs
+        dest=/usr/bin/node
+        state=link
+
+- name: ensure jquery directory exists
+  file: dest=/var/www/src-front
+        state=directory
+
+- name: fetch jquery source as zip
+  unarchive: src=https://github.com/jquery/jquery/archive/{{ jquery_version }}.zip
+             dest=/var/www/src-front
+             remote_src=yes
+             copy=no
+
+- name: install dependanices for jquery
+  npm: path=/var/www/src-front/jquery-{{ jquery_version }}
+
+- name: run grunt
+  command: "grunt custom:{{ jquery_custom_build }}"
+  args:
+    chdir: /var/www/src-front/jquery-{{ jquery_version }}
+
+- name: copy jquery build
+  command: cp /var/www/src-front/jquery-{{ jquery_version }}/dist/jquery.js /var/www/{{ site_url }}/src/AppBundle/Resources/public/vendor/jquery
+
+- name: copy jquery min build
+  command: cp /var/www/src-front/jquery-{{ jquery_version }}/dist/jquery.min.js /var/www/{{ site_url }}/src/AppBundle/Resources/public/vendor/jquery

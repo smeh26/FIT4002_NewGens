@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+  user: vagrant
+  serial: 1
+  vars_files:
+    - "vars/{{ env }}.yml"
+
+  tasks:
+
+    - name: Free mem
+      command: 'free -mh'
+

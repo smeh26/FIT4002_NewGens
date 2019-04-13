@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{07CB0993-6A65-4842-A548-F23349D8C1BD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MyNursingFuture.BL</RootNamespace>
+    <AssemblyName>MyNursingFuture.BL</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'LocalDev|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\LocalDev\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Jason RXP|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Jason RXP\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JWT, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\JWT.2.4.2\lib\net35\JWT.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RazorEngine, Version=3.10.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <HintPath>..\packages\RazorEngine.3.10.0\lib\net45\RazorEngine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.0.0\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\ActionEntity.cs" />
+    <Compile Include="Entities\AddressEntity.cs" />
+    <Compile Include="Entities\AdministratorEntity.cs" />
+    <Compile Include="Entities\AnswerEntity.cs" />
+    <Compile Include="Entities\ArticleEntity.cs" />
+    <Compile Include="Entities\AspectEntity.cs" />
+    <Compile Include="Entities\CategoryEntity.cs" />
+    <Compile Include="Entities\ConfigurationEntity.cs" />
+    <Compile Include="Entities\ContentItemEntity.cs" />
+    <Compile Include="Entities\DefinitionEntity.cs" />
+    <Compile Include="Entities\EmailEntity.cs" />
+    <Compile Include="Entities\DomainEntity.cs" />
+    <Compile Include="Entities\IEntity.cs" />
+    <Compile Include="Entities\ImageEntity.cs" />
+    <Compile Include="Entities\LinkEntity.cs" />
+    <Compile Include="Entities\LogChangeEntity.cs" />
+    <Compile Include="Entities\MenuEntity.cs" />
+    <Compile Include="Entities\EndorsedLogoEntity.cs" />
+    <Compile Include="Entities\PostCardEntity.cs" />
+    <Compile Include="Entities\QuestionEntity.cs" />
+    <Compile Include="Entities\QuizEntity.cs" />
+    <Compile Include="Entities\RawQuizDataEntity.cs" />
+    <Compile Include="Entities\ReasonEntity.cs" />
+    <Compile Include="Entities\ReasonsManager.cs" />
+    <Compile Include="Entities\RoleEntity.cs" />
+    <Compile Include="Entities\SectionEntity.cs" />
+    <Compile Include="Entities\SectorEntity.cs" />
+    <Compile Include="Entities\SectorsQuestionsEntity.cs" />
+    <Compile Include="Entities\SectorViewEntity.cs" />
+    <Compile Include="Entities\UserEntity.cs" />
+    <Compile Include="Entities\UserDataQuestionsEntity.cs" />
+    <Compile Include="Entities\AnonUserQuizzesEntity.cs" />
+    <Compile Include="Entities\UsersQuizzesEntity.cs" />
+    <Compile Include="Managers\ActionsManager.cs" />
+    <Compile Include="Managers\AdministratorsManager.cs" />
+    <Compile Include="Managers\AnswersManager.cs" />
+    <Compile Include="Managers\AppConfigurationsManager.cs" />
+    <Compile Include="Managers\ArticlesManager.cs" />
+    <Compile Include="Managers\AspectsManager.cs" />
+    <Compile Include="Managers\CacheManager.cs" />
+    <Compile Include="Managers\CategoriesManager.cs" />
+    <Compile Include="Managers\ContentItemsManager.cs" />
+    <Compile Include="Managers\CredentialsManager.cs" />
+    <Compile Include="Managers\DefinitionsManager.cs" />
+    <Compile Include="Managers\DomainsManager.cs" />
+    <Compile Include="Managers\EmailManager.cs" />
+    <Compile Include="Managers\EnumManager.cs" />
+    <Compile Include="Managers\FrameworkManager.cs" />
+    <Compile Include="Managers\ImageManager.cs" />
+    <Compile Include="Managers\IManager.cs" />
+    <Compile Include="Managers\IPublishable.cs" />
+    <Compile Include="Managers\LinksManager.cs" />
+    <Compile Include="Managers\LogChangesManager.cs" />
+    <Compile Include="Managers\MenusManager.cs" />
+    <Compile Include="Managers\EndorsedLogosManager.cs" />
+    <Compile Include="Managers\DataExtractManager.cs" />
+    <Compile Include="Managers\PostCardsManager.cs" />
+    <Compile Include="Managers\QuestionsManager.cs" />
+    <Compile Include="Managers\QuizzesManager.cs" />
+    <Compile Include="Managers\ReportManager.cs" />
+    <Compile Include="Managers\RolesManager.cs" />
+    <Compile Include="Managers\SectionsManager.cs" />
+    <Compile Include="Managers\SectorsManager.cs" />
+    <Compile Include="Managers\SectorViewsManager.cs" />
+    <Compile Include="Managers\UsersManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyNursingFuture.DL\MyNursingFuture.DL.csproj">
+      <Project>{f1d056d3-1fae-4bbc-9284-cdb25a3c1517}</Project>
+      <Name>MyNursingFuture.DL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MyNursingFuture.Util\MyNursingFuture.Util.csproj">
+      <Project>{1c17b790-9470-4433-8fb5-7b8d529d95af}</Project>
+      <Name>MyNursingFuture.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

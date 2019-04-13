@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>pie</title>
+
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+        #app {
+            margin: 100px;
+        }
+        .toolTip {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            position: relative;
+            display: none;
+            width: auto;
+            height: auto;
+            background: none repeat scroll 0 0 white;
+            border: 0 none;
+            border-radius: 8px 8px 8px 8px;
+            box-shadow: -3px 3px 15px #888888;
+            color: black;
+            font: 12px sans-serif;
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://unpkg.com/react@15/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+</head>
+<body>
+
+<div id="app"></div>
+<script type="text/babel">
+
+function translate(x, y) {
+    return `translate(${x}, ${y})`;
+}
+
+class Slice extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isHovered: false,
+        };
+        this.svgElement = null;
+        this.onMouseOver = this.onMouseOver.bind(this);
+        this.onMouseOut = this.onMouseOut.bind(this);
+    }
+
+    componentDidMount() {
+        var node = ReactDOM.findDOMNode(this.svgElement);
+        d3.select(node)
+            .on('mousemove', () => {
+                this.updateMousePos();
+            });
+    }
+
+    updateMousePos() {
+        let [x, y] = d3.mouse(this.svgElement);
+        this.props.toolTipPos(true, x, y);
+    }
+
+    onMouseOver() {
+        this.setState({
+            isHovered: true,
+        });
+    }
+
+    onMouseOut() {
+        this.props.toolTipPos(false);
+        this.setState({
+            isHovered: false,
+        });
+    }
+
+    render() {
+        let {value, fill, innerRadius = 0, outerRadius, cornerRadius, padAngle, padRadius, ...props} = this.props;
+        if (this.state.isHovered) {
+            fill = 'red';
+        }
+
+        let arc = d3.arc()
+            .innerRadius(innerRadius)
+            .outerRadius(outerRadius)
+            .cornerRadius(cornerRadius)
+            .padAngle(padAngle)
+            .padRadius(padRadius);
+
+        return (
+            <g onMouseOver={this.onMouseOver}
+               onMouseOut={this.onMouseOut}
+               {...props}
+               ref={(input) => { this.svgElement = input; }}>
+                <path d={arc(value)} fill={fill} />
+            </g>
+        );
+    }
+
+}
+
+const Pie = ({x, y, innerRadius, outerRadius, cornerRadius, padAngle, padRadius, data, toolTipPos}) => {
+    let pie = d3.pie();
+    let colorScale = d3.schemeCategory10;
+
+    let renderSlice = (value, i) => {
+        return (
+            <Slice
+                key={i}
+                innerRadius={innerRadius}
+                outerRadius={outerRadius}
+                cornerRadius={cornerRadius}
+                padAngle={padAngle}
+                padRadius={padRadius}
+                value={value}
+                label={value.data}
+                fill={colorScale[i]}
+                toolTipPos={toolTipPos} />
+        );
+    };
+
+    return (
+        <g transform={translate(x, y)}>
+            {pie(data).map(renderSlice)}
+        </g>
+    );
+};
+
+
+
+const DomainLabels = ({segmentLabels, x, y, innerRadius, outerRadius}) => {
+
+    let renderLabels = (value, i) => {
+        let labelArc = d3.arc()
+            .innerRadius(innerRadius)
+            .outerRadius(outerRadius);
+
+        return (
+            <g key={i}
+               transform={translate(...labelArc.centroid(value))}>
+                <text
+                    y="10"
+                    fill="Purple"
+                    textAnchor="middle">
+                    {value.data.name.split(' ').map((subStr, idx) => {
+                        return (
+                            <tspan
+                                key={idx}
+                                x={0}
+                                dy={(idx > 0 ? 17 : 0)}>
+                                {subStr.replace('_', ' ')}
+                            </tspan>
+                        );
+                    })}
+                </text>
+                <text
+                    y="-10"
+                    fontWeight="bold"
+                    fill="Purple"
+                    textAnchor="middle">
+                    {value.data.level}
+                </text>
+            </g>
+        );
+    };
+
+    let pie = d3.pie()
+        .value((d) => d.value);
+
+    return (
+        <g transform={translate(x, y)}>
+            {pie(segmentLabels).map(renderLabels)}
+        </g>
+    );
+};
+
+class PieGraph extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            width: 0
+        };
+    }
+
+    componentDidMount() {
+        var width = ReactDOM.findDOMNode(this).offsetWidth;
+        this.setState({
+            width
+        });
+    }
+
+    render() {
+        let {width} = this.state;
+        let {segmentData, segmentLabels, toolTipPos} = this.props;
+
+        let height = width;
+        let minViewportSize = Math.min(width, height);
+
+        let gap = 12;
+        let segmentsSection = minViewportSize / segmentData.length;
+        let segmentRadius = (segmentsSection / ((segmentData.length) )) - gap;
+
+        let x = (width / 2);
+        let y = (width / 2);
+
+        let pies = segmentData.map((segment, idx) => {
+
+            let outerRadius = segmentRadius * (idx + 1) + gap;
+            let innerRadius = (segmentRadius * idx) + gap + gap;
+
+            return (
+                <Pie key={idx}
+                     x={x}
+                     y={y}
+                     innerRadius={innerRadius}
+                     outerRadius={outerRadius}
+                     padAngle={0.5}
+                     padRadius={24}
+                     data={segment.arr}
+                     toolTipPos={toolTipPos} />
+            );
+        });
+
+        return (
+            <div style={{width:'100%'}}>
+                <svg width={width+'px'} height={width+'px'}>
+                    {pies}
+                    <DomainLabels
+                        segmentLabels={segmentLabels}
+                        x={x}
+                        y={y}
+                        innerRadius={segmentRadius * (segmentData.length + 0.5)}
+                        outerRadius={segmentRadius * (segmentData.length + 1.25)}
+                        />
+                </svg>
+            </div>
+        );
+    }
+
+}
+
+const ToolTip = ({show, x, y}) => {
+    let display = show === true
+        ? 'inline-block'
+        : 'none';
+    return (
+        <div className="toolTip"
+             style={{display:display, left:x, top:y}}>
+             ToolTip
+        </div>
+    );
+};
+
+class PieGraphContainer extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            toolTipShow: false,
+            toolTipX: 0,
+            toolTipY: 0,
+        }
+        this.setToolTipPos = this.setToolTipPos.bind(this);
+    }
+
+    setToolTipPos(show, x, y) {
+        let {width} = this.props;
+        x = (x + width/2) +'px';
+        y = (y - width/2) +'px';
+        console.log(x +' - '+ y);
+        this.setState({
+            toolTipShow: show,
+            toolTipX: x,
+            toolTipY: y,
+        });
+    }
+
+    render() {
+        let {segmentData, segmentLabels, width} = this.props;
+        let {toolTipShow, toolTipX, toolTipY} = this.state;
+        return (
+            <div style={{width: (width+'px'),
+                         height: (width+'px'),
+                         background:'#CCC',
+                         border: '1px solid red',
+                         margin: '10px auto'}}>
+                <PieGraph
+                    segmentData={segmentData}
+                    segmentLabels={segmentLabels}
+                    toolTipPos={(show, x, y) => {this.setToolTipPos(show, x, y)}}
+                    />
+                <ToolTip show={toolTipShow} x={toolTipX} y={toolTipY} />
+            </div>
+        );
+    }
+
+}
+
+
+
+var segmentData = [
+    {
+        arr: [1,1,1,1,1]
+    },
+    {
+        arr: [1,1,1,1,1]
+    },
+    {
+        arr: [1,1,1,1,1]
+    },
+];
+
+var segmentLabels = [
+    {
+        name: 'Education',
+        level: 'Level 1',
+        value: 1,
+    },
+    {
+        name: 'Research',
+        level: 'Level 2',
+        value: 1,
+    },
+    {
+        name: 'Publication_& Professional Leadership',
+        level: 'Level 3',
+        value: 1,
+    },
+    {
+        name: 'Support_of Systems',
+        level: 'Level 4',
+        value: 1,
+    },
+    {
+        name: 'Direct_Care',
+        level: 'Level 5',
+        value: 1,
+    },
+];
+
+var pieGraph = <PieGraphContainer
+            segmentData={segmentData}
+            segmentLabels={segmentLabels}
+            width={600}
+            />;
+
+ReactDOM.render(pieGraph, document.getElementById('app'));
+
+</script>
+</body>
+</html>

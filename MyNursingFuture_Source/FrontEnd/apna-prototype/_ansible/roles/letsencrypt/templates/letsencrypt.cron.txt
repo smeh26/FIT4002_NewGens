@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+cd /opt/certbot
+
+./certbot-auto renew --webroot \
+    --noninteractive \
+    -w /var/www/{{ site_url }}/web \
+    --post-hook "service nginx reload"

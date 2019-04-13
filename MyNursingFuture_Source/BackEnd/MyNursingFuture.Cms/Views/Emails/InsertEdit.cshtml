@@ -1,0 +1,103 @@
+﻿@using MyNursingFuture.Util
+@model MyNursingFuture.Cms.Models.EmailViewModel
+@{
+    Layout = "~/Views/Shared/_InsertEditLayout.cshtml";
+    ViewBag.EntityName = "Emails";
+
+    var types = TypeHelper.GetAll<MyNursingFuture.DL.Models.EmailType>().Select(x => new SelectListItem()
+    {
+        Text = x.Description ?? x.Type,
+        Value = x.Type,
+        Selected = Model.Type == x.Type
+    }).ToArray();
+}
+
+@Html.HiddenFor(x => x.EmailId)
+@Html.HiddenFor(x => x.Operation)
+@Html.EditorFor(x => x.Type, "SelectList", new { List = types, htmlAttributes = new { @readonly = true } })
+@Html.EditorFor(x => x.Title)
+@Html.EditorFor(x => x.Body, "RichText", new { Configuration = @"{
+resetCss: true,
+btns: [
+['viewHTML'],
+['formatting'],
+'btnGrp-semantic',
+['superscript', 'subscript'],
+['link'],
+['insertImage'],
+'btnGrp-justify',
+'btnGrp-lists',
+['horizontalRule'],
+['removeformat'],
+['fullscreen']
+]
+}" })
+
+@section AfterForm {
+    <style>
+        .dl-horizontal dt {
+            text-align: left;
+        }
+    </style>
+
+
+    <div class="form-group">
+
+        <label class="control-label col-sm-2">Common Fields</label>
+        <div class="col-sm-10">
+            <dl class="list-unstyled dl-horizontal">
+                <dt>@@Model.SiteUrl</dt>
+                <dd>The base URL of the website</dd>
+                <dt>@@Model.AssetUrl</dt>
+                <dd>The base URL of assets for images and media</dd>
+                <dt>@@Model.EmailType</dt>
+                <dd>Type of the email being sent</dd>
+                <dt>@@Model.EmailTo</dt>
+                <dd>Address of the receiver</dd>
+                <dt>@@Model.EmailFrom</dt>
+                <dd>Address of the sender</dd>
+                <dt>@@Model.UserId</dt>
+                <dd>Id of the logged in user</dd>
+                <dt>@@Model.UserName</dt>
+                <dd>Name of the logged in user</dd>
+                <dt>@@Model.UserEmail</dt>
+                <dd>Email address of the logged in user</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2">Available Fields</label>
+        <div class="col-sm-10">
+            <dl class="list-unstyled dl-horizontal">
+
+
+
+                @switch (Model.Type)
+                {
+                    case "Contact":
+                        <dt>@@Model.Name</dt>
+                        <dt>@@Model.Email</dt>
+                        <dt>@@Model.Phone</dt>
+                        <dt>@@Model.Message</dt>
+                        <dt>@@Model.SectorName</dt>
+                        break;
+                    case "Feedback":
+                        <dt>@@Model.Title</dt>
+                        <dt>@@Model.ArticleId</dt>
+                        <dt>@@Model.Feedback</dt>
+                        <dt>@@Model.Positive</dt>
+                        break;
+                    case "RecoverPassword":
+                        <dt>@@Model.Token</dt>
+                        break;
+                    case "Report":
+                    case "Welcome":
+                        break;
+                }
+
+
+            </dl>
+        </div>
+    </div>
+}

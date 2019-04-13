@@ -1,0 +1,35 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+    ViewBag.EntityName = "Aspect";
+}
+
+
+@section PageTitle {
+    Aspects of Practice
+}
+
+@section ColumnLabels {
+    <th style="width: 33%">Title</th>
+    <th>Domain</th>
+    <th>Position</th>
+    <th>Status</th>
+}
+
+@foreach (var item in ViewBag.Aspects)
+{
+    <tr>
+        <td>@item.Title</td>
+        <td>@item.DomainName</td>
+        <td>
+            @CustomHelpers.UpdatePositionControl(item.AspectId, item.Position, "Aspects")
+        </td>
+        <td>@CustomHelpers.PublishedButton(item.Published, item.AspectId)</td>
+
+        <td>
+            @CustomHelpers.EditActionButton(item.AspectId)
+            @CustomHelpers.DeleteActionButton(item.AspectId)
+        </td>
+    </tr>
+}
+

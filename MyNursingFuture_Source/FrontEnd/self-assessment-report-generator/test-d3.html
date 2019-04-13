@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- saved from url=(0082)file:///D:/Programming/apna/repo/self-assessment-report-generator/test-report.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+
+path {
+  fill: #ccc;
+  stroke: #333;
+  stroke-width: 1.5px;
+  transition: fill 250ms linear;
+  transition-delay: 150ms;
+}
+
+path:hover {
+  fill: #999;
+  stroke: #000;
+  transition-delay: 0;
+}
+
+</style>
+</head><body>
+<script src="./test-d3_files/d3.v3.min.js.download"></script>
+<script src="./test-d3_files/d3-color.v1.min.js.download"></script>
+<script>
+
+var data = [
+  {domain: 0, levelOne: 1, levelTwo: 0, levelThree: 0},
+  {domain: 1, levelOne: 1, levelTwo: 0, levelThree: 0},
+  {domain: 2, levelOne: 1, levelTwo: 0, levelThree: 0},
+  {domain: 3, levelOne: 1, levelTwo: 0, levelThree: 0},
+  {domain: 4, levelOne: 1, levelTwo: 0, levelThree: 0}
+];
+
+var width = 960,
+    height = 500;
+
+var outerRadius = 75,
+    innerRadius = 10,
+    cornerRadius = 10,
+    levelDiff = 80;
+
+var getColour = function(d,l){
+  let c;
+  switch(d.data.domain){
+    case 0:
+      c = '#424447';
+    break;
+    case 1:
+      c = '#00AEE4';
+    break;
+    case 2:
+      c = '#ACD7A0';
+    break;
+    case 3:
+      c = '#FC7E8A';
+    break;
+    case 4:
+      c = '#52CBCB';
+    break;
+    default:
+    break;
+  }
+  let cc = d3.color(c);
+  
+  return cc;
+}
+
+var pie = d3.layout.pie().padAngle(.02).value(function(d){return 1;});
+
+var arc = d3.svg.arc()
+    .outerRadius(outerRadius)
+    .innerRadius(innerRadius);
+    
+var arcTwo = d3.svg.arc()
+    .outerRadius(outerRadius+levelDiff)
+    .innerRadius(innerRadius+levelDiff);
+    
+var arcThree = d3.svg.arc()
+    .outerRadius(outerRadius+levelDiff*2)
+    .innerRadius(innerRadius+levelDiff*2);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+var g = svg.selectAll("path")
+    .data(pie(data))
+    .enter().append('g');
+    
+g.append('path')
+  .attr('d', function(d){
+    return arc(d);
+  })
+  .style("fill", function (d) {
+    return getColour(d,d.levelOne);
+  });
+g.append('path')
+  .attr('d', function(d){
+    return arcTwo(d);
+  })
+  .style("fill", function (d) {
+    return getColour(d,d.levelTwo);
+  });
+g.append('path')
+  .attr('d', function(d){
+    return arcThree(d);
+  })
+  .style("fill", function (d) {
+    return getColour(d,d.levelThree);
+  });
+
+
+</script><svg width="960" height="500"><g transform="translate(480,250)"><g><path d="M0.7566246869625117,-74.99618336344243A75,75 0 0,1 71.09179899843306,-23.894688011488885L9.249493117324846,-3.800904770256725A10,10 0 0,0 0.756624686962505,-9.9713348696691Z" style="fill: rgb(66, 68, 71);"></path><path d="M1.7923149606289746,-154.98963709578103A155,155 0 0,1 146.8500485360568,-49.59902463716159L85.02425585006124,-29.510606858269266A90,90 0 0,0 1.792314960628969,-89.98215160287015Z" style="fill: rgb(66, 68, 71);"></path><path d="M2.9003826621796382,-234.9821009788042A235,235 0 0,1 222.58499081581357,-75.37189040699587L160.7598076534422,-55.28367067433439A170,170 0 0,0 2.9003826621796454,-169.97525637695895Z" style="fill: rgb(66, 68, 71);"></path></g><g><path d="M71.55941877170315,-22.45550233363794A75,75 0 0,1 44.69377278936988,60.228454021767654L6.473125812177479,7.622246533648833A10,10 0 0,0 9.717112890594922,-2.3617190924057816Z" style="fill: rgb(0, 174, 228);"></path><path d="M147.95776010027043,-46.18983899204263A155,155 0 0,1 92.55063620548383,124.33575406117176L54.34019494413389,71.74359353582398A90,90 0 0,0 86.13196741427487,-26.10142121315031Z" style="fill: rgb(0, 174, 228);"></path><path d="M224.37752588142146,-69.85503474576504A235,235 0 0,1 140.4654723719356,188.39971091094858L102.2554078169024,135.8080688773645A170,170 0 0,0 162.55234271905013,-49.766815013103546Z" style="fill: rgb(0, 174, 228);"></path></g><g><path d="M43.46952832913729,61.1179196868016A75,75 0 0,1 -43.4695283291373,61.11791968680159L-5.248881351944895,8.511712198682773A10,10 0 0,0 5.248881351944896,8.511712198682773Z" style="fill: rgb(172, 215, 160);"></path><path d="M89.65060968064121,126.44274666381351A155,155 0 0,1 -89.6506096806412,126.44274666381351L-51.440168419291275,73.85058613846574A90,90 0 0,0 51.44016841929129,73.85058613846574Z" style="fill: rgb(172, 215, 160);"></path><path d="M135.77255464414807,191.80931522061653A235,235 0 0,1 -135.772554644148,191.80931522061655L-97.56249008911487,139.2176731870324A170,170 0 0,0 97.56249008911485,139.21767318703243Z" style="fill: rgb(172, 215, 160);"></path></g><g><path d="M-44.69377278936986,60.228454021767675A75,75 0 0,1 -71.55941877170315,-22.45550233363795L-9.717112890594922,-2.3617190924057816A10,10 0 0,0 -6.473125812177477,7.622246533648836Z" style="fill: rgb(252, 126, 138);"></path><path d="M-92.5506362054838,124.33575406117176A155,155 0 0,1 -147.95776010027043,-46.189838992042624L-86.13196741427487,-26.10142121315029A90,90 0 0,0 -54.34019494413389,71.74359353582398Z" style="fill: rgb(252, 126, 138);"></path><path d="M-140.46547237193562,188.39971091094856A235,235 0 0,1 -224.3775258814215,-69.85503474576497L-162.55234271905013,-49.76681501310356A170,170 0 0,0 -102.25540781690236,135.80806887736452Z" style="fill: rgb(252, 126, 138);"></path></g><g><path d="M-71.09179899843308,-23.89468801148886A75,75 0 0,1 -0.7566246869625043,-74.99618336344243L-0.7566246869625062,-9.9713348696691A10,10 0 0,0 -9.249493117324846,-3.800904770256723Z" style="fill: rgb(82, 203, 203);"></path><path d="M-146.8500485360568,-49.59902463716156A155,155 0 0,1 -1.7923149606289936,-154.98963709578103L-1.792314960629,-89.98215160287015A90,90 0 0,0 -85.02425585006124,-29.510606858269263Z" style="fill: rgb(82, 203, 203);"></path><path d="M-222.58499081581357,-75.3718904069959A235,235 0 0,1 -2.900382662179719,-234.9821009788042L-2.900382662179629,-169.97525637695895A170,170 0 0,0 -160.75980765344224,-55.283670674334346Z" style="fill: rgb(82, 203, 203);"></path></g></g></svg></body></html>

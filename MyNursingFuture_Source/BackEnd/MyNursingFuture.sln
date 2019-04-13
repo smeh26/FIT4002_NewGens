@@ -1,0 +1,91 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2024
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNursingFuture.Cms", "MyNursingFuture.Cms\MyNursingFuture.Cms.csproj", "{0866598A-58C5-4BD1-A9DA-B6910F3D988F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNursingFuture.Api", "MyNursingFuture.Api\MyNursingFuture.Api.csproj", "{4B6F2E53-1C76-45F5-A436-16880D9895C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNursingFuture.Test", "MyNursingFuture.Test\MyNursingFuture.Test.csproj", "{01E090F1-5925-4EDA-B4A6-A7121D71C514}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNursingFuture.DL", "MyNursingFuture.DL\MyNursingFuture.DL.csproj", "{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNursingFuture.BL", "MyNursingFuture.BL\MyNursingFuture.BL.csproj", "{07CB0993-6A65-4842-A548-F23349D8C1BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNursingFuture.Util", "MyNursingFuture.Util\MyNursingFuture.Util.csproj", "{1C17B790-9470-4433-8FB5-7B8D529D95AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNursingFuture.AdminUser", "MyNursingFuture.AdminUser\MyNursingFuture.AdminUser.csproj", "{77FF4C34-C934-4B4A-A363-27BB21B954CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Jason RXP|Any CPU = Jason RXP|Any CPU
+		LocalDev|Any CPU = LocalDev|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.Jason RXP|Any CPU.ActiveCfg = Jason RXP|Any CPU
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.Jason RXP|Any CPU.Build.0 = Jason RXP|Any CPU
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.LocalDev|Any CPU.ActiveCfg = LocalDev|Any CPU
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.LocalDev|Any CPU.Build.0 = LocalDev|Any CPU
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0866598A-58C5-4BD1-A9DA-B6910F3D988F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.Jason RXP|Any CPU.ActiveCfg = Jason RXP|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.Jason RXP|Any CPU.Build.0 = Jason RXP|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.LocalDev|Any CPU.ActiveCfg = LocalDev|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.LocalDev|Any CPU.Build.0 = LocalDev|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B6F2E53-1C76-45F5-A436-16880D9895C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.Jason RXP|Any CPU.ActiveCfg = Jason RXP|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.Jason RXP|Any CPU.Build.0 = Jason RXP|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.LocalDev|Any CPU.ActiveCfg = LocalDev|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.LocalDev|Any CPU.Build.0 = LocalDev|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01E090F1-5925-4EDA-B4A6-A7121D71C514}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.Jason RXP|Any CPU.ActiveCfg = Jason RXP|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.Jason RXP|Any CPU.Build.0 = Jason RXP|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.LocalDev|Any CPU.ActiveCfg = LocalDev|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.LocalDev|Any CPU.Build.0 = LocalDev|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1D056D3-1FAE-4BBC-9284-CDB25A3C1517}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.Jason RXP|Any CPU.ActiveCfg = Jason RXP|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.Jason RXP|Any CPU.Build.0 = Jason RXP|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.LocalDev|Any CPU.ActiveCfg = LocalDev|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.LocalDev|Any CPU.Build.0 = LocalDev|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07CB0993-6A65-4842-A548-F23349D8C1BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.Jason RXP|Any CPU.ActiveCfg = Jason RXP|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.Jason RXP|Any CPU.Build.0 = Jason RXP|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.LocalDev|Any CPU.ActiveCfg = LocalDev|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.LocalDev|Any CPU.Build.0 = LocalDev|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C17B790-9470-4433-8FB5-7B8D529D95AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.Jason RXP|Any CPU.ActiveCfg = Jason RXP|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.Jason RXP|Any CPU.Build.0 = Jason RXP|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.LocalDev|Any CPU.ActiveCfg = LocalDev|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.LocalDev|Any CPU.Build.0 = LocalDev|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77FF4C34-C934-4B4A-A363-27BB21B954CB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A5A7BD58-261B-46BE-B3D5-1208CA3413D2}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,411 @@
+﻿@model MyNursingFuture.Cms.Models.MenuViewModel
+@using MyNursingFuture.BL.Managers
+<script>
+    var menusList = @Html.Raw(Json.Encode(ViewBag.Menus));
+</script>
+
+<h2>Menus</h2>
+@CustomHelpers.SuccessMessage(TempData)
+
+@Html.ActionLink("Go back", "Index", null, new { @class = "btn btn-primary btn-back" })
+
+@using (Html.BeginForm("Edit", "Menus", FormMethod.Post, new { id = "form-post" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="menuType" value="@ViewBag.MenuType" />
+    <input type="hidden" name="menus" value="" id="menu-hidden" />
+}
+
+<div id="line-link" class="form-group">
+    <div class="form-group">
+        <label>Link Text</label>
+        <input type="text" value="" id="name-text-link-line" />
+        <span class="error-message warning" id="name-link-line-text-error" style="display: none">Text for the link is required</span>
+    </div>
+
+    <div class="row text-link-select">
+        <div class="col-sm-2">
+            <input type="checkbox" value="text" name="text-link-line-group-check" />
+            Custom URL
+        </div>
+        <div class="col-sm-6">
+            <input type="text" value="" />
+            <span class="error-message warning" id="text-link-line-text-error" style="display: none">An URL for the text link is required</span>
+        </div>
+    </div>
+
+    <div class="row sections-link-select">
+        <div class="col-sm-2">
+            <input type="checkbox" value="sections" name="text-link-line-group-check" />
+            Sections
+        </div>
+        <div class="col-sm-4">
+            <select>
+                @foreach (var item in Model.Links)
+                {
+                    if (item.Type == LinksTypes.SECTION.ToString())
+                    {
+                        <option value="@item.Href">@item.Name</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row articles-link-select">
+
+        <div class="col-sm-2">
+            <input type="checkbox" value="articles" name="text-link-line-group-check" />
+            Articles
+        </div>
+        <div class="col-sm-4">
+            <select>
+                @foreach (var item in Model.Links)
+                {
+                    if (item.Type == LinksTypes.ARTICLE.ToString())
+                    {
+                        <option value="@item.Href">@item.Name</option>
+                    }
+                }
+            </select>
+
+        </div>
+    </div>
+
+    <div class="row sectors-link-select">
+
+        <div class="col-sm-2">
+            <input type="checkbox" value="sectors" name="text-link-line-group-check" />
+            Sectors
+        </div>
+        <div class="col-sm-4">
+            <select>
+                @foreach (var item in Model.Links)
+                {
+                    if (item.Type == LinksTypes.SECTOR.ToString())
+                    {
+                        <option value="@item.Href">@item.Name</option>
+                    }
+                }
+            </select>
+
+        </div>
+    </div>
+
+    <div class="row roles-link-select">
+
+        <div class="col-sm-2">
+            <input type="checkbox" value="roles" name="text-link-line-group-check" />
+            Roles
+        </div>
+        <div class="col-sm-4">
+            <select>
+                @foreach (var item in Model.Links)
+                {
+                    if (item.Type == LinksTypes.ROLE.ToString())
+                    {
+                        <option value="@item.Href">@item.Name</option>
+                    }
+                }
+            </select>
+
+        </div>
+    </div>
+
+    <div class="row domains-link-select">
+        <div class="col-sm-2">
+            <input type="checkbox" value="domains" name="text-link-line-group-check" />
+            Domains
+        </div>
+        <div class="col-sm-4">
+            <select>
+                @foreach (var item in Model.Links)
+                {
+                    if (item.Type == LinksTypes.DOMAIN.ToString())
+                    {
+                        <option value="@item.Href">@item.Name</option>
+                    }
+                }
+            </select>
+
+        </div>
+    </div>
+
+    <div class="row aspects-link-select">
+        <div class="col-sm-2">
+            <input type="checkbox" value="aspects" name="text-link-line-group-check" />
+            Aspects
+        </div>
+        <div class="col-sm-4">
+            <select>
+                @foreach (var item in Model.Links)
+                {
+                    if (item.Type == LinksTypes.ASPECT.ToString())
+                    {
+
+                        <option value="@item.Href">@item.Name</option>
+                    }
+                }
+            </select>
+
+        </div>
+    </div>
+</div>
+
+<button onclick="addLink()">Add to menu</button>
+
+
+<div class="row text-center" style="margin-top: 5px;">
+    <div class="col-xs-1">
+        Position
+    </div>
+    <div class="col-xs-4">
+        Title
+    </div>
+</div>
+<div id="menu-list" class="text-center"></div>
+
+<br />
+<span class="error-message" id="error-list" style="display: none">Not a single item were added</span>
+<button class="btn" onclick="submitForm();">Save</button>
+
+@section scripts
+{
+    <script>
+        var listMenu = [];
+        var renderIndex = 0;
+
+        function submitForm() {
+            $(".error-message").hide();
+            if (listMenu.length < 1) {
+                $("#error-list").show();
+                return;
+            }
+            $("#menu-hidden").val(JSON.stringify(listMenu));
+            $("#form-post").submit();
+        }
+
+        function loadMenus() {
+            var item = null;
+            for (var i = 0; i < menusList.length; i++) {
+                item = menusList[i];
+                item.Index = renderIndex;
+                item.ImagePath = aplicationPath + "/Content/img/";
+                listMenu.push(item);
+                renderIndex++;
+            }
+            renderMenu();
+        }
+
+        $(document).ready(function () {
+            loadMenus();
+            $("input[name='text-link-line-group-check']").click(function () {
+                var checked = $(this).is(":checked");
+                $("input[name='text-link-line-group-check']").each(function (i, item) {
+                    $(item).prop("checked", false);
+                });
+                $(this).prop("checked", checked);
+            });
+        });
+        function addLink() {
+            $(".error-message").hide();
+            var item = validateLineLink();
+            if (!item) {
+                return;
+            }
+
+            item.Index = renderIndex;
+            item.ImagePath = aplicationPath + "/Content/img/";
+            item.Submenu = false;
+            item.Separator = false;
+            listMenu.push(item);
+            renderMenu();
+            renderIndex++;
+        }
+
+        function renderMenu() {
+            for (var i = 0; i < listMenu.length; i++) {
+                listMenu[i].Position = i + 1;
+            }
+            var menu = $("#menu-list");
+            menu.html("");
+            var template = $('#menu-template').html();
+            var rendered = Mustache.render(template, { menu: listMenu });
+            menu.html(rendered);
+        }
+
+        function removeMenu(index) {
+            var item = null;
+            for (var i = listMenu.length - 1; i >= 0; i--) {
+                item = listMenu[i];
+                if (item.Index == index) {
+                    listMenu.splice(i, 1);
+                    break;
+                }
+            }
+            renderMenu();
+        }
+
+        function updateTitle(el, index) {
+            var sel = $(el).val();
+            for (var i = listMenu.length - 1; i >= 0; i--) {
+                item = listMenu[i];
+                if (item.Index == index) {
+                    item.Title = sel;
+                    break;
+                }
+            }
+        }
+
+        function updateSubmenu(el, index) {
+            var sel = $(el).is(":checked");
+            for (var i = listMenu.length - 1; i >= 0; i--) {
+                item = listMenu[i];
+                if (item.Index == index) {
+                    item.Submenu = sel;
+                    break;
+                }
+            }
+        }
+
+        function updateSeparator(el, index) {
+            var sel = $(el).is(":checked");
+            for (var i = listMenu.length - 1; i >= 0; i--) {
+                item = listMenu[i];
+                if (item.Index == index) {
+                    item.Separator = sel;
+                    break;
+                }
+            }
+        }
+
+        function upMenu(index) {
+            for (var i = 0; i < listMenu.length; i++) {
+                item = listMenu[i];
+                if (item.Index == index) {
+                    if (i != 0) {
+                        var aux = listMenu[i - 1];
+                        listMenu[i - 1] = item;
+                        listMenu[i] = aux;
+                    }
+                    break;
+                }
+            }
+            renderMenu();
+        }
+
+        function downMenu(index) {
+            for (var i = 0; i < listMenu.length; i++) {
+                item = listMenu[i];
+                if (item.Index == index) {
+                    if (i + 1 < listMenu.length) {
+                        var aux = listMenu[i + 1];
+                        listMenu[i + 1] = item;
+                        listMenu[i] = aux;
+                    }
+                    break;
+                }
+            }
+            renderMenu();
+        }
+
+
+        function validateLineLink() {
+
+            var textLink = {};
+            var textLinkName = $("#name-text-link-line").val();
+
+            if (textLinkName === "") {
+                $("#name-link-line-text-error").show();
+                return false;
+            }
+
+            textLink.Title = textLinkName;
+            var href = "";
+            $("#line-link input[name='text-link-line-group-check']").each(function (i, item) {
+                var itemQ = $(item);
+                if (itemQ.is(":checked")) {
+                    var chkVal = itemQ.val();
+
+                    switch (chkVal) {
+                        case "text":
+                            href = $("#line-link .text-link-select input[type='text']").val();
+                            if (href === "" || href === null) {
+                                $("#text-link-line-text-error").show();
+                            }
+                            textLink.type = "text";
+                            break;
+                        case "sections":
+                            href = $("#line-link .sections-link-select  select").val();
+                            textLink.type = "sections";
+                            break;
+                        case "articles":
+                            href = $("#line-link  .articles-link-select  select").val();
+                            textLink.type = "articles";
+                            break;
+                        case "roles":
+                            href = $("#line-link  .roles-link-select  select").val();
+                            textLink.type = "roles";
+                            break;
+                        case "domains":
+                            href = $("#line-link .domains-link-select  select").val();
+                            textLink.type = "domains";
+                            break;
+                        case "aspects":
+                            href = $("#line-link  .aspects-link-select  select").val();
+                            textLink.type = "aspects";
+                            break;
+                    }
+                    textLink.Href = href;
+                }
+            });
+            if (href === "") {
+                return false;
+            }
+            return textLink;
+        }
+    </script>
+
+    <script id="menu-template" type="x-tmpl-mustache">
+        {{#menu}}
+        <div class="row text-center row-table" style="margin-top: 5px;">
+            <div class="col-xs-1">
+                {{Position}}.
+            </div>
+            <div class="col-xs-3">
+                <input onchange="updateTitle(this, {{Index}})" type="text" value="{{Title}}" style="width: 100%" />
+            </div>
+            <div class="col-xs-2">
+                <label>Submenu</label>
+                {{#Submenu}}
+                <input onclick="updateSubmenu(this, {{Index}})" type="checkbox" checked />
+                {{/Submenu}}
+                {{^Submenu}}
+                <input onclick="updateSubmenu(this, {{Index}})" type="checkbox" />
+                {{/Submenu}}
+            </div>
+            <div class="col-xs-2">
+                <label>Separator</label>
+                {{#Separator}}
+                <input onclick="updateSeparator(this, {{Index}})" type="checkbox" checked />
+                {{/Separator}}
+                {{^Separator}}
+                <input onclick="updateSeparator(this, {{Index}})" type="checkbox" />
+                {{/Separator}}
+            </div>
+            <div class="col-xs-1">
+                <img onclick="downMenu({{Index}})" style="cursor:pointer" src="{{ImagePath}}arrow-down.png" />
+            </div>
+            <div class="col-xs-1">
+                <img onclick="upMenu({{Index}})" style="cursor:pointer" src="{{ImagePath}}arrow-up.png" />
+            </div>
+            <div class="col-xs-2">
+                <button onclick="removeMenu({{Index}})">X</button>
+            </div>
+        </div>
+        {{/menu}}
+
+    </script>
+}
+
+

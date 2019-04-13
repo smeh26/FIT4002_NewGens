@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Nursing Future - Reports</title>
+    <link href="https://mynursingfuture.com.au/cms/Content/jquery-ui.min.css" rel="stylesheet">
+    <link href="https://mynursingfuture.com.au/cms/Content/bootstrap.css" rel="stylesheet">
+    <link href="https://mynursingfuture.com.au/cms/Content/site.css" rel="stylesheet">
+    <link href="https://mynursingfuture.com.au/cms/Content/trumbowyg.min.css" rel="stylesheet">
+
+    <script src="https://mynursingfuture.com.au/cms/Scripts/modernizr-2.6.2.js"></script>
+
+</head>
+<body>
+  <header>
+      <h3>My Nursing Future - Reports</h3>
+      <a href="#">Visit Site</a>
+  </header>
+  <div class="container body-content">
+      
+
+<form action="/mnfreport" method="post" novalidate="novalidate">
+  <div class="form-group">
+      <div class="row">
+          <div class="col-sm-2">Username: </div>
+          <div class="col-sm-2"><input class="form-control" data-val="true" data-val-required="The Username field is required." id="Username" name="u" type="text" value=""></div>
+          <div class="col-sm-2"><span class="field-validation-valid" data-valmsg-for="Username" data-valmsg-replace="true"></span></div>
+      </div>
+      <div class="row">
+          <div class="col-sm-2">Password: </div>
+          <div class="col-sm-2"><input class="form-control" data-val="true" data-val-length="Invalid length" data-val-length-max="30" data-val-length-min="6" data-val-required="The Password field is required." id="Password" name="p" type="password"> </div>
+          <div class="col-sm-2"><span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <select name="type">
+            <option value="all">All question answers per user</option>
+            <option value="selfassessment">Self assessment results per user</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+          <div class="col-sm-2"><input type="submit" value="Login" class="btn"></div>
+      </div>
+  </div>
+</form>
+
+
+      <hr>
+      <footer>
+          <p>© 2017 - My Nursing Future</p>
+      </footer>
+  </div>
+  <script src="https://mynursingfuture.com.au/cms/Scripts/jquery-1.10.2.js"></script>
+
+  <script src="https://mynursingfuture.com.au/cms/Scripts/jquery.validate.js"></script>
+<script src="https://mynursingfuture.com.au/cms/Scripts/jquery.validate.unobtrusive.js"></script>
+
+  <script src="https://mynursingfuture.com.au/cms/Scripts/jquery-ui.min.js"></script>
+<script src="https://mynursingfuture.com.au/cms/Content/js/vendor/trumbowyg.min.js"></script>
+<script src="https://mynursingfuture.com.au/cms/Content/js/vendor/mustache.min.js"></script>
+
+  <script src="https://mynursingfuture.com.au/cms/Scripts/bootstrap.js"></script>
+<script src="https://mynursingfuture.com.au/cms/Scripts/respond.js"></script>
+
+</body>
+</html>

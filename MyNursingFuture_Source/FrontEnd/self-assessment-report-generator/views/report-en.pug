@@ -1,0 +1,250 @@
+html
+  head
+    title= title
+    link(rel='stylesheet', href=(baseUrl)+'assets/app.css')
+    link(rel='stylesheet', href=(baseUrl)+'assets/report.css')
+  body
+    div(class='container report')
+      div(class='row header-row')
+        div(class='col-4 top-logo')
+          img(src=(baseUrl)+'/assets/img/logo-static.png')
+        div(class='col-8')
+          h1= "Your Self Assessment Overview"
+          h2
+            span= "Date Taken:"
+            span(class='light')= date
+          h2
+            span= "Name:"
+            span(class='light')= name
+      
+      br
+      div(class='row main-pie-row')
+        div(class='col-7')
+          h3= "You are working at the following level of practice for each domain."
+          div(class='pie-container')
+            img(src=(baseUrl)+'/assets/img/big-pie-grey-bg.png' class='bg')
+            if domainScores["1"] >= 0
+              img(src=(baseUrl)+'/assets/img/big-pie-0-one.png')
+            if domainScores["1"] >= 0.3
+              img(src=(baseUrl)+'/assets/img/big-pie-0-two.png')
+            if domainScores["1"] > 0.6
+              img(src=(baseUrl)+'/assets/img/big-pie-0-three.png')
+            if domainScores["2"] >= 0
+              img(src=(baseUrl)+'/assets/img/big-pie-1-one.png')
+            if domainScores["2"] >= 0.3
+              img(src=(baseUrl)+'/assets/img/big-pie-1-two.png')
+            if domainScores["2"] > 0.6
+              img(src=(baseUrl)+'/assets/img/big-pie-1-three.png')
+            if domainScores["3"] >= 0
+              img(src=(baseUrl)+'/assets/img/big-pie-2-one.png')
+            if domainScores["3"] >= 0.3
+              img(src=(baseUrl)+'/assets/img/big-pie-2-two.png')
+            if domainScores["3"] > 0.6
+              img(src=(baseUrl)+'/assets/img/big-pie-2-three.png')
+            if domainScores["4"] >= 0
+              img(src=(baseUrl)+'/assets/img/big-pie-3-one.png')
+            if domainScores["4"] >= 0.3
+              img(src=(baseUrl)+'/assets/img/big-pie-3-two.png')
+            if domainScores["4"] > 0.6
+              img(src=(baseUrl)+'/assets/img/big-pie-3-three.png')
+            if domainScores["5"] >= 0
+              img(src=(baseUrl)+'/assets/img/big-pie-4-one.png')
+            if domainScores["5"] >= 0.3
+              img(src=(baseUrl)+'/assets/img/big-pie-4-two.png')
+            if domainScores["5"] > 0.6
+              img(src=(baseUrl)+'/assets/img/big-pie-4-three.png')
+        div(class='col-5')
+          div(class='legend-domain')
+            img(src=(baseUrl)+'/assets/img/direct-care.png')
+            h3(class='domain-0-text')=domainNames["1"]
+          div(class='legend-domain')
+            img(src=(baseUrl)+'/assets/img/education.png')
+            h3(class='domain-1-text')=domainNames["2"]
+          div(class='legend-domain')
+            img(src=(baseUrl)+'/assets/img/systems.png')
+            h3(class='domain-2-text')=domainNames["3"]
+          div(class='legend-domain')
+            img(src=(baseUrl)+'/assets/img/research.png')
+            h3(class='domain-3-text')=domainNames["4"]
+          div(class='legend-domain')
+            img(src=(baseUrl)+'/assets/img/leadership.png')
+            h3(class='domain-4-text')=domainNames["5"]
+      hr
+      div(class='row')
+        div(class='col-12')
+          h2= "Key:"
+      div(class='row text-center three-pie-row')
+        div(class='col-4')
+          img(src=(baseUrl)+'/assets/img/foundation.png')
+          p= "Foundation"
+        div(class='col-4')
+          img(src=(baseUrl)+'/assets/img/intermediate.png')
+          p= "Intermediate"
+        div(class='col-4')
+          img(src=(baseUrl)+'/assets/img/advanced.png')
+          p= "Advanced"
+      hr
+      div(class='row text-center')
+        div(class='col-4')
+          h2= "1."
+          p= "Read report and print or save to profile"
+        div(class='col-4')
+          h2= "2."
+          p= "take printed report and talk about your results with your manager or a professional mentor (if you have one ) Discuss the best actions you could take over the next 6 to 12 months"
+        div(class='col-4')
+          h2= "3."
+          p= "Take action!"
+      each domainScore, domainIndex in domainScores
+        div(class='row header-row break-before')
+          div(class='col-6')
+            h1= domainNames[domainIndex]
+          div(class='col-6 text-right')
+            p(class='no-bottom bold')
+              span= "Your level for "
+              span(class='domain-'+(domainIndex-1)+'-text')= domainNames[domainIndex]
+            ul(class='progress-pills')
+              if domainScore >= 0
+                li(class='filled domain-'+(domainIndex-1)+'-bg')
+              else
+                li(class='grey-bg')
+              if domainScore >= 0.3
+                li(class='filled domain-'+(domainIndex-1)+'-bg')
+              else
+                li(class='grey-bg')
+              if domainScore > 0.6
+                li(class='filled domain-'+(domainIndex-1)+'-bg')
+              else
+                li(class='grey-bg')
+            p
+              if domainScore > 0.6
+                span= "Advanced"
+              else if domainScore >= 0.3
+                span= "Intermediate"
+              else
+                span= "Foundation"
+        div(class='row')
+          div(class='col-6')
+            br
+            div(class='pie-container')
+              img(src=(baseUrl)+'/assets/img/big-pie-grey-bg-small.png' class='bg small')
+              if domainScore >= 0
+                img(src=(baseUrl)+'/assets/img/big-pie-'+(domainIndex-1)+'-one.png', class="slice")
+              if domainScore >= 0.3
+                img(src=(baseUrl)+'/assets/img/big-pie-'+(domainIndex-1)+'-two.png', class="slice")
+              if domainScore > 0.6
+                img(src=(baseUrl)+'/assets/img/big-pie-'+(domainIndex-1)+'-three.png', class="slice")
+          div(class='col-5 offset-1')
+            br
+            h2= "Areas of Strength"
+            each strengthValue, strengthIndex in domainStrengths[domainIndex]
+              div(class='area-of-strength')
+                each aspectValue, aspectIndex in aspects[domainIndex].sort(((a,b)=>{return a.aspectId - b.aspectId}))
+                  if aspectValue.aspectId == strengthValue
+                    p(class='no-bottom')
+                      span= aspectValue.name
+                    ul(class='progress-pills')
+                      if aspectValue.answer >= 0
+                        li(class='filled domain-'+(domainIndex-1)+'-bg')
+                      else
+                        li(class='grey-bg')
+                      if aspectValue.answer >= 0.3
+                        li(class='filled domain-'+(domainIndex-1)+'-bg')
+                      else
+                        li(class='grey-bg')
+                      if aspectValue.answer > 0.6
+                        li(class='filled domain-'+(domainIndex-1)+'-bg')
+                      else
+                        li(class='grey-bg')
+        div(class='row ')
+          div(class='col-8')
+            div(class='row header-row')
+              div(class='col-12')
+                h1= "Top 10 Actions"
+            div(class='row')
+              div(class='col-12')
+                ol(class='bold top-ten-actions')
+                  each actionValue, actionIndex in topActions[domainIndex]
+                    li(class='light')= actionValue.title
+          div(class='col-4 postcard')
+            h2= postcards[0].text
+        div(class='row header-row')
+          div(class='col-6')
+            h1= domainNames[domainIndex]
+            h4= "Aspects of Practice"
+          div(class='col-6 text-right')
+            p(class='no-bottom bold')
+              span= "Your level for "
+              span(class='domain-'+(domainIndex-1)+'-text')= domainNames[domainIndex]
+            ul(class='progress-pills')
+              if domainScore >= 0
+                li(class='filled domain-'+(domainIndex-1)+'-bg')
+              else
+                li(class='grey-bg')
+              if domainScore >= 0.3
+                li(class='filled domain-'+(domainIndex-1)+'-bg')
+              else
+                li(class='grey-bg')
+              if domainScore > 0.6
+                li(class='filled domain-'+(domainIndex-1)+'-bg')
+              else
+                li(class='grey-bg')
+            p
+              if domainScore > 0.6
+                span= "Advanced"
+              else if domainScore >= 0.3
+                span= "Intermediate"
+              else
+                span= "Foundation"
+        each aspectValue, aspectIndex in aspects[domainIndex]
+          div(class='aspect row '+(aspectIndex % 2 == 0 ? '' : 'dark' ))
+            div(class='col-12')
+              br
+              h2= aspectValue.name
+              p
+                span(class='bold')= "Definition; "
+                span= aspectValue.definition
+              div(class='big-pills')
+                ul(class='progress-pills')
+                  if aspectValue.answer >= 0
+                    li(class='filled domain-'+(domainIndex-1)+'-bg')
+                  else
+                    li(class='grey-bg')
+                  if aspectValue.answer >= 0.3
+                    li(class='filled domain-'+(domainIndex-1)+'-bg')
+                  else
+                    li(class='grey-bg')
+                  if aspectValue.answer > 0.6
+                    li(class='filled domain-'+(domainIndex-1)+'-bg')
+                  else
+                    li(class='grey-bg')
+                div(class='row')
+                  div(class='col-4')
+                    p= "Foundation"
+                  div(class='col-4 text-center')
+                    p= "Intermediate"
+                  div(class='col-4 text-right')
+                    p= "Advanced"
+                if aspectValue.answer > 0.6
+                  div(class="answer-box-wrapper advanced")
+                    span(class='answer-box-arrow')
+                    div(class='answer-box')
+                      p= aspectValue.answerText
+                else if aspectValue.answer >= 0.3
+                  div(class="answer-box-wrapper intermediate")
+                    span(class='answer-box-arrow')
+                    div(class='answer-box')
+                      p= aspectValue.answerText
+                else
+                  div(class="answer-box-wrapper foundation")
+                    span(class='answer-box-arrow')
+                    div(class='answer-box')
+                      p= aspectValue.answerText
+              br
+              br
+              if aspectValue.actionsToGrow.length > 0
+                div(class='row')
+                  div(class='col-12')
+                    h4= "Actions to grow to the next level:"
+                    ol(class='squeeze-top')
+                      each actionToGrowValue, actionToGrowIndex in aspectValue.actionsToGrow
+                        li= actionToGrowValue.text

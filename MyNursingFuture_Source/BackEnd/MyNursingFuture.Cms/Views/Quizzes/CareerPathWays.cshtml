@@ -1,0 +1,66 @@
+﻿@using MyNursingFuture.Cms.Models;
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+    ViewBag.Title = "Career Pathways";
+    ViewBag.EntityName = "Question";
+    ViewBag.DeleteController = "Questions";
+}
+
+
+@section PageTitle {
+    Career Pathway Questions
+}
+
+@section ColumnLabels {
+    <th>Text</th>
+    <th>Type</th>
+    <th>Position</th>
+}
+
+@section Actions {
+    <button class="btn btn-primary pull-right" onclick="$('#modal-questions').modal('show')">Add Question</button>
+}
+
+
+@foreach (var item in ViewBag.Quiz.Questions)
+{
+    <tr>
+        <td>@item.Text</td>
+        <td>@(TypeHelper.Get<QuestionTypes>(item.Type).Description)</td>
+        <td>@CustomHelpers.UpdatePositionControl(item.QuestionId, item.Position, "Questions")</td>
+        <td>@Html.ActionLink("Edit", "Edit", "Questions", new { id = item.QuestionId, type = item.Type, quizType = "PATHWAY" }, new { @class="btn btn-info btn-sm" })</td>
+        <td>@CustomHelpers.DeleteActionButton(item.QuestionId)</td>
+    </tr>
+}
+
+@section DeleteActionFields {
+    <input type="hidden" value="PATHWAY" name="quizType" />
+    <input type="hidden" name="domainId" value="@ViewBag.Quiz.DomainId" />
+}
+
+@section AfterTable {
+    <div class="modal fade" id="modal-questions" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Add a Question
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        @foreach (var type in TypeHelper.GetAll<QuestionTypes>())
+                        {
+                            <div class="col-xs-6">
+                                @Html.ActionLink(type.Description, "InsertPathway", "Questions", new { quizId = ViewBag.Quiz.QuizId, type = type.Type, quizType = "PATHWAY" }, new { @class = "btn inverse" })
+                            </div>
+                        }
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

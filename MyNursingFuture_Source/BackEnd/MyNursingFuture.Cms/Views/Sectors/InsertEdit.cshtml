@@ -1,0 +1,74 @@
+﻿@model MyNursingFuture.Cms.Models.SectorViewModel
+
+
+<h1>Sectors</h1>
+
+@Html.ActionLink("Go back", "Index", null, new { @class = "btn btn-primary btn-back" })
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@using (Html.BeginForm("InsertEdit", "Sectors", FormMethod.Post, new { id = "form-post", @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.SectorId)
+    @Html.HiddenFor(x => x.Operation)
+    if (Model.Operation == "E")
+    {
+        @Html.EditorFor(x => x.Name, new { @disabled = "disabled" })
+        @Html.HiddenFor(x => x.Name, new { @class = "form-control" })
+    }
+    else
+    {
+        @Html.EditorFor(x => x.Name)
+    }
+    @Html.EditorFor(x => x.Title)
+
+    <input type="submit" class="btn" value="Save" />
+}
+
+
+@if (Model.Operation == "E")
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                @Model.SectorEn.Type
+            </div>
+            <div class="col-sm-4">
+                @Html.ActionLink("Edit", "Edit", "SectorViews", new { id = Model.SectorEn.SectorViewId }, null)
+            </div>
+            <div class="col-sm-4">
+                @if (Model.SectorEn.Active)
+                {
+                    @Html.ActionLink("Set Inactive", "SetInactive", "SectorViews", new { id = Model.SectorEn.SectorViewId, sectorId = Model.SectorId }, null)
+                }
+                else
+                {
+                    @Html.ActionLink("Set Active", "SetActive", "SectorViews", new { id = Model.SectorEn.SectorViewId, sectorId = Model.SectorId }, null)
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                @Model.SectorRn.Type
+            </div>
+            <div class="col-sm-4">
+                @Html.ActionLink("Edit", "Edit", "SectorViews", new { id = Model.SectorRn.SectorViewId }, null)
+            </div>
+            <div class="col-sm-4">
+                @if (Model.SectorRn.Active)
+                {
+                    @Html.ActionLink("Set Inactive", "SetInactive", "SectorViews", new { id = Model.SectorRn.SectorViewId, sectorId = Model.SectorId }, null)
+                }
+                else
+                {
+                    @Html.ActionLink("Set Active", "SetActive", "SectorViews", new { id = Model.SectorRn.SectorViewId, sectorId = Model.SectorId }, null)
+                }
+
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,13 @@
+---
+- name: provision web instances
+  hosts: "tag_domain_{{ domain_tag }}:&tag_environment_{{ env }}"
+  remote_user: ubuntu
+  become: true
+  become_method: sudo
+  gather_facts: no
+
+  vars_files:
+    - "vars/{{ env }}.yml"
+
+  roles:
+    - deploy-symfony

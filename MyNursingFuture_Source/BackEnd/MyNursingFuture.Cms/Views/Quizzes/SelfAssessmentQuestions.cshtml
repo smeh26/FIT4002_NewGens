@@ -1,0 +1,114 @@
+﻿@using MyNursingFuture.Cms.Models;
+@using MyNursingFuture.BL.Entities;
+
+
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+
+    ViewBag.Title = "Self-Assessment Questions";
+    ViewBag.EntityName = "Question";
+
+    ViewBag.BackAction = "SelfAssessment";
+    ViewBag.BackController = "Quizzes";
+
+    ViewBag.DeleteController = "Questions";
+}
+
+@section ColumnLabels {
+    <th>Aspect Title</th>
+    <th>Question Type</th>
+    <th>Position</th>
+}
+
+@section Actions { }
+
+@foreach (AspectEntity aspect in ViewBag.Aspects)
+{
+
+    var item = (ViewBag.Quiz as QuizEntity).Questions.Single(q => q.AspectId == aspect.AspectId);
+
+    <tr>
+        <td>@aspect.Title</td>
+        <td>@(TypeHelper.Get<QuestionTypes>(item.Type).Description)</td>
+        <td>@CustomHelpers.UpdatePositionControl(item.QuestionId, item.Position, "Questions")</td>
+        <td>
+            <button class="btn btn-info btn-sm" onclick="modalShow(@aspect.AspectId)">Add Question</button>
+            @Html.ActionLink("Edit", "InsertAssessment", "Questions", new { quizId = ViewBag.Quiz.QuizId, type = item.Type, aspectId = item.AspectId }, new { @class = "btn btn-info btn-sm" })
+            @CustomHelpers.DeleteActionButton(item.QuestionId)
+        </td>
+    </tr>
+}
+
+@section DeleteActionFields {
+    <input type="hidden" value="ASSESSMENT" name="quizType" />
+    <input type="hidden" name="domainId" value="@ViewBag.Quiz.DomainId" />
+}
+
+@section AfterTable {
+    <div class="modal fade" id="modal-questions" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Add questions
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <button class="btn inverse" onclick="submitForm('RANGE')">Range Question</button>
+                        </div>
+                        <div class="col-xs-6">
+                            <button class="btn inverse" onclick="submitForm('CHOICE')">Single Choice Question</button>
+                        </div>
+                        <div class="col-xs-6">
+                            <button class="btn inverse" onclick="submitForm('MULTI')">Multiple Choices Question</button>
+                        </div>
+                        <div class="col-xs-6">
+                            <button class="btn inverse" onclick="submitForm('INPUT')">User Input Question</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    @using (Html.BeginForm("Delete", "Questions", FormMethod.Post, new { id = "form-delete" }))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" value="" id="delete-id" name="id" />
+        <input type="hidden" value="ASSESSMENT" name="quizType" />
+        <input type="hidden" name="domainId" value="@ViewBag.Quiz.DomainId" />
+    }
+
+
+    @using (Html.BeginForm("InsertAssessment", "Questions", FormMethod.Get, new { id = "form-new" }))
+    {
+        <input type="hidden" name="aspectId" id="quiz-aspect" value="" />
+        <input type="hidden" name="type" id="quiz-type" value="ASSESSMENT" />
+        <input type="hidden" name="quizId" value="@ViewBag.Quiz.QuizId" />
+    }
+}
+@section scripts{
+    <script>
+        function modalShow(aspectId) {
+            $("#quiz-aspect").val(aspectId);
+            $('#modal-questions').modal('show');
+        }
+        function submitForm(type) {
+            $("#quiz-type").val(type);
+            $("#form-new").submit();
+        }
+
+        function confirmDelete(id) {
+            $("#delete-id").val(id);
+            $("#confirm-delete").modal('show');
+        }
+
+    </script>
+    <script src="~/Content/js/custom/updatePosition.js"></script>
+
+}

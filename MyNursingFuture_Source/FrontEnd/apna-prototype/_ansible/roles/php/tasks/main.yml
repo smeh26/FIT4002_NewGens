@@ -1,0 +1,32 @@
+---
+- name: use ondrej/php repo
+  apt_repository: repo=ppa:ondrej/php update_cache=yes
+
+- name: install php packages
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - php{{ php_version }}
+    - php{{ php_version }}-cli
+    - php{{ php_version }}-fpm
+    - php{{ php_version }}-common
+    - php{{ php_version }}-curl
+    - php{{ php_version }}-gd
+    - php{{ php_version }}-mysql
+    - php{{ php_version }}-mcrypt
+    - php{{ php_version }}-xml
+    - php{{ php_version }}-zip
+
+- name: stop old php-fpm
+  service: name=php{{ php_version_old }}-fpm state=stopped
+  when: php_version_old is defined
+
+- name: setup php cli config
+  template: src=php-{{ php_version }}.cli.ini dest=/etc/php/{{ php_version }}/cli/php.ini
+
+- name: setup php fpm config
+  template: src=php-{{ php_version }}.fpm.ini dest=/etc/php/{{ php_version }}/fpm/php.ini
+  notify: restart php-fpm
+
+- name: setup fpm pool config
+  template: src=www.conf dest=/etc/php/{{ php_version }}/fpm/pool.d/www.conf
+  notify: restart php-fpm

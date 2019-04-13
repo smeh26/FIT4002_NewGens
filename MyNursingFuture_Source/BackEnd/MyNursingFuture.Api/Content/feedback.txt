@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome to My Nursing Future</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+    <style>
+        h1{
+            font-family:'Arial', 'sans-serif';
+        }
+        h3{
+            font-family:'Arial', 'sans-serif';
+            font-weight: lighter;
+            font-style: italic;
+        }
+        a{ text-decoration: none; color:#525456}
+    </style>
+</head>
+<body style="padding:0;margin:0; font-family:'Montserrat', 'Arial', 'sans-serif'; color:#525456">
+    <div style="text-align:center;">
+        <div style="max-width:80%; text-align:left; display:inline-block" >
+            <h1>My Nursing Future Article Feedback</h1>
+            <br /><br />
+			<h2>Article Title</h2>
+			<p>@ArticleTitle</p>
+			<h2>Article Id</h2>
+			<p>@ArticleTitle</p>
+			<h2>Message</h2>
+			<p>@ArticleFeedback</p>
+			<h2>Positive</h2>
+			<p>@Positive</p>
+        </div>
+    </div>
+</body>
+</html>

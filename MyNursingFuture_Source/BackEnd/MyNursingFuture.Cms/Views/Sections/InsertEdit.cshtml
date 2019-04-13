@@ -1,0 +1,210 @@
+﻿@using MyNursingFuture.Cms.Models
+@using MyNursingFuture.Util
+@model MyNursingFuture.Cms.Models.SectionViewModel
+@{
+    ViewBag.Title = Model.Operation == "E" ? "Edit" : "Insert";
+
+}
+<script>
+    var contentItems = null;
+</script>
+@if (Model.ContentItems != null)
+{
+    <script>
+        contentItems = @Html.Raw(Json.Encode(Model.ContentItems));
+    </script>
+}
+
+
+
+<h2>Section View @ViewBag.Title</h2>
+
+@CustomHelpers.SuccessMessage(TempData)
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-success" id="success-position" style="display: none">
+            Position updated
+        </div>
+        <div class="alert alert-danger" id="error-position" style="display: none">
+            An error occurred updating the position
+        </div>
+    </div>
+</div>
+
+
+@Html.ActionLink("Go Back", "Index", null, new { @class = "btn btn-primary btn-back" })
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th colspan="6">
+                <div class="col-sm-6">
+                    <div class="panel-body">
+                        @using (Html.BeginForm("InsertEdit", "Sections", FormMethod.Post, new { id = "post-form", @class = "form-horizontal" }))
+                        {
+                            @Html.HiddenFor(x => x.SectionId)
+                            @Html.HiddenFor(x => x.Operation)
+                            @Html.HiddenFor(x => x.ContentItemsJson)
+                            @Html.AntiForgeryToken()
+
+                            @Html.EditorFor(x => x.Name)
+                            @Html.EditorFor(x => x.Title)
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button class="btn btn-primary" onclick="$('#post-form').submit()"> Save</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    @if (Model.Operation == "E")
+    {
+        <thead>
+            <tr>
+                <th colspan="6">
+                    <button class="btn btn-primary pull-right" onclick="$('#content-items-modal').modal('show')">Add Content</button>
+                </th>
+            </tr>
+        </thead>
+    }
+    @if (Model.ContentItems != null)
+    {
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Text</th>
+                <th>Position</th>
+                <th colspan="2">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="content-items">
+            @foreach (var item in Model.ContentItems)
+            {
+                <tr>
+                    <td>@(TypeHelper.Get<ContentItemTypes>(item.Type).Description)</td>
+                    <td>@item.Title</td>
+                    <td>@item.TextShort</td>
+                    <td>
+
+                        <div class="input-group" style="width: 14em">
+                            <input type="number" class="form-control" value="@item.Position" id="post-@item.ContentItemId" />
+                            <span class="input-group-btn">
+                                <input type="button" class="btn btn-default" value="Update Position" onclick="updatePositionContentItem(@item.ContentItemId, 'post-@(item.ContentItemId)','success-position','error-position')" />
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        @if (@item.Type == "LINK" || @item.Type == "VIDEOEMBED" || @item.Type == "SINGLELINELINK" || @item.Type == "HEADING" || @item.Type == "DEFAULT" || @item.Type == "SINGLEBUTTONLINK" || @item.Type == "MARKUP" || @item.Type == "ACCORDION")
+                        {
+                            @Html.ActionLink("Edit", "Edit", "ContentItems", new { id = @item.ContentItemId, previous = "SECTION" }, null)
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-outline" onclick="confirmDelete(@item.ContentItemId)">X</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    } else
+    {
+        <tbody></tbody>
+    }
+</table>
+
+
+@using (Html.BeginForm("Delete", "Sections", FormMethod.Post, new { id = "form-delete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" value="" id="delete-id" name="id" />
+    <input type="hidden" value="@Model.SectionId" id="section-id" name="sectionId" />
+}
+
+
+
+<div class="modal fade" id="content-items-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Add content item
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    @foreach (var type in TypeHelper.GetAll<ContentItemTypes>())
+                    {
+                        <div class="col-xs-4 text-center" style="margin-bottom: 0.5em">
+                            @Html.ActionLink(type.Description, "Insert" + type.Category, "ContentItems", new { sectionId = Model.SectionId, type.Type }, new { @class = "btn btn-sm btn-primary" })
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Delete Content Item
+            </div>
+            <div class="modal-body">
+                Are you sure that you want to delete this content item?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" onclick="$('#form-delete').submit()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script src="~/Content/js/custom/updatePositionContentItems.js"></script>
+
+    <script>
+        function confirmDelete(id) {
+            $("#delete-id").val(id);
+            $("#confirm-delete").modal('show');
+        }
+    </script>
+
+    <script id="content-template" type="x-tmpl-mustache">
+        {{#items}}
+        <div class="row text-center" style="margin-top: 5px;">
+            <div class="col-xs-1">
+                {{Position}}.
+            </div>
+            <div class="col-xs-2">
+                {{Type}}
+            </div>
+            <div class="col-xs-2">
+                {{Title}}
+            </div>
+            <div class="col-sm-3">
+                {{TextShort}}
+            </div>
+            <div class="col-xs-1">
+                <img onclick="downAction({{Index}})" style="cursor:pointer" src="/Content/img/arrow-down.png" />
+            </div>
+            <div class="col-xs-1">
+                <img onclick="upAction({{Index}})" style="cursor:pointer" src="/Content/img/arrow-up.png" />
+            </div>
+            <div class="col-xs-1">
+                <button class="btn delete-btn" onclick="confirmDelete({{ContentItemId}})">X</button>
+            </div>
+        </div>
+        {{/items}}
+
+    </script>
+}

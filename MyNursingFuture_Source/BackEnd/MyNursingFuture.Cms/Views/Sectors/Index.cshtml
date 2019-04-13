@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+}
+
+@section ColumnLabels {
+    <th>Name</th>
+    <th>Title</th>
+    <th>Status</th>
+}
+
+@foreach (var item in ViewBag.Sectors)
+{
+    <tr>
+        <td>@item.Name</td>
+        <td>@item.Title</td>
+        <td>@CustomHelpers.PublishedButton(item.Published, item.SectorId)</td>
+        <td>
+            @CustomHelpers.EditActionButton(item.SectorId)
+        @CustomHelpers.DeleteActionButton(item.SectorId)
+    </td>
+</tr>
+}

@@ -1,0 +1,30 @@
+﻿@using MyNursingFuture.Cms.Models;
+@using MyNursingFuture.BL.Entities;
+
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+
+    ViewBag.Title = "Administrators";
+    ViewBag.EntityName = "Administrator";
+}
+
+@section ColumnLabels {
+    <th>Username</th>
+    <th>Name</th>
+}
+
+@foreach (AdministratorEntity item in ViewBag.Administrators)
+{
+    <tr>
+        <td>@item.Username</td>
+        <td>@item.Name</td>
+        <td>
+            @if (!item.Sealed)
+            {
+                @CustomHelpers.EditActionButton(item.AdministratorId)
+                       
+                @CustomHelpers.DeleteActionButton(item.AdministratorId)
+            }
+        </td>
+    </tr>
+}

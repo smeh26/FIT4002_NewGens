@@ -1,0 +1,289 @@
+﻿
+@model MyNursingFuture.Cms.Models.DomainViewModel
+@{
+    List<SelectListItem> frameworkList = new List<SelectListItem>();
+    var itemRn = new SelectListItem
+    {
+        Text = "RN",
+        Value = "rn"
+    };
+    itemRn.Selected = itemRn.Value == Model.Framework;
+    frameworkList.Add(itemRn);
+    var itemEn = new SelectListItem
+    {
+        Text = "EN",
+        Value = "en"
+    };
+    itemEn.Selected = itemEn.Value == Model.Framework;
+    frameworkList.Add(itemEn);
+}
+
+<script>
+    var actionListLoaded = null;
+</script>
+
+@if (Model.ActionsList != null)
+{
+    <script>
+        actionListLoaded = @Html.Raw(Json.Encode(Model.ActionsList));
+    </script>
+}
+
+
+<h2>Domains</h2>
+<div class="form-group btn-back">
+    <button class="btn btn-primary pull-right" onclick="submitForm()">
+        Save Domain
+    </button>
+    @Html.ActionLink("Go back", "Index", "Domains", null, new { @class = "btn btn-primary" })
+</div>
+@CustomHelpers.SuccessMessage(TempData)
+
+
+@using (Html.BeginForm("InsertEdit", "Domains", FormMethod.Post, new { id = "form-post", @enctype = "multipart/form-data", @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.DomainId)
+    @Html.HiddenFor(x => x.Operation)
+
+    @Html.EditorFor(x => x.Name)
+    @Html.EditorFor(x => x.Title)
+    @Html.EditorFor(x => x.Framework, "SelectList", new { List = frameworkList })
+
+
+    @Html.EditorFor(x => x.Text, "RichText")
+    @Html.EditorFor(x => x.Image, "Image", new { ErrorMessage = "An image is required"})
+    @Html.EditorFor(x => x.Icon, "Image", new { ErrorMessage = "An icon is required"})
+    
+    @Html.HiddenFor(x => x.ActionsListJson)
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <button class="btn btn-primary pull-right" onclick="submitForm()">Save Top Actions</button>
+        <h4>Top Actions for this Domain</h4>
+
+    </div>
+    <div class="panel-body">
+        <div class="alert alert-danger" style="display: none" id="action-autocomplete-error">An action must be selected</div>
+
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th colspan="6">
+
+                        <div class="alert alert-danger" style="display: none" id="action-added-error">Action already added</div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-1">Title</label>
+
+                                    <div class="col-sm-9">
+                                        <input type="text" id="action-autocomplete" class="form-control" />
+                                        <input type="hidden" id="action-autocomplete-selected" class="form-control" value="" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button class="btn btn-primary" onclick="addAction()">Add action</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Title</th>
+                    <th colspan="3">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="actions-list"></tbody>
+        </table>
+
+    </div>
+</div>
+
+
+
+@Html.Partial("ContentItems/_ImagesLoader")
+
+@section scripts{
+    <script>
+        var listActions = [];
+        var renderIndex = 0;
+
+        function submitForm() {
+            $(".error-message").hide();
+            var imgVal = $("#Image").val();
+            if (imgVal == "") {
+                $("#image-required-error").show();
+                return;
+            }
+
+            var iconVal = $("#Icon").val();
+            if (iconVal == "") {
+                $("#icon-required-error").show();
+                return;
+            }
+
+            //console.log('actions post', JSON.stringify(listActions), listActions);
+
+            $("#ActionsListJson").val(JSON.stringify(listActions));
+            //return;
+            $("#form-post").submit();
+
+        }
+
+        function addAction() {
+            $("#action-autocomplete-error").hide();
+            $("#action-added-error").hide();
+            var existingAction = $("#action-autocomplete-selected").val();
+            if (existingAction == "") {
+                $("#action-autocomplete-error").show();
+                return;
+            }
+            var item = JSON.parse(existingAction);
+
+            for (var i = 0; i < listActions.length; i++) {
+                if (listActions[i].ActionId == item.ActionId) {
+                    $("#action-added-error").show();
+                    return;
+                }
+            }
+
+
+            item.Index = renderIndex;
+            listActions.push(item);
+            renderActions();
+            renderIndex++;
+        };
+
+
+        function renderActions() {
+            for (var i = 0; i < listActions.length; i++) {
+                listActions[i].Position = i + 1;
+            }
+            var actionList = $("#actions-list");
+            actionList.html("");
+            var template = $('#action-template').html();
+            var rendered = Mustache.render(template, { actions: listActions });
+            actionList.html(rendered);
+        }
+
+        function removeAction(index) {
+            var item = null;
+            for (var i = listActions.length - 1; i >= 0; i--) {
+                item = listActions[i];
+                if (item.Index == index) {
+                    listActions.splice(i, 1);
+                    break;
+                }
+            }
+            renderActions();
+        }
+
+        function upAction(index) {
+            for (var i = 0; i < listActions.length; i++) {
+                item = listActions[i];
+                if (item.Index == index) {
+                    if (i != 0) {
+                        var aux = listActions[i - 1];
+                        listActions[i - 1] = item;
+                        listActions[i] = aux;
+                    }
+                    break;
+                }
+            }
+            renderActions();
+        }
+
+        function downAction(index) {
+            for (var i = 0; i < listActions.length; i++) {
+                item = listActions[i];
+                if (item.Index == index) {
+                    if (i + 1 < listActions.length) {
+                        var aux = listActions[i + 1];
+                        listActions[i + 1] = item;
+                        listActions[i] = aux;
+                    }
+                    break;
+                }
+            }
+            renderActions();
+        }
+        $(document).ready(function () {
+            if (actionListLoaded != null) {
+                var ac;
+                for (var i = 0; i < actionListLoaded.length; i++) {
+                    ac = actionListLoaded[i];
+                    ac.Index = renderIndex;
+                    ac.applicationPath = aplicationPath;
+                    renderIndex++;
+                    listActions.push(ac);
+                    renderActions();
+                }
+            }
+
+            var modalAc = $("#action-autocomplete");
+            modalAc.autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        dataType: "json",
+                        type: 'POST',
+                        url: aplicationPath + '/Domains/GetAction',
+                        data: { name: request.term },
+                        success: function (data) {
+                            if (data.Success) {
+                                var list = data.Entity;
+                                response($.map(list,
+                                    function (item) {
+                                        return {
+                                            label: item.Title,
+                                            value: item.ActionId
+                                        };
+                                    })
+                                );
+                            }
+
+                        },
+                        error: function (data) {
+                        }
+                    });
+                },
+                minLength: 3,
+                focus: function (event, ui) {
+                    event.preventDefault();
+                    modalAc.val(ui.item.label);
+                },
+                select: function (event, ui) {
+                    event.preventDefault();
+                    var item = ui.item || null;
+                    if (item !== null) {
+                        modalAc.val(item.label);
+                        var action = { ActionId: item.value, Title: item.label, applicationPath: aplicationPath };
+                        $("#action-autocomplete-selected").val(JSON.stringify(action));
+                    }
+                }
+            });
+        });
+
+
+    </script>
+
+    <script id="action-template" type="x-tmpl-mustache">
+        {{#actions}}
+        <tr>
+            <td>{{Position}}.</td>
+            <td>{{Title}}</td>
+            <td><img onclick="downAction({{Index}})" style="cursor:pointer" src="{{applicationPath}}/Content/img/arrow-down.png" /></td>
+            <td><img onclick="upAction({{Index}})" style="cursor:pointer" src="{{applicationPath}}/Content/img/arrow-up.png" /></td>
+            <td>
+                <button class="btn btn-danger btn-outline" onclick="removeAction({{Index}})">X</button>
+            </td>
+        </tr>
+        {{/actions}}
+
+    </script>
+}

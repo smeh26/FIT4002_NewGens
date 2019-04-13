@@ -1,0 +1,30 @@
+﻿@model MyNursingFuture.Cms.Models.PostCardViewModel
+@{
+    Layout = "~/Views/Shared/_InsertEditLayout.cshtml";
+    ViewBag.EntityName = "Postcard";
+    ViewBag.OnSave = "submitForm()";
+    ViewBag.EncType = "multipart/form-data";
+}
+
+@Html.HiddenFor(x => x.PostCardId)
+@Html.HiddenFor(x => x.Operation)
+@Html.EditorFor(x => x.Text, "RichText")
+@Html.EditorFor(x => x.Image, "Image", new { ErrorMessage = "An image is required", FileInput = Html.NameFor(x => x.ImageFile) })
+
+@section scripts {
+    <script>
+        function submitForm() {
+            var image = $("#@Html.IdFor(x => x.Image)").val();
+
+            $("#image-required-error").hide();
+
+            if (image == "") {
+                $("#image-required-error").show();
+            }
+
+            if ($("#post-form").valid() && image != "") {
+                $("#post-form").submit();
+            }
+        }
+    </script>
+}

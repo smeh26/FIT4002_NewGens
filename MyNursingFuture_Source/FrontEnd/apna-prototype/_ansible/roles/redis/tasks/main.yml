@@ -1,0 +1,10 @@
+---
+- name: install server
+  apt: pkg=redis-server state=latest
+
+- name: ensure service is restarted
+  service: name=redis-server state=restarted
+
+- name: install php package
+  apt: pkg=php5-redis state=latest
+  notify: restart php-fpm

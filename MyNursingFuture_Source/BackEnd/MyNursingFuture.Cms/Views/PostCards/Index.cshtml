@@ -1,0 +1,21 @@
+﻿
+@using MyNursingFuture.Cms.Models;
+@using MyNursingFuture.BL.Entities;
+
+@{
+    Layout = "~/Views/Shared/_IndexLayout.cshtml";
+    ViewBag.EntityName = "Post Card";
+}
+
+@section ColumnLabels {
+    <th>Text</th>
+}
+
+@foreach (PostCardEntity item in ViewBag.PostCards)
+{
+    <tr>
+        <td>@item.Text</td>
+        <td>@CustomHelpers.EditActionButton(item.PostCardId)
+        @CustomHelpers.DeleteActionButton(item.PostCardId)</td>
+    </tr>
+}

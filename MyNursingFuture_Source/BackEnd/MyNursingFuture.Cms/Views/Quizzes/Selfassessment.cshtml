@@ -1,0 +1,29 @@
+﻿@using MyNursingFuture.BL.Entities;
+@{
+    ViewBag.Title = "Self-Assessment Question";
+    var domains = ViewBag.Domains as List<DomainEntity>;
+}
+
+<h2>Self-Assessment Questions</h2>
+<div class="bar">
+    @Html.ActionLink("Go Back", "Index", "Home", null, new { @class = "btn btn-primary pull-left" })
+</div>
+
+@CustomHelpers.SuccessMessage(TempData)
+
+<div class="grid">
+    @foreach (var item in domains)
+    {
+
+        <div>
+            <a href="@Url.Action("SelfAssessmentQuestions", "Quizzes", new { domainId = item.DomainId })">
+                <h4>@item.Name</h4>
+                <img src="~/Content/img/Uploads/@item.Icon" onerror="this.className += 'missing'" alt="" />
+            </a>
+        </div>
+
+    }
+</div>
+
+
+

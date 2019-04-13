@@ -1,0 +1,46 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString();
+    ViewBag.EntityName = ViewBag.EntityName == null ? controllerName.Substring(0, controllerName.Length - 1) : ViewBag.EntityName;
+    ViewBag.OnSave = ViewBag.OnSave ?? "$('#post-form').submit()";
+}
+
+@if (IsSectionDefined("PageTitle"))
+{
+    <h2>@RenderSection("PageTitle")</h2>
+}
+else
+{
+    <h2>@(ViewBag.Title ?? ((Model.Operation == "E" ? "Edit" : "Insert") + " " + ViewBag.EntityName))</h2>
+}
+
+@CustomHelpers.SuccessMessage(TempData)
+
+@Html.ActionLink("Go back", "Index", (ViewBag.BackController as string ?? controllerName), null, new { @class = "btn btn-primary btn-back" })
+
+@RenderSection("BeforeForm", false)
+
+@using (Html.BeginForm(ViewBag.EditAction as string ?? "InsertEdit", ViewBag.EditController as string ?? controllerName, FormMethod.Post, new { id = "post-form", @class = "form-horizontal", enctype = ViewBag.EncType as string }))
+{
+    @Html.AntiForgeryToken()
+    @RenderBody()
+
+    <footer class="text-right">
+        @if (IsSectionDefined("FooterActions"))
+        {
+            @RenderSection("FooterActions", false)
+        }
+        else
+        {
+            <button type="submit" class="btn btn-primary" onclick="event.preventDefault(); @ViewBag.OnSave">
+                @(ViewBag.SaveButtonLabel as string ?? (Model.Operation == "E" ? "Save Changes" : "Create New"))
+            </button>
+        }
+    </footer>
+}
+
+@RenderSection("AfterForm", false)
+
+@section scripts {
+    @RenderSection("scripts", false)
+}

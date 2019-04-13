@@ -1,0 +1,65 @@
+---
+- name: launch prod instances
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  vars_files:
+    - "vars/{{ env }}.yml"
+
+  tasks:
+
+    - name: create web security group
+      local_action:
+        module: ec2_group
+        region: "{{ region }}"
+        name: "{{ security_group_web }}"
+        description: security group for web hosts
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: "{{ allowed_ip }}"
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 443
+            to_port: 443
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+
+    - name: launch web instances
+      ec2:
+        key_name: "{{ keyname }}"
+        group: "{{ security_group_web }}"
+        instance_type: "{{ web_instance_type }}"
+        image: ami-623c0d01
+        region: "{{ region }}"
+        wait: yes
+        instance_tags:
+          Name: "{{ domain_tag }}-{{ env }}"
+          class: web
+          environment: "{{ env }}"
+          domain: "{{ domain_tag }}"
+        exact_count: "{{ instance_count }}"
+        count_tag:
+          Name: "{{ domain_tag }}-{{ env }}"
+          environment: "{{ env }}"
+      register: ec2
+
+    - name: config dns
+      route53:
+        command: create
+        zone: "{{ site_domain }}"
+        record: "{{ site_url }}"
+        type: A
+        ttl: 300
+        overwrite: yes
+        value: "{{ item.public_ip }}"
+      register: rec
+      with_items: "{{ ec2.instances }}"
+      when: item.dns_name is defined
