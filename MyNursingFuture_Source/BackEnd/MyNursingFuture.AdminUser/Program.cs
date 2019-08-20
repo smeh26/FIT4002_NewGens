@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 using MyNursingFuture.BL.Entities;
 using MyNursingFuture.BL.Managers;
 
+/*
+ * This program is created for creating admin accounts on the server
+ * Build and run the binary to create the account. Make sure thhe settings of the database is 
+ */
+
 namespace MyNursingFuture.AdminUser
 {
     class Program
