@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
-import thunkMiddleware from 'redux-thunk'
-import { Provider, connect } from 'react-redux'
+import { connect } from 'react-redux'
 import { Route } from 'react-router'
-import { Link } from 'react-router-dom';
-import { ConnectedRouter, routerReducer, routerMiddleware, push } from 'react-router-redux'
+import { ConnectedRouter } from 'react-router-redux'
 import cookies from '../Misc/cookies';
+import RegisterUser from './RegisterUser'
 
 import { fetchFrameworkData, 
   closeModal, 
@@ -530,7 +528,8 @@ handleLogIn() {
             <Route exact path="/user/quizzes/:id" component={UserQuizzes} />
             
             <Route exact path="/user" component={UserHub} />
-            
+            <Route exact path="/user/register" component={RegisterUser} />
+
             <Footer />
             </div>
         }
@@ -557,7 +556,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onMount: function(title, setState) {
+    onMount: function() {
       dispatch(fetchFrameworkData());
       dispatch(fetchUserQuizzes());
 
