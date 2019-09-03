@@ -13,6 +13,7 @@ class Sidebar extends Component{
       cssClass += ' showing'
     }
     var loginMenu = [];
+    var employerLoginMenu = [];
     if (this.props.loggedIn){
       loginMenu = [
         { href: "#", title: 'Hi, ' + this.props.name, className: 'no-decoration'},
@@ -24,7 +25,22 @@ class Sidebar extends Component{
         ]
     } else {
       loginMenu = [
-        { href: "#", title: 'Sign in', className: 'sign-in', action: 'authModal'},
+        { href: "#", title: 'Nurse Sign in', className: 'sign-in', action: 'authModal'},
+        { href: "", spacer: true }
+      ];
+    }
+    if (this.props.loggedIn){
+      employerLoginMenu = [
+        { href: "#", title: 'Hi, ' + this.props.name, className: 'no-decoration'},
+        // { href: "/user/quizzes/selfAssessment", title: 'My self-assessments', className: 'sign-in'},
+        // { href: "/user/quizzes/careerPathways", title: 'Career quiz results', className: 'sign-in'},
+        { href: "/user/profile", title: 'Account settings', className: 'sign-in'},
+        { href: "#", title: 'Employer Sign out', className: 'sign-in', action: 'logOut'},
+        { href: "", spacer: true }
+        ]
+    } else {
+      employerLoginMenu = [
+        { href: "#", title: 'Employer Sign in', className: 'sign-in', action: 'authModal'},
         { href: "", spacer: true }
       ];
     }
@@ -40,6 +56,7 @@ class Sidebar extends Component{
       </div>
       <div className="content-container">
         <Menu menuData={loginMenu} />
+        <Menu menuData ={employerLoginMenu}/>
         <Menu menuData={sidebarMenuItems} />
       </div>
     </div>
