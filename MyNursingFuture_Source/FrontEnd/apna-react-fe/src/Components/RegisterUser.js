@@ -38,7 +38,7 @@ class RegisterUser extends React.Component {
         }
 
         if (this.state.loading) {
-            return <p>Loadinig....</p>
+            return <p>Loading....</p>
         }
 
         const { name, email, password } = this.state;
