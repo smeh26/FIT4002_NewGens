@@ -7,25 +7,14 @@ import { Link } from 'react-router-dom';
 class Header extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isHome: false,
-    }
   }
-
-// componentWillMount() {
-//   // if (window.location.pathname === "/"){
-//   //   this.setState({isHome: true})
-//   // }
-//   console.log(window.location);
-// }
-
 
   render() {
     const backgroundClass = (this.props.locationLabel == 'Career Advice'
       ? 'article-gradient-background'
       : '');
 
-    const  {onMenuIconClick} = this.props;
+    const  showMenu = window.location.pathname !== "/";
 
     return (
       <div>
@@ -41,8 +30,8 @@ class Header extends Component {
               <div className="header-col hidden-xs">
                 <span className="page-title">{this.props.locationLabel}</span>
               </div>
-              {window.location.pathname !== "/" && <div className="header-col menu-col">
-                <div onClick={() => onMenuIconClick()}>
+              {showMenu && <div className="header-col menu-col">
+                <div onClick={() => this.props.onMenuIconClick()}>
                   <span className="oi" data-glyph="menu"></span>
                 </div>
               </div>}

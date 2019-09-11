@@ -198,7 +198,7 @@ handleLogIn() {
                         <p>{this.props.userError}</p>
                         }
                         <button className="btn" onClick={this.handleLogIn} disabled={!this.state.inputs.email || !this.state.inputs.password}>Log in</button>
-                        
+                        <div><a href="/user/register">Register</a></div>
                         <a href="" onClick={this.handleRequestResetPassword}>Reset password</a>
                         <p>
                           If you are using your APNA member login details and need to reset your password click <a href="https://www.apna.asn.au/account/getanewpassword" target="_blank">here</a>.
