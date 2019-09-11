@@ -2,7 +2,7 @@ import React from 'react';
 import AppPage from './AppPage';
 
 const Home = () => (
-  <AppPage endpoint="home" />
+  <AppPage endpoint="main home" />
 )
 export default Home;
 
