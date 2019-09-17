@@ -34,18 +34,10 @@ namespace MyNursingFuture.Api.Controllers
         // POST: api/employers
         public HttpResponseMessage Post([FromBody]EmployerEntity value)
         {
-            System.Diagnostics.Debugger.Break();
+           // System.Diagnostics.Debugger.Break();
             var dump = ObjectDumper.Dump(value);
 
-            // Test code 
-
-
-            var value2 = new EmployerEntity();
-            value2.Email = "testemail01@gmail.com";
-            value2.EmployerName = "TCompany01";
-            value2.Password = "ABCdef123456";
-            value = value2;
-
+  
             //
             Console.WriteLine(dump);
             Result result = null;

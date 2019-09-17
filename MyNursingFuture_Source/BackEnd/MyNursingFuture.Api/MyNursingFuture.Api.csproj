@@ -104,6 +104,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ArticlesController.cs" />
+    <Compile Include="Controllers\EmployerLoginController.cs" />
     <Compile Include="Controllers\EmployersController.cs" />
     <Compile Include="Controllers\FrameworkController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
