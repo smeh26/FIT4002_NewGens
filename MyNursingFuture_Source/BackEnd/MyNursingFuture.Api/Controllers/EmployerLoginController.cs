@@ -86,10 +86,10 @@ namespace MyNursingFuture.Api.Controllers
                         }
                     }
                 }
-            }
+            }*/
 
             if (!result.Success)
-                return Request.CreateResponse(HttpStatusCode.OK, result);*/
+                return Request.CreateResponse(HttpStatusCode.OK, result);
 
             var employer = new EmployerModel();
             var employerEntity = (EmployerEntity)result.Entity;

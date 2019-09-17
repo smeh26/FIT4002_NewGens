@@ -514,6 +514,8 @@ namespace MyNursingFuture.BL.Managers
                     return result;
                 }
 
+
+
                 var countEmployers = (int)(((IEnumerable<dynamic>)result.Entity).First().n);
                 if (countEmployers > 0)
                 {
