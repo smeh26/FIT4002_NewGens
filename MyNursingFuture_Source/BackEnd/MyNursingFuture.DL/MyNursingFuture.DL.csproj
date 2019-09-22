@@ -71,6 +71,9 @@
     <Compile Include="Models\Article.cs" />
     <Compile Include="Models\Aspect.cs" />
     <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\Class1.cs" />
+    <Compile Include="Models\Employer.cs" />
+    <Compile Include="Models\Class2.cs" />
     <Compile Include="Models\Configuration.cs" />
     <Compile Include="Models\ContentItem.cs" />
     <Compile Include="Models\Definition.cs" />
