@@ -1,7 +1,7 @@
 const initialState = {
   user: {},
   quizzes: [],
-  loggedIn: false,
+  loggedIn: true,
   isLoading: false,
   error: undefined,
   message: undefined

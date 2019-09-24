@@ -88,6 +88,7 @@
     <Compile Include="Entities\DefinitionEntity.cs" />
     <Compile Include="Entities\EmailEntity.cs" />
     <Compile Include="Entities\DomainEntity.cs" />
+    <Compile Include="Entities\EmployerEntity.cs" />
     <Compile Include="Entities\IEntity.cs" />
     <Compile Include="Entities\ImageEntity.cs" />
     <Compile Include="Entities\LinkEntity.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Managers\DefinitionsManager.cs" />
     <Compile Include="Managers\DomainsManager.cs" />
     <Compile Include="Managers\EmailManager.cs" />
+    <Compile Include="Managers\EmployersManager.cs" />
     <Compile Include="Managers\EnumManager.cs" />
     <Compile Include="Managers\FrameworkManager.cs" />
     <Compile Include="Managers\ImageManager.cs" />

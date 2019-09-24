@@ -141,6 +141,32 @@ namespace MyNursingFuture.BL.Managers
             return token;
         }
 
+        public string GenerateEmployerToken(EmployerEntity employer)
+        {
+            var utc0 = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var issueTime = DateTime.Now;
+
+            var iat = (int)issueTime.Subtract(utc0).TotalSeconds;
+            var exp = (int)issueTime.AddDays(30).Subtract(utc0).TotalSeconds;
+
+            IJwtAlgorithm algorithm = new HMACSHA256Algorithm();
+            IJsonSerializer serializer = new JsonNetSerializer();
+            IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+            IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
+
+            var payload = new Dictionary<string, object>
+            {
+                { "EmployerID", employer.EmployerID },
+                { "Email", employer.Email },
+                { "EmployerName", employer.EmployerName },
+                { "exp", exp },
+                { "iat", iat }
+            };
+
+            var token = encoder.Encode(payload, SecretUserKey);
+            return token;
+        }
+
         public string GenerateRecoverPasswordToken(UserEntity user)
         {
             var utc0 = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
@@ -157,6 +183,30 @@ namespace MyNursingFuture.BL.Managers
             var payload = new Dictionary<string, object>
             {
                 { "UserId", user.UserId },
+                { "exp", exp },
+                { "iat", iat }
+            };
+
+            var token = encoder.Encode(payload, SecretRecoverKey);
+            return token;
+        }
+
+        public string GenerateRecoverPasswordToken(EmployerEntity employer)
+        {
+            var utc0 = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var issueTime = DateTime.Now;
+
+            var iat = (int)issueTime.Subtract(utc0).TotalSeconds;
+            var exp = (int)issueTime.AddDays(1).Subtract(utc0).TotalSeconds;
+
+            IJwtAlgorithm algorithm = new HMACSHA256Algorithm();
+            IJsonSerializer serializer = new JsonNetSerializer();
+            IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+            IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
+
+            var payload = new Dictionary<string, object>
+            {
+                { "UserId", employer.EmployerID },
                 { "exp", exp },
                 { "iat", iat }
             };

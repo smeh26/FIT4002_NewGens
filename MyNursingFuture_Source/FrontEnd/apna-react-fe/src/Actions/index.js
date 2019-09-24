@@ -362,6 +362,12 @@ export const setUserData = (user) => {
   }
 }
 
+export const setEmployerData = (employer) => {
+  return {
+    type: 'SET_EMPLOYER_DATA',
+    data: employer
+  }
+}
 export const startLogout = () => {
   return {
     type: 'START_LOGOUT'
@@ -378,6 +384,14 @@ export const endLogout = (message) => {
 export const unsetUserData = () => { // TODO this might not work right cuz merge not set
   return {
     type: 'UNSET_USER_DATA',
+    data: {}
+  }
+}
+
+
+export const unsetEmployerData = () => { 
+  return {
+    type: 'UNSET_EMPLOYER_DATA',
     data: {}
   }
 }
