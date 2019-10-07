@@ -216,6 +216,29 @@ namespace MyNursingFuture.DL
 
             return result;
         }
+/*        public Result ExecuteTransaction(List<QueryEntity> queries)
+
+
+        {
+            var result = new Result();
+            using (TransactionScope scope = new TransactionScope())
+            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["MyNursingFutureConnection"].ConnectionString))
+
+                try
+                {
+                    con.Open();
+                    result.Entity = con.Query(query.Query, query.Entity, commandType: CommandType.StoredProcedure);
+                    scope.Complete();
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(e);
+                    result.Success = false;
+                    result.Message = e.Message;
+                }
+
+            return result;
+        }*/
 
 
     }

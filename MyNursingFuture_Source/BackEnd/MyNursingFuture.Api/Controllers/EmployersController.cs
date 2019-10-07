@@ -32,6 +32,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         // POST: api/employers
+        [Route("api/v1/employers")]
         public HttpResponseMessage Post([FromBody]EmployerEntity value)
         {
            // System.Diagnostics.Debugger.Break();
@@ -58,7 +59,7 @@ namespace MyNursingFuture.Api.Controllers
             employer.Token = employerEntity.Token;
             employer.EmployerName = employerEntity.EmployerName;
             //employer.ApnaUser = false;
-            employer.EmployerID = employerEntity.EmployerID;
+            employer.EmployerID = employerEntity.EmployerId;
             result.Entity = employer;
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }

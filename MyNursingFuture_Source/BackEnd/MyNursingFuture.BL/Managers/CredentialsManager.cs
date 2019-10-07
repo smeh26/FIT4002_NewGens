@@ -156,7 +156,7 @@ namespace MyNursingFuture.BL.Managers
 
             var payload = new Dictionary<string, object>
             {
-                { "EmployerID", employer.EmployerID },
+                { "EmployerID", employer.EmployerId },
                 { "Email", employer.Email },
                 { "EmployerName", employer.EmployerName },
                 { "exp", exp },
@@ -206,7 +206,7 @@ namespace MyNursingFuture.BL.Managers
 
             var payload = new Dictionary<string, object>
             {
-                { "UserId", employer.EmployerID },
+                { "UserId", employer.EmployerId },
                 { "exp", exp },
                 { "iat", iat }
             };

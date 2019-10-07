@@ -491,6 +491,10 @@ namespace MyNursingFuture.BL.Managers
             return new Result(false);
         }
 
+        /*
+         Get Quizz result by Client ID
+             */
+
         public Result GetQuizzes(int userId, string type, bool complete)
         {
             try
@@ -508,6 +512,7 @@ namespace MyNursingFuture.BL.Managers
             }
             return new Result(false);
         }
+
 
 
         public Result GenerateRecoveringCode(UserEntity entity)
@@ -774,6 +779,27 @@ namespace MyNursingFuture.BL.Managers
             result = con.ExecuteQuery<UserEntity>(query);
             result.Message = result.Success ? "The user has been deleted" : "An error has occurred";
             return result;
+        }
+
+        /*
+         Get a list of all UserId
+             */
+        public Result GetAllUserId() {
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = new { };
+                query.Query = @"SELECT UserId FROM Users";
+                var result = con.ExecuteQuery(query);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+
         }
     }
 }

@@ -27,5 +27,11 @@ namespace MyNursingFuture.DL.Models
         public string Qualification { get; set; }
         public string Setting { get; set; }
         public bool SaveOnly { get; set; }
+
+        // V1 extension
+         public bool IsLookingForJob { get; set; }
+        public int MaxSalary { get; set; }
+        public int MinSalary { get; set; }
+
     }
 }

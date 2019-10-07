@@ -71,9 +71,9 @@
     <Compile Include="Models\Article.cs" />
     <Compile Include="Models\Aspect.cs" />
     <Compile Include="Models\Category.cs" />
-    <Compile Include="Models\Class1.cs" />
+    <Compile Include="Models\JobApplication.cs" />
+    <Compile Include="Models\JobListing.cs" />
     <Compile Include="Models\Employer.cs" />
-    <Compile Include="Models\Class2.cs" />
     <Compile Include="Models\Configuration.cs" />
     <Compile Include="Models\ContentItem.cs" />
     <Compile Include="Models\Definition.cs" />
@@ -81,10 +81,13 @@
     <Compile Include="Models\Domain.cs" />
     <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Models\IModel.cs" />
+    <Compile Include="Models\JobListingCriteria.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LogChange.cs" />
+    <Compile Include="Models\Membership.cs" />
     <Compile Include="Models\Menu.cs" />
     <Compile Include="Models\EndorsedLogo.cs" />
+    <Compile Include="Models\NurseSelfAssessmentAnswers.cs" />
     <Compile Include="Models\PostCard.cs" />
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\Quiz.cs" />

@@ -89,7 +89,7 @@ namespace MyNursingFuture.BL.Managers
                 result = con.InsertQuery(query);
                 if (result.Success)
                 {
-                    entity.EmployerID = (int)result.Entity;
+                    entity.EmployerId = (int)result.Entity;
                     entity.Password = "";
                     entity.Hash = "";
                     entity.Token = credentials.GenerateEmployerToken(entity);
@@ -277,7 +277,7 @@ namespace MyNursingFuture.BL.Managers
 
 
 
-            query.Entity = new { EmployerID = employer.EmployerID };
+            query.Entity = new { EmployerID = employer.EmployerId };
             query.Query = @"SELECT * FROM Employers
                             where EmployerID = @EmployerID and Active = 1 and ApnaUser = 0";
 
@@ -401,7 +401,7 @@ namespace MyNursingFuture.BL.Managers
 
                 query.Query = @"Update Employers Set Password = @Password, Hash = @Hash
                             where EmployerID = @EmployerID";
-                query.Entity = new { EmployerID = employer.EmployerID, Hash = entity.Hash, Password = entity.Password };
+                query.Entity = new { EmployerID = employer.EmployerId, Hash = entity.Hash, Password = entity.Password };
 
                 result = con.ExecuteQuery(query);
                 result.Message = result.Success ? "The user password has been updated" : "An error has occurred";
@@ -468,7 +468,7 @@ namespace MyNursingFuture.BL.Managers
 
                 query.Query = @"Update Employers Set Password = @Password, Hash = @Hash
                             where EmployerID = @EmployerID";
-                query.Entity = new { EmployerID = entity.EmployerID, Hash = entity.Hash, Password = entity.Password };
+                query.Entity = new { EmployerID = entity.EmployerId, Hash = entity.Hash, Password = entity.Password };
 
                 result = con.ExecuteQuery<EmployerEntity>(query);
                 result.Message = result.Success ? "The user password has been updated" : "An error has occurred";
@@ -527,7 +527,7 @@ namespace MyNursingFuture.BL.Managers
 
                 query.Query = @"Update Employers Set Name = @Name, Email = @Email
                             where EmployerID = @EmployerID and Active = 1";
-                query.Entity = new { EmployerID = entity.EmployerID, Email = entity.Email, Name = entity.EmployerName };
+                query.Entity = new { EmployerID = entity.EmployerId, Email = entity.Email, Name = entity.EmployerName };
                 result = con.ExecuteQuery<EmployerEntity>(query);
                 result.Message = result.Success ? "The user details has been updated" : "An error has occurred";
             }
@@ -552,7 +552,7 @@ namespace MyNursingFuture.BL.Managers
                 return result;
             }
             var employer = (EmployerEntity)result.Entity;
-            if (employer.EmployerID != entity.EmployerID)
+            if (employer.EmployerId != entity.EmployerId)
             {
                 result.Message = "Forbidden operation";
                 result.Success = false;
@@ -564,7 +564,7 @@ namespace MyNursingFuture.BL.Managers
             entity.Email = entity.Email.Trim().ToLower();
             query.Query = @"Update Employers Set Active = 0
                             where EmployerID = @EmployerID";
-            query.Entity = new { EmployerID = entity.EmployerID };
+            query.Entity = new { EmployerID = entity.EmployerId };
 
             result = con.ExecuteQuery<EmployerEntity>(query);
             result.Message = result.Success ? "The user has been deleted" : "An error has occurred";

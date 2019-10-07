@@ -32,6 +32,7 @@ namespace MyNursingFuture.Api.Controllers
 
         }
         // POST: api/Login
+        [Route("api/v1/EmployerLogin")]
         public async Task<HttpResponseMessage> Post([FromBody]EmployerEntity value)
         {
             Result result = null;
@@ -97,7 +98,7 @@ namespace MyNursingFuture.Api.Controllers
             employer.Token = employerEntity.Token;
             employer.EmployerName = employerEntity.EmployerName;
 //            employer.ApnaUser = apnaLogin;
-            employer.EmployerID = employerEntity.EmployerID;
+            employer.EmployerID = employerEntity.EmployerId;
 
             employer.Area = employerEntity.Area;
             employer.State = employerEntity.State;

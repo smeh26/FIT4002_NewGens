@@ -91,10 +91,14 @@
     <Compile Include="Entities\EmployerEntity.cs" />
     <Compile Include="Entities\IEntity.cs" />
     <Compile Include="Entities\ImageEntity.cs" />
+    <Compile Include="Entities\JobApplicationEntity.cs" />
+    <Compile Include="Entities\JobListingCriteriaEntity.cs" />
+    <Compile Include="Entities\JobListingEntity.cs" />
     <Compile Include="Entities\LinkEntity.cs" />
     <Compile Include="Entities\LogChangeEntity.cs" />
     <Compile Include="Entities\MenuEntity.cs" />
     <Compile Include="Entities\EndorsedLogoEntity.cs" />
+    <Compile Include="Entities\NurseSelfAssessmentAnswersEntity.cs" />
     <Compile Include="Entities\PostCardEntity.cs" />
     <Compile Include="Entities\QuestionEntity.cs" />
     <Compile Include="Entities\QuizEntity.cs" />
@@ -129,11 +133,16 @@
     <Compile Include="Managers\ImageManager.cs" />
     <Compile Include="Managers\IManager.cs" />
     <Compile Include="Managers\IPublishable.cs" />
+    <Compile Include="Managers\JobApplicationManager.cs" />
+    <Compile Include="Managers\JobListingCriteriaManager.cs" />
+    <Compile Include="Managers\JobListingManager.cs" />
     <Compile Include="Managers\LinksManager.cs" />
     <Compile Include="Managers\LogChangesManager.cs" />
+    <Compile Include="Managers\ManagersUtil.cs" />
     <Compile Include="Managers\MenusManager.cs" />
     <Compile Include="Managers\EndorsedLogosManager.cs" />
     <Compile Include="Managers\DataExtractManager.cs" />
+    <Compile Include="Managers\NurseSelfAssessmentAnswersManager.cs" />
     <Compile Include="Managers\PostCardsManager.cs" />
     <Compile Include="Managers\QuestionsManager.cs" />
     <Compile Include="Managers\QuizzesManager.cs" />
@@ -142,6 +151,8 @@
     <Compile Include="Managers\SectionsManager.cs" />
     <Compile Include="Managers\SectorsManager.cs" />
     <Compile Include="Managers\SectorViewsManager.cs" />
+    <Compile Include="Managers\SelfAssessmentManager.cs" />
+    <Compile Include="Managers\UsersManagerVersion1.cs" />
     <Compile Include="Managers\UsersManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
