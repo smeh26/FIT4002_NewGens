@@ -40,6 +40,11 @@ namespace MyNursingFuture.Api.Filters
             user.Token = token.Parameter;
             actionContext.Request.Properties.Add("user", user);
             base.OnAuthorization(actionContext);
+
+            var employer = resultToken.Entity as EmployerEntity;
+            employer.Token = token.Parameter;
+            actionContext.Request.Properties.Add("employer", employer);
+            base.OnAuthorization(actionContext);
         }
         private void Challenge(HttpActionContext actionContext)
         {

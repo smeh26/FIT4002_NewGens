@@ -113,6 +113,7 @@
     <Compile Include="Controllers\EmployerLoginController.cs" />
     <Compile Include="Controllers\EmployersController.cs" />
     <Compile Include="Controllers\FrameworkController.cs" />
+    <Compile Include="Controllers\JobApplicationController.cs" />
     <Compile Include="Controllers\JobListingController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Models\ArticleFeedback.cs" />
     <Compile Include="Models\ContactModel.cs" />
     <Compile Include="Models\EmployerModel.cs" />
+    <Compile Include="Models\JobListingModel.cs" />
     <Compile Include="Models\ListingCriteriaModel.cs" />
     <Compile Include="Models\NurseSelfAssesmentAnswerModel.cs" />
     <Compile Include="Models\QuizResultsModel.cs" />

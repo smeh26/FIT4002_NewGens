@@ -19,7 +19,8 @@ namespace MyNursingFuture.BL.Managers
         Result PublishJobListing(JobListingEntity entity, EmployerEntity employer);
         Result DeleteJobListing(JobListingEntity entity, EmployerEntity employer);
         Result GetListingById(int listingId);
-        Result GetPotentialApplicants(List<JobListingCriteriaEntity> criteria);
+        Result GetPotentialApplicantsByCriteria(List<JobListingCriteriaEntity> criteria);
+        Result GetPotentialApplicantsByListingId(int jobListingId);
 
     }
     public class JobListingManager : IJobListingManager
@@ -443,7 +444,7 @@ namespace MyNursingFuture.BL.Managers
 
         }
 
-        public Result GetPotentialApplicants(List<JobListingCriteriaEntity> criteria)
+        public Result GetPotentialApplicantsByCriteria(List<JobListingCriteriaEntity> criteria)
         {
             Result result = null;
             try
@@ -459,7 +460,7 @@ namespace MyNursingFuture.BL.Managers
                 {
                     /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
                                             , criterion.AspectId, criterion.Value , counter));*/
-                    query_string += String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
+                    query_string += String.Format("INNER JOIN (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
 
                     counter++;
                 }
@@ -484,6 +485,59 @@ namespace MyNursingFuture.BL.Managers
         }
 
 
+        public Result GetPotentialApplicantsByListingId(int jobListingId)
+        {
+            Result result = null;
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                var credentials = new CredentialsManager();
+
+                var JLM = new JobListingManager();
+                var JLCM = new JobListingCriteriaManager();
+
+                // get criteria list 
+                var Listing_Re = JLCM.GetCriteriaByListingId(jobListingId);
+                if (!Listing_Re.Success)
+                {
+                    result.Success = false;
+                    result.Message = Listing_Re.Message;
+                    return result; 
+                }
+                var criteria = (List<JobListingCriteriaEntity>)Listing_Re.Entity;
+
+                // Assemble inner join query
+                string query_string = "SELECT H.UserId FROM NurseSelfAssessmentAnswers AS H ";
+                List<String> select_queries = new List<String>();
+                int counter = 0;
+                foreach (JobListingCriteriaEntity criterion in criteria)
+                {
+                    /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
+                                            , criterion.AspectId, criterion.Value , counter));*/
+                    query_string += String.Format(" INNER JOIN (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
+
+                    counter++;
+                }
+
+                query.Query = query_string;
+                return con.ExecuteQuery(query);
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+            return result;
+
+        }
 
     }
 }

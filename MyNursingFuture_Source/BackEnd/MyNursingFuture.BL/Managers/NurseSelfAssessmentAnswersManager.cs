@@ -13,11 +13,11 @@ using System.Configuration;
 
 namespace MyNursingFuture.BL.Managers
 {   public interface INurseSelfAssessmentAnswersManager {
-        public Result GetAnswerbyID(int userId);
+        Result GetAnswerbyID(int userId);
         Result InsertAnswer(int userId, NurseSelfAssessmentAnswersEntity answer);
         Result InsertAnswers(int userId, List<NurseSelfAssessmentAnswersEntity> answer_list);
         Result UpdateAnswer(int userId, NurseSelfAssessmentAnswersEntity answer);
-        Result UpdateAnswers(int userId, List<NurseSelfAssessmentAnswersEntity> answer_list)
+        Result UpdateAnswers(int userId, List<NurseSelfAssessmentAnswersEntity> answer_list);
     }
     public class NurseSelfAssessmentAnswersManager : INurseSelfAssessmentAnswersManager
     {

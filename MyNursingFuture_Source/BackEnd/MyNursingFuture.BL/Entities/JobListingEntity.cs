@@ -9,6 +9,6 @@ namespace MyNursingFuture.BL.Entities
 {
     public class JobListingEntity : JobListing, IEntity
     {
-        public List<JobListingCriteria> JobListingCriteria { get; set; }
+        public List<JobListingCriteriaEntity> JobListingCriteria { get; set; }
     }
 }

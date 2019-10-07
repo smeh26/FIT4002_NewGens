@@ -25,7 +25,7 @@ namespace MyNursingFuture.Util.DataFormatter
 
         static void Main(string[] args)
         {
-
+/*
             Console.WriteLine("//Reconstructing database //");
             FrameworkManager FM = new FrameworkManager();
             AspectsManager AM = new AspectsManager();
@@ -39,7 +39,7 @@ namespace MyNursingFuture.Util.DataFormatter
 
             //Get Answers
 
-            var answ_Resul = NSAM.GetAllUsersIdWithQuizz_OldDB();
+            var answ_Resul = NSAM.GetAllQuizz_OldDB();
             var answ_List = (List<UsersQuizzesEntity>)answ_Resul.Entity;
             List<Object> results = new List<Object>();
 
@@ -51,7 +51,7 @@ namespace MyNursingFuture.Util.DataFormatter
                 Object answer = ressult_obj.GetType().GetProperty("Answer");
                 if (answer != null)
                 {
-                    var answer_dict = answer.ToDictionary(x => x.);
+                    //var answer_dict = answer.ToDictionary(x => x.);
 
 
 
@@ -75,8 +75,8 @@ namespace MyNursingFuture.Util.DataFormatter
         Dictionary<int, string> GetAnswer(string json)
         {
             JObject json_object = JObject.Parse(json);
-            IDictionary<JToken> 
-        }
+            //IDictionary<JToken> 
+        }*/
 
     }
 }

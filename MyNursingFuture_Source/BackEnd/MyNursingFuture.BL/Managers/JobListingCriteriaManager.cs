@@ -15,8 +15,8 @@ namespace MyNursingFuture.BL.Managers
 {
     public interface IJobListingCriteriaManager
     {
-        Result GetAnswerbyListing(int listingId);
-        Result GetAnswerbyListingbyCriteria(int listingId, int criteriaId);
+        Result GetCriteriaByListingId(int listingId);
+        Result GetAnswerbyListingbyAspect(int listingId, int aspectId);
         Result InsertCriterion(JobListingCriteriaEntity criterion);
         Result InsertCriteria(List<JobListingCriteriaEntity> criteria);
         Result UpdateCriterion(JobListingCriteriaEntity criterion);
@@ -26,7 +26,7 @@ namespace MyNursingFuture.BL.Managers
     {
 
 
-        public Result GetAnswerbyListing(int jobListingId)
+        public Result GetCriteriaByListingId(int jobListingId)
         /*
         * Get all criteria of a listing 
         * 
@@ -53,9 +53,9 @@ namespace MyNursingFuture.BL.Managers
             return result;
         }
 
-        public Result GetAnswerbyListingbyCriteria(int listingId, int criteriaId)
+        public Result GetAnswerbyListingbyAspect(int listingId, int aspectId)
         /*
-        * Get one criteria of a listing 
+        * Get one aspect of a listing 
         * 
         */
         {
@@ -67,9 +67,9 @@ namespace MyNursingFuture.BL.Managers
                 query.Entity = new
                 {
                     JobListingId = listingId,
-                    CriteriaId = criteriaId
+                    AspectId = aspectId
                 };
-                query.Query = @"SELECT * FROM JobListingCriteria WHERE JobListingId = @JobListingId AND  CriteriaId = @CriteriaId  ";
+                query.Query = @"SELECT * FROM JobListingCriteria WHERE JobListingId = @JobListingId AND  AspectId = @AspectId  ";
                 result = con.ExecuteQuery<JobListingCriteriaEntity>(query);
 
                 return result;
