@@ -32,6 +32,8 @@ namespace MyNursingFuture.Api.Controllers
         // POST: api/Users
         public HttpResponseMessage Post([FromBody]UserEntity value)
         {
+            System.Diagnostics.Debugger.Break();
+
             Result result = null;
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Password) || string.IsNullOrEmpty(value.Name))
             {

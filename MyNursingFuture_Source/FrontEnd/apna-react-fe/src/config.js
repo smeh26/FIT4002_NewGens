@@ -10,13 +10,11 @@ conf = {
 
 
 // if (process.env.NODE_ENV == 'production'){
-  // conf = {
     // apiUrl: 'http://180.235.131.104/',
     // apiBaseUrl: 'app/api/',
     // siteUrl: 'http://180.235.131.104/',
     // shareBaseUrl: 'http://180.235.131.104/',
     // imagesDirectory: 'app/Content/img/'
-  // };
 // } else {
 //   conf = {
 //     apiUrl: 'http://180.235.131.104/',

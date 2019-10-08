@@ -21,6 +21,7 @@ namespace MyNursingFuture.Api
 
             // Register your types, for instance using the scoped lifestyle:
             container.Register<IUsersManager, UsersManager>(Lifestyle.Scoped);
+            container.Register<IEmployersManager, EmployersManager>(Lifestyle.Scoped);
             container.Register<IFrameworkManager, FrameworkManager>(Lifestyle.Scoped);
             container.Register<ICacheManager, CacheManager>(Lifestyle.Scoped);
             container.Register<IAppConfigurationsManager, AppConfigurationsManager>(Lifestyle.Scoped);
