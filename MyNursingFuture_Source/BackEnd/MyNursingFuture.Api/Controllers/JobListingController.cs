@@ -54,7 +54,7 @@ namespace MyNursingFuture.Api.Controllers
 
             // return failed 
             if (!result.Success)
-                return Request.CreateResponse(HttpStatusCode.OK, result);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
 
             // if success
 
@@ -64,19 +64,37 @@ namespace MyNursingFuture.Api.Controllers
             jobListing.ModificationDate = listingEntity.ModificationDate;
             jobListing.CreateDate = listingEntity.CreateDate;
             result.Entity = jobListing;
+            return Request.CreateResponse(HttpStatusCode.Created, result);
+
+        }
+
+        [Route("api/v1/JobListings")]
+        public HttpResponseMessage GetAllListings()
+        {
+            Result result = null;
+            result = _jobListingManager.GetAllListings();
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+
             return Request.CreateResponse(HttpStatusCode.OK, result);
+
 
         }
 
         [JwtAuthorized]
         [Route("api/v1/JobListings/Criteria")]
-        public HttpResponseMessage Post([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
+        public HttpResponseMessage PutCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
         {
             Result result = null;
             if (jobListingCriteria.Count == 0)
             {
                 result = new Result(false);
-                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
             }
             result = _jobListingCriteriaManager.InsertCriteria(jobListingCriteria);
 
@@ -90,6 +108,14 @@ namespace MyNursingFuture.Api.Controllers
             Result result = null;
 
             result = _jobListingManager.GetListingById(id);
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
@@ -101,6 +127,13 @@ namespace MyNursingFuture.Api.Controllers
             Result result = null;
 
             result = _jobListingManager.GetPotentialApplicantsByListingId(id);
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
@@ -112,9 +145,20 @@ namespace MyNursingFuture.Api.Controllers
             Result result = null;
 
             result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
+
+
+
+
 
     }   
 }

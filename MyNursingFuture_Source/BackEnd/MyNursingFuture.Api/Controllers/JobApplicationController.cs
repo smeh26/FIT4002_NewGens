@@ -42,5 +42,87 @@ namespace MyNursingFuture.Api.Controllers
             _jobApplicationManager = jobApplicationManager;
 
         }
+
+        [JwtAuthorized]
+        public HttpResponseMessage Post([FromBody] JobApplicationEntity jobApplication)
+        {
+            Result result = new Result();
+            jobApplication.AppliedDate = DateTime.Now;
+            jobApplication.LastModifiedDate = jobApplication.AppliedDate;
+            result = _jobApplicationManager.CreateJobApplication(jobApplication);
+
+            // return failed 
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            // if success
+            return Request.CreateResponse(HttpStatusCode.Created, result);
+
+
+
+        }
+
+        [JwtAuthorized]
+        [Route("api/v1/Applications/Users/{id}")]
+        public HttpResponseMessage GetApplicationByUserId(int id)
+        {
+            Result result = new Result();
+
+            result = _jobApplicationManager.GetJobApplicationByUserId(id);
+
+            //If failed
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            //If if not found
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+            //If it is good
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
+
+        [JwtAuthorized]
+        [Route("api/v1/Applications/Listing/{id}")]
+        public HttpResponseMessage GetApplicationByListingId(int id)
+        {
+            Result result = new Result();
+
+            result = _jobApplicationManager.GetJobApplicationByListingId(id);
+
+            //If failed
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            //If if not found
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+            //If it is good
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+        }
+
+        [JwtAuthorized]
+        [Route("api/v1/Applications/{id}")]
+        public HttpResponseMessage GetApplicationById(int id)
+        {
+            Result result = new Result();
+
+            result = _jobApplicationManager.GetJobApplicationByApplicationId(id);
+
+            //If failed
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            //If if not found
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+            //If it is good
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+        }
+
+
     }
 }

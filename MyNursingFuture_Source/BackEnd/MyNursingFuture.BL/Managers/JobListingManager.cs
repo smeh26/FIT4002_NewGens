@@ -21,6 +21,7 @@ namespace MyNursingFuture.BL.Managers
         Result GetListingById(int listingId);
         Result GetPotentialApplicantsByCriteria(List<JobListingCriteriaEntity> criteria);
         Result GetPotentialApplicantsByListingId(int jobListingId);
+        Result GetAllListings();
 
     }
     public class JobListingManager : IJobListingManager
@@ -391,9 +392,48 @@ namespace MyNursingFuture.BL.Managers
                 Logger.Log(ex);
                 result.Entity = null;
                 result.Success = false;
-                result.Message = "An error occurred";
+                result.Message = "An error occurred" + ex.Message;
             }
             return result;
+        }
+
+        public Result GetAllListings()
+        {
+            Result result = null;
+            try
+            {
+
+                var credentials = new CredentialsManager();
+
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity
+                {
+                    Entity = new { },
+                    Query = @"SELECT *
+                          FROM JobListing
+                    "
+                };
+
+
+                return con.ExecuteQuery<JobListingEntity>(query);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = "An error occurred" + ex.Message;
+            }
+            return result;
+
+
         }
 
         private Result ValidateEmployer(JobListingEntity entity)

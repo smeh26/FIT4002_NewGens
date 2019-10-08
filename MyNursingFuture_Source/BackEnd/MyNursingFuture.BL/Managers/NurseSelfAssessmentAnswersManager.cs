@@ -94,28 +94,47 @@ namespace MyNursingFuture.BL.Managers
                     return result;
                 }
                 query.Entity = answer;
-               /* query.Entity = new { UserId = userId,
-                    AspectId = answer.AspectId,
-                   // AnswerId = answer.AnswerId,
-                    Value = answer.Value
+                /* query.Entity = new { UserId = userId,
+                     AspectId = answer.AspectId,
+                    // AnswerId = answer.AnswerId,
+                     Value = answer.Value
 
-                };*/
+                 };*/
 
                 // check if there is any records exist if yes, update, else, insert
 
-
-                query.Query = @"
+                String query_string = String.Format(@"
                 BEGIN TRAN
-                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = @UserId and AspectId = @AspectId )
+                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = {0} and AspectId = @AspectId )
                 BEGIN
-                    UPDATE NurseSelfAssessmentAnswers SET Value = @Value , LastUpdate= @LastUpdate
-                    WHERE UserId = @UserId and AspectId = @AspectId
+                    UPDATE NurseSelfAssessmentAnswers SET Value = @Value 
+                                                        , LastUpdate= @LastUpdate 
+                                                        , QuestionId = @QuestionId 
+                                                        , AnswerId = @AnswerId
+                                                        , TextAnswerField = @TextAnswerField
+                    WHERE UserId = {0} and AspectId = @AspectId
                 END 
                 ELSE
                 BEGIN 
-                INSERT INTO NurseSelfAssessmentAnswers (UserId, AspectId, Value)
-                                                    VALUES(@UserId, @AspectId, @Value)
-";
+                INSERT INTO NurseSelfAssessmentAnswers (UserId 
+                                                        ,AspectId
+                                                        ,Value 
+                                                        ,QuestionId
+                                                        ,AnswerId
+                                                        ,TextAnswerField
+                                                        ,LastUpdate)
+                                                    VALUES({0}
+                                                            , @AspectId
+                                                            , @Value 
+                                                            , @QuestionId
+                                                            ,@AnswerId
+                                                            ,@TextAnswerField
+                                                            ,@LastUpdate)
+                END
+                COMMIT TRAN
+
+", userId);
+                query.Query = query_string;
                 result = con.ExecuteQuery<UsersQuizzesEntity>(query);
 
                 return result;

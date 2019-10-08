@@ -16,6 +16,7 @@ namespace MyNursingFuture.BL.Managers
         Result GetByAspect(int aspectId);
         Result UpdatePosition(int questionId, int position);
         Result UpdateFieldNameAndPosition(int questionId, int position, string fieldName);
+        Result Get();
     }
     public class QuestionsManager : IQuestionsManager
     {
@@ -34,7 +35,24 @@ namespace MyNursingFuture.BL.Managers
 
         public Result Get()
         {
-            throw new NotImplementedException();
+            var con = new DapperConnectionManager();
+            var query = new QueryEntity();
+
+            query.Query = @"SELECT * FROM Questions
+WHERE AspectId IS NOT NULL
+                            ";
+            query.Entity = new {};
+
+            var result = con.ExecuteQuery<QuestionEntity>(query);
+
+            if (!result.Success)
+            {
+                result.Message = "Bad request - Question not found" ;
+                return result;
+            }
+
+            return result;
+
         }
 
         public Result Get(int id)

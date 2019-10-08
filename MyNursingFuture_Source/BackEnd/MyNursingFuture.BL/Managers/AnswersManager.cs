@@ -1,10 +1,12 @@
-﻿using System;
+﻿using MyNursingFuture.BL.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MyNursingFuture.BL.Entities;
 using MyNursingFuture.Util;
+using MyNursingFuture.DL;
+using System.Transactions;
 
 namespace MyNursingFuture.BL.Managers
 {
@@ -16,7 +18,29 @@ namespace MyNursingFuture.BL.Managers
     {
         public Result Get()
         {
-            throw new NotImplementedException();
+            var con = new DapperConnectionManager();
+            var query = new QueryEntity();
+
+            query.Query = @"SELECT * FROM(
+SELECT *,  RANK() OVER
+ (PARTITION BY a.QuestionId , a.Value ORDER BY a.AnswerId) RK
+
+FROM Answers  as a
+) as d
+
+WHERE  d.RK  = 1 and d.Type IS NULL
+                            ";
+            query.Entity = new { };
+
+            var result = con.ExecuteQuery<AnswerEntity>(query);
+
+            if (!result.Success)
+            {
+                result.Message = "Answers not found";
+                return result;
+            }
+
+            return result;
         }
 
         public Result Get(int id)
