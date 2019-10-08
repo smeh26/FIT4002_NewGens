@@ -339,6 +339,55 @@ namespace MyNursingFuture.BL.Managers
             return new Result(false);
         }
 
+        public Result SaveIsLookingForWork(int userId, bool isLookingForWork)
+        {
+            try
+            {
+                var con = new DapperConnectionManager();
+
+                var query = new QueryEntity();
+
+                query.Query = @"Update users
+                            set isLookingForJobs = @isLookingForJobs
+                            where UserId = @UserId";
+                query.Entity = new
+                {
+                    UserId = userId,
+                    isLookingForJobs = isLookingForWork
+                };
+                var result = con.ExecuteQuery<UserEntity>(query);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+        }
+
+        public Result SaveMinReqSalaryk(int userId, int MinSalaryReq)
+        {
+            try
+            {
+                var con = new DapperConnectionManager();
+
+                var query = new QueryEntity();
+
+                query.Query = @"Update users
+                            set MinSalaryExpectation = @MinSalaryExp
+                            where UserId = @UserId";
+                query.Entity = new
+                {
+                    UserId = userId,
+                    MinSalaryExp = MinSalaryReq
+                };
+                var result = con.ExecuteQuery<UserEntity>(query);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+        }
         public Result SaveQuiz(UsersQuizzesEntity quiz, Dictionary<int, object> questionsAnswers)
         {
             try

@@ -14,12 +14,18 @@ class UserProfile extends Component {
     this.state = {
       nameEditing: false,
       emailEditing: false,
+      minSalaryEditing: false,
+      locationPrefEditing: false,
+      isLookingForJobEditing: false,
       passwordEditing: false,
       inputs: {
         name: this.props.user.name,
         email: this.props.user.email,
         newPassword: '',
-        oldPassword: ''
+        oldPassword: '',
+        minSalaryReq: '',
+        locationPref: '',
+        isLookingForJob: ''
       }
     };
   }
@@ -61,14 +67,23 @@ class UserProfile extends Component {
         this.setState({passwordEditing: false});
         this.setState({inputs: Object.assign({},this.state.inputs,{oldPassword: '', newPassword: ''})});
         this.props.unsetUserError();
+      case 'minSalaryReq' :
+        this.setState({minSalaryEditing: !this.state.minSalaryEditing});
+        break;
+      case 'locationPref' :
+        this.setState({locationPrefEditing: !this.state.locationPrefEditing});
+        break;
+      case 'isLookingForJob' :
+        this.setState({isLookingForJobEditing: !this.state.isLookingForJobEditing});
+        break;
       default:
         break;
     }
   }
   
   handleSaveChange = function(){
-    if (this.props.user.name != this.state.inputs.name || this.props.user.email != this.state.inputs.email){
-      this.props.saveChangeToProfile(this.state.inputs.name, this.state.inputs.email);
+    if (this.props.user.name != this.state.inputs.name || this.props.user.email != this.state.inputs.email  || this.props.user.locationPref != this.state.inputs.locationPref || this.props.user.minSalaryReq != this.state.inputs.minSalaryReq  || this.props.user.isLookingForJob != this.state.inputs.isLookingForJob){
+      this.props.saveChangeToProfile(this.state.inputs.name, this.state.inputs.email, this.state.inputs.minSalaryReq, this.state.locationPref, this.state.isLookingForJob);
     }
   }
   
@@ -138,6 +153,61 @@ class UserProfile extends Component {
           }
         </div>
         
+        <div className="row">
+          <div className="col-12">
+            <h1>Minimum Salary Requirement ($):</h1>
+          </div>
+          {this.state.minSalaryEditing && 
+          <div className="col-12">
+          <div className="row">
+            <div className="col-6">
+              <div className="input-block">
+                <input type="text" value={this.state.inputs.minSalaryReq} name="minSalaryReq" placeholder="Minimum Salary Requirement in $" onChange={this.handleChangeInput} />
+              </div>
+            </div>
+            <div className="col-6">
+              <button className="btn" onClick={() => {this.handleToggleEditing('minSalaryReq');this.handleSaveChange();}}>Save</button>
+            </div>
+          </div>
+          </div>
+          }
+          {!this.state.minSalaryEditing && 
+          <div className="col-12">
+            <div className="row">
+              <div className="col-6"><p>{this.state.inputs.minSalaryReq}</p></div>
+              {!this.props.user.apnaUser && <div className="col-6"><button className="btn" onClick={() => {this.handleToggleEditing('minSalaryReq')}}>Edit</button></div>}
+            </div>
+          </div>
+          }
+        </div>
+        
+        <div className="row">
+          <div className="col-12">
+            <h1>Are you looking for Job?</h1>
+          </div>
+          {this.state.minSalaryEditing && 
+          <div className="col-12">
+          <div className="row">
+            <div className="col-6">
+              <div className="input-block">
+                <input type="checkbox" value={this.state.inputs.isLookingForJob} name="isLookingForJob" onChange={this.handleChangeInput} />
+              </div>
+            </div>
+            <div className="col-6">
+              <button className="btn" onClick={() => {this.handleToggleEditing('isLookingForJob');this.handleSaveChange();}}>Save</button>
+            </div>
+          </div>
+          </div>
+          }
+          {!this.state.isLookingForJobEditing && 
+          <div className="col-12">
+            <div className="row">
+              <div className="col-6"><p>{this.state.inputs.isLookingForJob}</p></div>
+              {!this.props.user.apnaUser && <div className="col-6"><button className="btn" onClick={() => {this.handleToggleEditing('isLookingForJob')}}>Edit</button></div>}
+            </div>
+          </div>
+          }
+        </div>
         <div className="row">
           {!this.props.user.apnaUser &&<div className="col-12">
             <h1>Password:</h1>
