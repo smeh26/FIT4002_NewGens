@@ -44,6 +44,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         [JwtAuthorized]
+        [Route("api/v1/Applications")]
         public HttpResponseMessage Post([FromBody] JobApplicationEntity jobApplication)
         {
             Result result = new Result();
