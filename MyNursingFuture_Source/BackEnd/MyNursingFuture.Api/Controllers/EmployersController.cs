@@ -33,7 +33,7 @@ namespace MyNursingFuture.Api.Controllers
 
         // POST: api/employers
         [Route("api/v1/employers")]
-        public HttpResponseMessage Post([FromBody]EmployerEntity value)
+        public HttpResponseMessage RegisterEmployer([FromBody]EmployerEntity value)
         {
            // System.Diagnostics.Debugger.Break();
             var dump = ObjectDumper.Dump(value);

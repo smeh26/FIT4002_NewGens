@@ -1,0 +1,181 @@
+{
+  "definitions": {
+    "JobListingCriteriaEntity": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "JobListingId": {
+          "type": "integer"
+        },
+        "UserId": {
+          "type": "integer"
+        },
+        "AspectId": {
+          "type": "integer"
+        },
+        "QuestionId": {
+          "type": "integer"
+        },
+        "AnswerId": {
+          "type": "integer"
+        },
+        "Value": {
+          "type": "number"
+        },
+        "TextAnswerField": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "LastUpdate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "JobListingId",
+        "UserId",
+        "AspectId",
+        "QuestionId",
+        "AnswerId",
+        "Value",
+        "TextAnswerField",
+        "LastUpdate"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "JobListingCriteria": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/definitions/JobListingCriteriaEntity"
+      }
+    },
+    "JobListingId": {
+      "type": "integer"
+    },
+    "EmployerId": {
+      "type": "integer"
+    },
+    "Title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "NurseType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "SpecialRequirements": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "PublishStatus": {
+      "type": "boolean"
+    },
+    "minSalary": {
+      "type": "integer"
+    },
+    "maxSalary": {
+      "type": "integer"
+    },
+    "CreateDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ApplicationDeadline": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ModificationDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Area": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "State": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "Country": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "Suburb": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "PostalCode": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "AddressLine1": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "AddressLine2": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "Completed": {
+      "type": "boolean"
+    },
+    "JobType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "JobListingCriteria",
+    "JobListingId",
+    "EmployerId",
+    "Title",
+    "NurseType",
+    "SpecialRequirements",
+    "PublishStatus",
+    "minSalary",
+    "maxSalary",
+    "CreateDate",
+    "ApplicationDeadline",
+    "ModificationDate",
+    "Area",
+    "State",
+    "Country",
+    "Suburb",
+    "PostalCode",
+    "AddressLine1",
+    "AddressLine2",
+    "Completed",
+    "JobType"
+  ]
+}

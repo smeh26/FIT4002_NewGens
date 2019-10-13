@@ -15,13 +15,14 @@ namespace MyNursingFuture.BL.Managers
     public interface IJobListingManager
     {
         Result CreateJobListing(JobListingEntity entity, EmployerEntity employer);
+        Result CreateJobListingById(JobListingEntity entity, int employerId); // Working, tested
         Result EditJobListing(JobListingEntity entity, EmployerEntity employer);
         Result PublishJobListing(JobListingEntity entity, EmployerEntity employer);
         Result DeleteJobListing(JobListingEntity entity, EmployerEntity employer);
-        Result GetListingById(int listingId);
+        Result GetListingById(int listingId); //working, tested
         Result GetPotentialApplicantsByCriteria(List<JobListingCriteriaEntity> criteria);
         Result GetPotentialApplicantsByListingId(int jobListingId);
-        Result GetAllListings();
+        Result GetAllListings();// working, tested 
 
     }
     public class JobListingManager : IJobListingManager
@@ -37,7 +38,7 @@ namespace MyNursingFuture.BL.Managers
 
                 // Check if listing is valid
 
-                query.Query = @"SELECT * FROM JobListing
+                query.Query = @"SELECT * FROM JobListings
                             where JobListingId = @JobListing";
                 query.Entity = entity;
                 result = con.ExecuteQuery<UserEntity>(query);
@@ -109,7 +110,7 @@ namespace MyNursingFuture.BL.Managers
 
 
                 query.Entity = entity;
-                query.Query = @"INSERT INTO [dbo].[JobListing]
+                query.Query = @"INSERT INTO [dbo].[JobListings]
                                            ([EmployerId]
                                            ,[Title]
                                            ,[NurseType]
@@ -149,6 +150,103 @@ namespace MyNursingFuture.BL.Managers
                                            ,@AddressLine2
                                            ,@Completed
                                            ,@JobType)";
+
+
+                result = con.ExecuteQuery<JobListingEntity>(query);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = "An error occurred";
+            }
+            return result;
+
+
+        }
+
+        public Result CreateJobListingById(JobListingEntity entity, int employerId)
+        {
+            Result result = null;
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                var credentials = new CredentialsManager();
+
+
+                // check if the listing has required fields
+                if (entity.Title == null ||
+                    entity.NurseType == null ||
+                    entity.Suburb == null)
+                {
+
+                    entity.PublishStatus = false;
+                }
+
+                entity.CreateDate = DateTime.Now;
+                entity.ModificationDate = entity.CreateDate;
+
+                if (entity.ApplicationDeadline < entity.CreateDate) entity.ApplicationDeadline = entity.CreateDate;
+
+                // TODO : check for each element type and length
+
+
+
+                query.Entity = entity;
+                query.Query = @"
+
+
+INSERT INTO [dbo].[JobListings]
+                                           ([EmployerId]
+                                           ,[Title]
+                                           ,[NurseType]
+                                           ,[SpecialRequirements]
+                                           ,[PublishStatus]
+                                           ,[MinSalary]
+                                           ,[MaxSalary]
+                                           ,[CreateDate]
+                                           ,[ApplicationDeadline]
+                                           ,[ModificationDate]
+                                           ,[Area]
+                                           ,[State]
+                                           ,[Country]
+                                           ,[Suburb]
+                                           ,[PostalCode]
+                                           ,[AddressLine1]
+                                           ,[AddressLine2]
+                                           ,[Completed]
+                                           ,[JobType])
+
+                                     VALUES
+                                           ( " + employerId.ToString() + @" 
+                                           ,@Title
+                                           ,@NurseType
+                                           ,@SpecialRequirements
+                                           ,@PublishStatus
+                                           ,@MinSalary
+                                           ,@MaxSalary
+                                           ,@CreateDate
+                                           ,@ApplicationDeadline
+                                           ,@ModificationDate
+                                           ,@Area
+                                           ,@State
+                                           ,@Country
+                                           ,@Suburb
+                                           ,@PostalCode
+                                           ,@AddressLine1
+                                           ,@AddressLine2
+                                           ,@Completed
+                                           ,@JobType) ;
+                                    
+";
 
 
                 result = con.InsertQuery(query);
@@ -205,7 +303,7 @@ namespace MyNursingFuture.BL.Managers
 
 
                 query.Entity = entity;
-                query.Query = @"UPDATE [dbo].[JobListing] set 
+                query.Query = @"UPDATE [dbo].[JobListings] set 
                                            [EmployerId] = @EmployerId 
                                            ,[Title] = @Title
                                            ,[NurseType] = ,@NurseType
@@ -272,7 +370,7 @@ namespace MyNursingFuture.BL.Managers
 
 
                 query.Entity = entity;
-                /*                query.Query = @"UPDATE [dbo].[JobListing] set 
+                /*                query.Query = @"UPDATE [dbo].[JobListings] set 
                                                            [EmployerId] = @EmployerId 
                                                            ,[Title] = @Title
                                                            ,[NurseType] = ,@NurseType
@@ -293,7 +391,7 @@ namespace MyNursingFuture.BL.Managers
                                                            ,[JobType] =@JobType
                                                      WHERE JobListingId = @JobListingId";*/
 
-                query.Query = @"UPDATE [dbo].[JobListing] set [PublishStatus] = @PublishStatus  WHERE JobListingId = @JobListingId";
+                query.Query = @"UPDATE [dbo].[JobListings] set [PublishStatus] = @PublishStatus  WHERE JobListingId = @JobListingId";
                 result = con.InsertQuery(query);
 
 
@@ -339,7 +437,7 @@ namespace MyNursingFuture.BL.Managers
 
                 // create a query for hiding the listing 
                 query.Entity = entity;
-                query.Query = @"UPDATE JobListing set Hidden = 1 WHERE JobListingId = @JobListingId";
+                query.Query = @"UPDATE JobListings set Hidden = 1 WHERE JobListingId = @JobListingId";
                 con.ExecuteQuery(query);
                 result.Message = result.Success ? "The listing has been deleted" : "An error has occurred";
                 return result;
@@ -373,7 +471,7 @@ namespace MyNursingFuture.BL.Managers
                 {
                     Entity = new { JobListingId = listingId },
                     Query = @"SELECT *
-                          FROM JobListing
+                          FROM JobListings
                           where JobListingId = @JobListingId"
                 };
 
@@ -410,7 +508,7 @@ namespace MyNursingFuture.BL.Managers
                 {
                     Entity = new { },
                     Query = @"SELECT *
-                          FROM JobListing
+                          FROM JobListings
                     "
                 };
 

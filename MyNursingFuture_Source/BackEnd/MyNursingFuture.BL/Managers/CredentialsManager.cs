@@ -12,18 +12,23 @@ using MyNursingFuture.BL.Entities;
 using MyNursingFuture.Util;
 using Newtonsoft.Json;
 
+
 namespace MyNursingFuture.BL.Managers
 {
     public interface ICredentialsManager
     {
         Result ValidateAdminToken(string token);
         Result ValidateUserToken(string token, bool recover = false);
+        Result ValidateEmployerToken(string token, bool recover = false);
+        Result GetPayLoad(string token, bool recover = false);
+
     }
 
     public class CredentialsManager: ICredentialsManager
     {
         private string SecretAdminKey => "Bb3NQPLCEvrTQSPI9To7eOm7A1OKP2ueUb2m6Cr";
         private string SecretUserKey =>  "YS8A0fIf0y4S4yNFyajSUyhNExRaZoVJFcr84kg";
+        private string SecretEmployerKey => "YS8A0fIf0y4S4yNFyajSUyhNExRaZoVJFcr84kg";
         private string SecretRecoverKey =>  "yNFyajSUyhYS8A0fIf0y4SNEx7eOm7A1OKPkPLg";
 
         public string GenerateSalt() //length of salt    
@@ -108,7 +113,8 @@ namespace MyNursingFuture.BL.Managers
                 { "AdministratorId", admin.AdministratorId },
                 { "Username", admin.Username },
                 { "exp", exp },
-                { "iat", iat }
+                { "iat", iat },
+                { "roles", @"[admin, generic]" }
             };
 
             var token = encoder.Encode(payload, SecretAdminKey);
@@ -134,7 +140,8 @@ namespace MyNursingFuture.BL.Managers
                 { "Email", user.Email },
                 { "Name", user.Name },
                 { "exp", exp },
-                { "iat", iat }
+                { "iat", iat },
+                {"roles", @"[nurse, generic]" }
             };
 
             var token = encoder.Encode(payload, SecretUserKey);
@@ -160,10 +167,11 @@ namespace MyNursingFuture.BL.Managers
                 { "Email", employer.Email },
                 { "EmployerName", employer.EmployerName },
                 { "exp", exp },
-                { "iat", iat }
+                { "iat", iat },
+                {"roles", @"[employer, generic]" }
             };
 
-            var token = encoder.Encode(payload, SecretUserKey);
+            var token = encoder.Encode(payload, SecretEmployerKey);
             return token;
         }
 
@@ -184,7 +192,10 @@ namespace MyNursingFuture.BL.Managers
             {
                 { "UserId", user.UserId },
                 { "exp", exp },
-                { "iat", iat }
+                { "iat", iat },
+                {"roles", "[nurse, generic]" }
+
+
             };
 
             var token = encoder.Encode(payload, SecretRecoverKey);
@@ -206,9 +217,10 @@ namespace MyNursingFuture.BL.Managers
 
             var payload = new Dictionary<string, object>
             {
-                { "UserId", employer.EmployerId },
+                { "EmployerId", employer.EmployerId },
                 { "exp", exp },
-                { "iat", iat }
+                { "iat", iat },
+                {"roles", "employer, generic" }
             };
 
             var token = encoder.Encode(payload, SecretRecoverKey);
@@ -261,6 +273,54 @@ namespace MyNursingFuture.BL.Managers
             }
             return result;
         }
+        public Result ValidateEmployerToken(string token, bool recover = false)
+        {
+            var secret = recover ? SecretRecoverKey : SecretEmployerKey;
+            var result = new Result();
+            try
+            {
+                IJsonSerializer serializer = new JsonNetSerializer();
+                IDateTimeProvider provider = new UtcDateTimeProvider();
+                IJwtValidator validator = new JwtValidator(serializer, provider);
+                IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+                IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder);
+
+                var json = decoder.Decode(token, secret, verify: true);
+                var employer = JsonConvert.DeserializeObject<EmployerEntity>(json);
+                employer.Token = token;
+                result.Entity = employer;
+            }
+            catch (Exception)
+            {
+                result.Success = false;
+            }
+            return result;
+        }
+
+        public Result GetPayLoad(string token, bool recover = false)
+        {
+            var secret = recover ? SecretRecoverKey : SecretEmployerKey;
+            var result = new Result();
+            try
+            {
+                IJsonSerializer serializer = new JsonNetSerializer();
+                IDateTimeProvider provider = new UtcDateTimeProvider();
+                IJwtValidator validator = new JwtValidator(serializer, provider);
+                IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+                IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder);
+
+                var payload = decoder.DecodeToObject(token, secret, verify: true);
+
+
+                result.Entity = payload;
+            }
+            catch (Exception)
+            {
+                result.Success = false;
+            }
+            return result;
+        }
+
 
 
     }

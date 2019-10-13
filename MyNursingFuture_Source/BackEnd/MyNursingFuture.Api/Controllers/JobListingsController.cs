@@ -15,19 +15,21 @@ using System.Web;
 using System.Web.Hosting;
 using Newtonsoft.Json;
 using System.Configuration;
+using System.Threading.Tasks;
+
 
 
 namespace MyNursingFuture.Api.Controllers
 {
     [ExceptionFilter]
-    public class JobListingController : ApiController
+    public class JobListingsController : ApiController
     {
         private readonly IUsersManager _usersManager;
         private readonly IEmployersManager _employersManager;
         private readonly ICacheManager _cacheManager;
         private readonly IJobListingManager _jobListingManager;
         private readonly IJobListingCriteriaManager _jobListingCriteriaManager;
-        public JobListingController(IUsersManager usersManager,
+        public JobListingsController(IUsersManager usersManager,
          IEmployersManager employersManager,
          ICacheManager cacheManager,
          IJobListingManager jobListingManager,
@@ -40,38 +42,48 @@ namespace MyNursingFuture.Api.Controllers
             _jobListingManager = jobListingManager;
 
         }
-        [JwtAuthorized]
+
+
+        [HttpPut]
+        [EmployerJWTAuthorized]
         [Route("api/v1/JobListings")]
-        public HttpResponseMessage Post([FromBody] JobListingEntity jobListing)
+        public HttpResponseMessage PostListing([FromBody] JobListingEntity jobListing)
         {
+            //Woking , tested
+
             Result result = null;
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
             var employer = objemployer as EmployerEntity;
             jobListing.CreateDate = DateTime.Now;
             jobListing.ModificationDate = jobListing.CreateDate;
-            result = _jobListingManager.CreateJobListing(jobListing, employer);
+            result = _jobListingManager.CreateJobListingById(jobListing, employer.EmployerId);
 
             // return failed 
             if (!result.Success)
-                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+                return Request.CreateResponse(HttpStatusCode.BadRequest , result);
+
 
             // if success
 
             //Result cri_result = null;
-            var listingEntity = (JobListingEntity)result.Entity;
-            jobListing.JobListingId = listingEntity.JobListingId;
-            jobListing.ModificationDate = listingEntity.ModificationDate;
-            jobListing.CreateDate = listingEntity.CreateDate;
+            var listingID = (int)result.Entity;
+            jobListing.JobListingId = listingID;
             result.Entity = jobListing;
             return Request.CreateResponse(HttpStatusCode.Created, result);
 
         }
 
+        [HttpGet]
         [Route("api/v1/JobListings")]
         public HttpResponseMessage GetAllListings()
         {
+            //Working, tested
             Result result = null;
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            var employer = objemployer as EmployerEntity;
+
             result = _jobListingManager.GetAllListings();
 
             if (!result.Success)
@@ -86,7 +98,8 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-        [JwtAuthorized]
+        [HttpPut]
+        [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/Criteria")]
         public HttpResponseMessage PutCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
         {
@@ -101,10 +114,11 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [JwtAuthorized]
+        //[JwtAuthorized]
         [Route("api/v1/JobListings/{id}")]
         public HttpResponseMessage GetListingById(int id)
         {
+            //Working, tested
             Result result = null;
 
             result = _jobListingManager.GetListingById(id);
@@ -120,7 +134,7 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-        [JwtAuthorized]
+        [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/PotentialApplicants/{id}")]
         public HttpResponseMessage GetPotentialApplicantsByCriteria(int id)
         {
@@ -138,7 +152,7 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-        [JwtAuthorized]
+        [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/PotentialApplicants/")]
         public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
         {
