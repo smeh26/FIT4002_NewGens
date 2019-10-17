@@ -90,7 +90,13 @@ namespace MyNursingFuture.Cms.Models
         HEROIMAGE,
         [Category("GenericItem")]
         [Description("Endorsed Logo")]
-        ENDORSEDLOGO
+        ENDORSEDLOGO,
+        [Category("GenericItem")]
+        [Description("Auth Nurse")]
+        AUTHNURSE,
+        [Category("GenericItem")]
+        [Description("Auth Employer")]
+        AUTHEMPLOYER,
     }
 
     public class ContentItemViewModel

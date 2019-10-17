@@ -24,7 +24,9 @@ class Sidebar extends Component{
         ]
     } else {
       loginMenu = [
-        
+        { href: "#", title: 'Sign in', className: 'sign-in', action: 'authModal'},
+        { href: "/user/register", title: 'Register', className:'sign-in'},
+        { href: "", spacer: true }
       ];
     }
     
