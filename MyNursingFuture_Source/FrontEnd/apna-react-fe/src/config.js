@@ -3,9 +3,9 @@ var conf;
 conf = {
   apiUrl: 'https://mynursingfutureapi.azurewebsites.net/',
   apiBaseUrl: 'api/',
-  siteUrl: 'http://localhost:50565/',
-  shareBaseUrl: 'http://localhost:50565/',
-  imagesDirectory: 'Content/img/'
+  siteUrl: 'http://localhost:3000/',
+  shareBaseUrl: 'http://localhost:3000/',
+  imagesDirectory: 'img/'
 };
 
 
