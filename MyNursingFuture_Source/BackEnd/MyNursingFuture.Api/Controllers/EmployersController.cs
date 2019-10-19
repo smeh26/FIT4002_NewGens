@@ -191,7 +191,7 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [JwtAuthorized]
+        [EmployerJWTAuthorized]
         [Route("api/employers/edit")]
         public HttpResponseMessage EditDetails([FromBody]EmployerEntity value)
         {
@@ -212,7 +212,7 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [JwtAuthorized]
+        [EmployerJWTAuthorized]
         [Route("api/employers/changepassword")]
         public HttpResponseMessage ChangePassword([FromBody]EmployerEntity value)
         {
@@ -236,7 +236,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
-        [JwtAuthorized]
+        [EmployerJWTAuthorized]
         // DELETE: api/employers/5
         public HttpResponseMessage Delete(int id)
         {

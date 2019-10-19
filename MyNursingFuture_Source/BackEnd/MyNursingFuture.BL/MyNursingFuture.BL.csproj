@@ -110,6 +110,7 @@
     <Compile Include="Entities\SectorEntity.cs" />
     <Compile Include="Entities\SectorsQuestionsEntity.cs" />
     <Compile Include="Entities\SectorViewEntity.cs" />
+    <Compile Include="Entities\SelfAssessmentQuizzesEntity.cs" />
     <Compile Include="Entities\UserEntity.cs" />
     <Compile Include="Entities\UserDataQuestionsEntity.cs" />
     <Compile Include="Entities\AnonUserQuizzesEntity.cs" />
@@ -152,6 +153,7 @@
     <Compile Include="Managers\SectorsManager.cs" />
     <Compile Include="Managers\SectorViewsManager.cs" />
     <Compile Include="Managers\SelfAssessmentManager.cs" />
+    <Compile Include="Managers\SelfAssessmentQuizzesManager.cs" />
     <Compile Include="Managers\UsersManagerVersion1.cs" />
     <Compile Include="Managers\UsersManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

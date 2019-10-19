@@ -118,14 +118,14 @@ namespace MyNursingFuture.BL.Managers
 
                 query.Query = @"
                 BEGIN TRAN
-                IF EXISTS (SELECT * FROM JobListingCriteria WHERE JobListingId = @JobListingId and AspectId = @AspectId )
+                IF EXISTS (SELECT * FROM dbo.JobListingCriteria WHERE JobListingId = @JobListingId and AspectId = @AspectId )
                 BEGIN
-                    UPDATE NurseSelfAssessmentAnswers SET Value = @Value , QuestionId = @QuestionId, AnswerId = @AnswerId , LastUpdate= @LastUpdate
+                    UPDATE dbo.JobListingCriteria SET Value = @Value , QuestionId = @QuestionId, AnswerId = @AnswerId , LastUpdate= @LastUpdate
                     WHERE JobListingId = @JobListingId and AspectId = @AspectId
                 END 
                 ELSE
                 BEGIN 
-                INSERT INTO JobListingCriteria (JobListingId, AspectId, Value, QuestionId, AnswerId, LastUpdate )
+                INSERT INTO dbo.JobListingCriteria (JobListingId, AspectId, Value, QuestionId, AnswerId, LastUpdate )
                                                     VALUES(@JobListingId, @AspectId, @Value, @QuestionId, @AnswerId, @LastUpdate)
                 END
                 COMMIT TRAN
@@ -158,16 +158,30 @@ namespace MyNursingFuture.BL.Managers
             {
                 var con = new DapperConnectionManager();
                 var query = new QueryEntity();
+                var results = new List<Result>();
                 foreach (JobListingCriteriaEntity entity in criteria)
+
                 {
                     // Temporary solution need to impove to become a batch process
+                    if (entity == null) continue;
+                    result = new Result();
                     result = InsertCriterion(entity);
+
+                    results.Add(result);
+
+                }
+                foreach(Result r in results)
+                {
+                    if (!r.Success)
+                    {
+                        return new Result(false);
+                    }
+
 
                 }
 
-                result = con.ExecuteQuery<JobListingCriteriaEntity>(query);
 
-                return result;
+                return new Result(true);
             }
             catch (Exception ex)
             {

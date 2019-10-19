@@ -41,6 +41,8 @@ namespace MyNursingFuture.Api.Controllers
             _jobListingCriteriaManager = jobListingCriteriaManager;
             _jobListingManager = jobListingManager;
 
+
+
         }
 
 
@@ -98,7 +100,7 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-        [HttpPut]
+/*        [HttpPut]
         [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/Criteria")]
         public HttpResponseMessage PutCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
@@ -113,6 +115,52 @@ namespace MyNursingFuture.Api.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
+*/
+        [HttpPut]
+        [EmployerJWTAuthorized]
+        [Route("api/v1/JobListings/Criteria")]
+        public HttpResponseMessage PutCriteria_V1([FromBody] ListingCriteriaModel listingCriteriaModel)
+        {
+            Result result = null;
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            var employer = objemployer as EmployerEntity;
+
+            var timestamp = DateTime.Now;
+
+            var ListingCriteria = new List<JobListingCriteriaEntity>();
+
+
+            foreach (KeyValuePair<int, AnswerEntity> entry in listingCriteriaModel.Answers)
+            {
+                int aspectId = entry.Key;
+                AnswerEntity answer = entry.Value;
+
+                var listingCriterion = new JobListingCriteriaEntity();
+                listingCriterion.AspectId = aspectId;
+                listingCriterion.QuestionId = answer.QuestionId;
+                listingCriterion.AnswerId = answer.AnswerId;
+                listingCriterion.Value = answer.Value;
+                listingCriterion.LastUpdate = timestamp;
+                listingCriterion.JobListingId = listingCriteriaModel.JobListingId;
+
+                ListingCriteria.Add(listingCriterion);
+
+            }
+
+            result = _jobListingCriteriaManager.InsertCriteria(ListingCriteria);
+
+            if (!result.Success)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            }
+
+            result.Message = " Criteria updated successfully";
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
+
 
         //[JwtAuthorized]
         [Route("api/v1/JobListings/{id}")]
@@ -133,10 +181,10 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
-
+        [HttpGet]
         [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/PotentialApplicants/{id}")]
-        public HttpResponseMessage GetPotentialApplicantsByCriteria(int id)
+        public HttpResponseMessage GetPotentialApplicantsByListingId(int id)
         {
             Result result = null;
 
@@ -152,7 +200,7 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-        [EmployerJWTAuthorized]
+/*        [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/PotentialApplicants/")]
         public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
         {
@@ -168,7 +216,7 @@ namespace MyNursingFuture.Api.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
-        }
+        }*/
 
 
 

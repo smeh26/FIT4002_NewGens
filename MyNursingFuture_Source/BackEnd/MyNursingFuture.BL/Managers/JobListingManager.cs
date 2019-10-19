@@ -591,14 +591,15 @@ INSERT INTO [dbo].[JobListings]
                 var query = new QueryEntity();
                 var credentials = new CredentialsManager();
 
-                string query_string = "SELECT H.UserId FROM NurseSelfAssessmentAnswers AS H ";
+                string query_string = "SELECT UserId FROM NurseSelfAssessmentAnswers  ";
                 List<String> select_queries = new List<String>();
                 int counter = 0;
                 foreach (JobListingCriteriaEntity criterion in criteria)
                 {
                     /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
                                             , criterion.AspectId, criterion.Value , counter));*/
-                    query_string += String.Format("INNER JOIN (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
+                    // query_string += String.Format("INNER JOIN (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
+                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) ", criterion.AspectId, criterion.Value);
 
                     counter++;
                 }
@@ -646,20 +647,21 @@ INSERT INTO [dbo].[JobListings]
                 var criteria = (List<JobListingCriteriaEntity>)Listing_Re.Entity;
 
                 // Assemble inner join query
-                string query_string = "SELECT H.UserId FROM NurseSelfAssessmentAnswers AS H ";
+                string query_string = "SELECT DISTINCT T0.UserId FROM NurseSelfAssessmentAnswers AS T0 ";
                 List<String> select_queries = new List<String>();
-                int counter = 0;
+                int counter = 1;
                 foreach (JobListingCriteriaEntity criterion in criteria)
                 {
                     /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
                                             , criterion.AspectId, criterion.Value , counter));*/
-                    query_string += String.Format(" INNER JOIN (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
+                    //query_string += String.Format(" INNER JOIN (SELECT DISTINCT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON T{3}.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter, counter - 1);
+                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) ", criterion.AspectId, criterion.Value);
 
                     counter++;
                 }
 
                 query.Query = query_string;
-                return con.ExecuteQuery(query);
+                return con.ExecuteQuery<int>(query);
 
             }
             catch (Exception ex)
