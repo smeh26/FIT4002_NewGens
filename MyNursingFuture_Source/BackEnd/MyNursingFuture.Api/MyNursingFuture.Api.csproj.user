@@ -2,24 +2,15 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <UseIISExpress>true</UseIISExpress>
-    <Use64BitIISExpress>true</Use64BitIISExpress>
+    <Use64BitIISExpress />
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
-    <NameOfLastUsedPublishProfile>LocalDev</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>MyNursingFutureApi - Web Deploy</NameOfLastUsedPublishProfile>
     <ProjectView>ShowAllFiles</ProjectView>
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
-    <Controller_SelectedScaffolderID>ApiControllerEmptyScaffolder</Controller_SelectedScaffolderID>
-    <Controller_SelectedScaffolderCategoryPath>root/Controller</Controller_SelectedScaffolderCategoryPath>
-    <WebStackScaffolding_ControllerDialogWidth>2272</WebStackScaffolding_ControllerDialogWidth>
-    <WebStackScaffolding_IsLayoutPageSelected>True</WebStackScaffolding_IsLayoutPageSelected>
-    <WebStackScaffolding_IsPartialViewSelected>False</WebStackScaffolding_IsPartialViewSelected>
-    <WebStackScaffolding_IsReferencingScriptLibrariesSelected>True</WebStackScaffolding_IsReferencingScriptLibrariesSelected>
-    <WebStackScaffolding_LayoutPageFile />
-    <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
-    <WebStackScaffolding_DbContextDialogWidth>2272</WebStackScaffolding_DbContextDialogWidth>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
@@ -31,7 +22,7 @@
           <AspNetDebugging>True</AspNetDebugging>
           <SilverlightDebugging>False</SilverlightDebugging>
           <NativeDebugging>False</NativeDebugging>
-          <SQLDebugging>True</SQLDebugging>
+          <SQLDebugging>False</SQLDebugging>
           <ExternalProgram>
           </ExternalProgram>
           <StartExternalURL>
