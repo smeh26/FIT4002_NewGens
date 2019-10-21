@@ -25,23 +25,24 @@ class Sidebar extends Component{
         ]
     } else {
       loginMenu = [
-        { href: "#", title: 'Nurse Sign in', className: 'sign-in', action: 'authModal'},
-        { href: "/user/register", title: 'Register', className:'sign-in'},
-      ];
-    }
-    if (this.props.loggedIn){
-      employerLoginMenu = [
-        { href: "#", title: 'Hi, ' + this.props.name, className: 'no-decoration'},
-        // { href: "/user/quizzes/selfAssessment", title: 'My self-assessments', className: 'sign-in'},
-        // { href: "/user/quizzes/careerPathways", title: 'Career quiz results', className: 'sign-in'},
-        { href: "/user/profile", title: 'Account settings', className: 'sign-in'},
-        { href: "#", title: 'Employer Sign out', className: 'sign-in', action: 'logOut'},
-        { href: "", spacer: true }
-        ]
-    } else {
-      employerLoginMenu = [
-        { href: "#", title: 'Employer Sign in', className: 'sign-in', action: 'authModal'},
-        { href: "", spacer: true }
+    //     { href: "#", title: 'Nurse Sign in', className: 'sign-in', action: 'authModal'},
+    //     { href: "/user/register", title: 'Register', className:'sign-in'},
+    //   ];
+    // }
+    // if (this.props.loggedIn){
+    //   employerLoginMenu = [
+    //     { href: "#", title: 'Hi, ' + this.props.name, className: 'no-decoration'},
+    //     // { href: "/user/quizzes/selfAssessment", title: 'My self-assessments', className: 'sign-in'},
+    //     // { href: "/user/quizzes/careerPathways", title: 'Career quiz results', className: 'sign-in'},
+    //     { href: "/user/profile", title: 'Account settings', className: 'sign-in'},
+    //     { href: "#", title: 'Employer Sign out', className: 'sign-in', action: 'logOut'},
+    //     { href: "", spacer: true }
+    //     ]
+    // } else {
+    //   employerLoginMenu = [
+    //     { href: "#", title: 'Employer Sign in', className: 'sign-in', action: 'authModal'},
+    //     { href: "", spacer: true }
+        
       ];
     }
     

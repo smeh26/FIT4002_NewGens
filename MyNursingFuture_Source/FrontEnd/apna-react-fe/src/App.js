@@ -14,23 +14,23 @@ const reduxRouterMiddleware = routerMiddleware(history);
 window.__redux_router_ga_last_location = '';
 
 function logPathChange({ getState }) {
-    return (next) =>
-      (action) => {
+  return (next) =>
+    (action) => {
 
-        if (action.type == '@@router/LOCATION_CHANGE'){
-           console.info(`Route Changed: ${action.payload.pathname}`);
-          if (window.ga && window.__redux_router_ga_last_location != action.payload.pathname){
-            window.ga('set','page', action.payload.pathname); // Correctly sets the GA tracker to the new active page/path/relative address
-            window.ga('send','pageview'); // Updates GA as well as the tracker.
-            // reference >  https://developers.google.com/analytics/devguides/collection/analyticsjs/single-page-applications
-          }
-          window.__redux_router_ga_last_location = action.payload.pathname;
+      if (action.type == '@@router/LOCATION_CHANGE') {
+        console.info(`Route Changed: ${action.payload.pathname}`);
+        if (window.ga && window.__redux_router_ga_last_location != action.payload.pathname) {
+          window.ga('set', 'page', action.payload.pathname); // Correctly sets the GA tracker to the new active page/path/relative address
+          window.ga('send', 'pageview'); // Updates GA as well as the tracker.
+          // reference >  https://developers.google.com/analytics/devguides/collection/analyticsjs/single-page-applications
         }
+        window.__redux_router_ga_last_location = action.payload.pathname;
+      }
 
-        return next(action);
+      return next(action);
 
-      };
-  }
+    };
+}
 
 // redux devtools
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -46,7 +46,7 @@ const store = createStore(
 );
 
 
-class App extends Component {  
+class App extends Component {
   render() {
     return (
       <Provider store={store}>

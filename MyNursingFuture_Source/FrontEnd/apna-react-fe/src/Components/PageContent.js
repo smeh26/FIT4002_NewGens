@@ -21,6 +21,8 @@ import AcceptTermsAndPrivacy from './ContentItems/AcceptTermsAndPrivacy';
 import HeroImage from './ContentItems/HeroImage';
 import Endorsedlogo from './ContentItems/Endorsedlogo';
 import Accordion from './ContentItems/Accordion';
+import AuthNurse from './ContentItems/AuthNurse';
+// import AuthEmployer from './ContentItems/AuthEmployer';
 // contentItem types:
 // default
 // sectorLinkList (semi-static)
@@ -49,6 +51,10 @@ var PageContent = (props) => {
         return <SectorLinkList key={index}/>
       case 'HEROIMAGE':
         return <HeroImage key={index}/>      
+      case 'AUTHNURSE':
+            return <AuthNurse key={index}/>  
+      // case 'AUTHEMPLOYER':
+      //       return <AuthEmployer key={index}/>   
       case 'ENDORSEDLOGO':
         return <Endorsedlogo key={index}/>      
       case 'ROLESLIST':

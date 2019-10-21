@@ -930,10 +930,10 @@ export function fetchRegister(n,e,p){
   }
 }
 
-export function fetchUpdateUserDetails(name,email){
+export function fetchUpdateUserDetails(name,email,salary){
   return function (dispatch, getState){
     dispatch(unsetUserError());
-    if ((!name || !email)){
+    if ((!name || !email || !salary)){
       dispatch(setUserError('Please ensure you have entered the required data.'));
       return;
     }
@@ -943,7 +943,8 @@ export function fetchUpdateUserDetails(name,email){
     }
     let data = {
       name: name,
-      email: email
+      email: email,
+      salary: salary,
     };
     
     data = JSON.stringify(data);
@@ -956,13 +957,15 @@ export function fetchUpdateUserDetails(name,email){
       },
       body: data
     };
+
+    console.log(data);
     return fetch(config.apiUrl+config.apiBaseUrl+'users/edit', options).then(function(response){
         return response.json();
       }).then(function(response){
         if (!response.success){
           dispatch(setUserError(response.message));
         } else {
-          dispatch(setUserData(Object.assign({},getState().app.user.user,{name: name, email: email})));
+          dispatch(setUserData(Object.assign({},getState().app.user.user,{name: name, email: email, salary:salary})));
         }
       }).catch(function(error){
         if (error && error.message){
