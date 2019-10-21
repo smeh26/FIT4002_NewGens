@@ -88,7 +88,14 @@ namespace MyNursingFuture.BL.Managers
                 ELSE
                 BEGIN 
                     INSERT INTO JobApplications  (JobListingId, UserId, Summary, IsDraft, ApplicationStatus, AppliedDate, LastModifiedDate)
-                                            VALUES  (@JobListingId, @UserId, @Summary, @IsDraft, @ApplicationStatus, @AppliedDate, @LastModifiedDate)
+                                            VALUES  (@JobListingId, 
+                                                        @UserId, 
+                                                        @Summary, 
+                                                        @IsDraft, 
+                                                        @ApplicationStatus,
+                                                        @AppliedDate, 
+                                                        @LastModifiedDate
+)
                 END TRAN
                 COMMIT 
                 ";
@@ -154,7 +161,6 @@ namespace MyNursingFuture.BL.Managers
 
             return result;
         }
-
         public Result GetJobApplicationByApplicationId(int applicationId)
         {
             Result result = new Result();
@@ -166,7 +172,7 @@ namespace MyNursingFuture.BL.Managers
                 query.Query = @"
                 SELECT * FROM JobApplications WHERE ApplicationId = @ApplicationId
                 ";
-                result = con.ExecuteQuery<JobApplicationEntity>(query);
+                result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
 
                 return result;
             }

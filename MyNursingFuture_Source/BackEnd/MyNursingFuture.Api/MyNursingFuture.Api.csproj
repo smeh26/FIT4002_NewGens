@@ -151,6 +151,7 @@
     <Compile Include="Models\EmployerModel.cs" />
     <Compile Include="Models\JobListingModel.cs" />
     <Compile Include="Models\ListingCriteriaModel.cs" />
+    <Compile Include="Models\membershipModel.cs" />
     <Compile Include="Models\NurseSelfAssesmentAnswerModel.cs" />
     <Compile Include="Models\QuizResultsModel.cs" />
     <Compile Include="Models\UserModel.cs" />

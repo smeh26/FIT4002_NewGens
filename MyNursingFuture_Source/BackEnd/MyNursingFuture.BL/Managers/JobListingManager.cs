@@ -24,6 +24,9 @@ namespace MyNursingFuture.BL.Managers
         Result GetPotentialApplicantsByListingId(int jobListingId);
         Result GetAllListings();// working, tested 
 
+        //Boolean IsListingBelongToEmployer(int ListingId, int EmployerId);
+
+
     }
     public class JobListingManager : IJobListingManager
     {
@@ -476,7 +479,7 @@ INSERT INTO [dbo].[JobListings]
                 };
 
 
-                return con.ExecuteQuery<JobListingEntity>(query);
+                return con.ExecuteGetOneItemQuery<JobListingEntity>(query);
 
 
 
@@ -678,6 +681,8 @@ INSERT INTO [dbo].[JobListings]
             return result;
 
         }
+
+
 
     }
 }

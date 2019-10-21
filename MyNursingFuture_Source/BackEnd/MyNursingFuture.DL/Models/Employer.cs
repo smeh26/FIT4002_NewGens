@@ -11,6 +11,9 @@ namespace MyNursingFuture.DL.Models
         public int EmployerId { get; set; }
         public string Email { get; set; }
         public string EmployerName { get; set; }
+        public string AgentFirstName { get; set; }
+        public string AgentLastName { get; set; }
+        public Boolean Active { get; set; }
         public string Company { get; set; }
         public string Password { get; set; }
         public string Hash { get; set; }

@@ -51,6 +51,7 @@ namespace MyNursingFuture.Api.Filters
                     var employer = resultToken.Entity as EmployerEntity;
                     employer.Token = token.Parameter;
                     actionContext.Request.Properties.Add("employer", employer);
+                    actionContext.Request.Properties.Add("user", null);
                     base.OnAuthorization(actionContext);
 
                 } else if (roles_l.Contains("nurse")){
@@ -64,6 +65,7 @@ namespace MyNursingFuture.Api.Filters
                     var user = resultToken.Entity as UserEntity;
                     user.Token = token.Parameter;
                     actionContext.Request.Properties.Add("user", user);
+                    actionContext.Request.Properties.Add("employer", null);
                     base.OnAuthorization(actionContext);
 
                 }

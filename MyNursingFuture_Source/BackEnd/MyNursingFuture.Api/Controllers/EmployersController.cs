@@ -238,11 +238,11 @@ namespace MyNursingFuture.Api.Controllers
 
         [EmployerJWTAuthorized]
         // DELETE: api/employers/5
-        public HttpResponseMessage Delete(int id)
+        public HttpResponseMessage Delete([FromBody] int id)
         {
             Result result = null;
             object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
+            Request.Properties.TryGetValue("employer", out objuser);
             var employer = objuser as EmployerEntity;
             if (employer == null)
             {
@@ -251,6 +251,44 @@ namespace MyNursingFuture.Api.Controllers
             }
             result = _employersManager.Delete(employer);
             return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        [HttpPut]
+        [EmployerJWTAuthorized]
+        [Route("api/v1/employers/membership")]
+        public HttpResponseMessage AdjustMembership ( [FromBody] MembershipModel mbm )
+        {
+            var employerId = mbm.EmployerId;
+            var duration = mbm.Duration;
+
+            Result result = null;
+            var employer = (EmployerEntity) _employersManager.GetEmployerById(employerId).Entity;
+            if (employer == null)
+            {
+                result = new Result(false);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            }
+
+            employer.MembershipType = "STANDARD";
+
+            if (DateTime.Compare(employer.MembershipEndDate, DateTime.Now) >= 0)
+            {
+                employer.MembershipEndDate = employer.MembershipEndDate.AddDays(duration);
+            }
+            else {
+                employer.MembershipEndDate = DateTime.Now.AddDays(duration);
+                employer.MembershipStartDate = DateTime.Now;
+            }
+            result = _employersManager.UpdateDetails(employer);
+            //If failed
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            
+            //If it is good
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
         }
 
     }

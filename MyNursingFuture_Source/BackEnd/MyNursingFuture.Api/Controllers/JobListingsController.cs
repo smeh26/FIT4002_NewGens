@@ -49,14 +49,30 @@ namespace MyNursingFuture.Api.Controllers
         [HttpPut]
         [EmployerJWTAuthorized]
         [Route("api/v1/JobListings")]
-        public HttpResponseMessage PostListing([FromBody] JobListingEntity jobListing)
+        public HttpResponseMessage PostListing(JobListingEntity jobListing)
         {
             //Woking , tested
 
             Result result = null;
+
+            //Employer vertification 
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
             var employer = objemployer as EmployerEntity;
+
+            if (employer.MembershipEndDate == null ||  DateTime.Compare(employer.MembershipEndDate, DateTime.Now) < 0 ) 
+                {
+                // membership expired
+
+                result.Success = false;
+                result.Message = "Membership expired";
+
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, result);
+            } 
+
+
             jobListing.CreateDate = DateTime.Now;
             jobListing.ModificationDate = jobListing.CreateDate;
             result = _jobListingManager.CreateJobListingById(jobListing, employer.EmployerId);
@@ -122,9 +138,16 @@ namespace MyNursingFuture.Api.Controllers
         public HttpResponseMessage PutCriteria_V1([FromBody] ListingCriteriaModel listingCriteriaModel)
         {
             Result result = null;
+
+            //Employer vertification 
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
             var employer = objemployer as EmployerEntity;
+            if (employer.EmployerId != listingCriteriaModel.EmmployerId)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+
 
             var timestamp = DateTime.Now;
 
@@ -163,6 +186,8 @@ namespace MyNursingFuture.Api.Controllers
 
 
         //[JwtAuthorized]
+        [HttpGet]
+        [GenericJWTAuthorized]
         [Route("api/v1/JobListings/{id}")]
         public HttpResponseMessage GetListingById(int id)
         {
@@ -170,6 +195,8 @@ namespace MyNursingFuture.Api.Controllers
             Result result = null;
 
             result = _jobListingManager.GetListingById(id);
+
+            //Test the return
 
             if (!result.Success)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
@@ -187,6 +214,21 @@ namespace MyNursingFuture.Api.Controllers
         public HttpResponseMessage GetPotentialApplicantsByListingId(int id)
         {
             Result result = null;
+
+            //Employer vertification 
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var employer = objemployer as EmployerEntity;
+
+            var listing = (JobListingEntity) _jobListingManager.GetListingById(id).Entity;
+
+
+            if (employer.EmployerId != listing.EmployerId)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+
+
 
             result = _jobListingManager.GetPotentialApplicantsByListingId(id);
             if (!result.Success)

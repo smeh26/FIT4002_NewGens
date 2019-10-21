@@ -735,7 +735,26 @@ namespace MyNursingFuture.BL.Managers
                 }
                 
 
-                query.Query = @"Update Users Set Name = @Name, Email = @Email
+                query.Query = @"Update Users Set 
+                                            Name = @Name, 
+                                            Email = @Email,
+                                            [NurseType] = ISNULL(@NurseType, NurseType) ,
+                                            [ActiveWorking] = ISNULL(@ActiveWorking, ActiveWorking) ,
+                                            [Area] = ISNULL(@Area, Area) ,
+                                            [Age] = ISNULL(@Age, Age) ,
+                                            [Country] = ISNULL(@Country, Country) ,
+                                            [Suburb] = ISNULL(@Suburb, Suburb) ,
+                                            [PostalCode] = ISNULL(@PostalCode, PostalCode) ,
+                                            [State] = ISNULL(@State, State) ,
+                                            [Patients] = ISNULL(@Patients, Patients) ,
+                                            [PatientsTitle] = ISNULL(@PatientsTitle, PatientsTitle) ,
+                                            [Qualification] = ISNULL(@Qualification, Qualification) ,
+                                            [Setting] = ISNULL(@Setting, Setting) ,
+                                            [IsLookingForJob] = ISNULL(@IsLookingForJob, IsLookingForJob) ,
+                                            [minsalary] = ISNULL(@minsalary, minsalary) ,
+                                            [maxsalary] = ISNULL(@maxsalary, maxsalary),
+                                            [defaultQuizId] = ISNULL(@defaultQuizId, NULL)
+
                             where UserId = @UserId and Active = 1";
                 query.Entity = new { UserId = entity.UserId, Email = entity.Email, Name = entity.Name };
                 result = con.ExecuteQuery<UserEntity>(query);

@@ -25,6 +25,7 @@ namespace MyNursingFuture.BL.Managers
         Result Delete(EmployerEntity entity);
         Result UpdateDetails(EmployerEntity entity);
         Result ResetPassword(EmployerEntity entity);
+        Result GetEmployerById(int employerId);
     }
     public class EmployersManager:IEmployersManager
     {
@@ -524,10 +525,29 @@ namespace MyNursingFuture.BL.Managers
                     result.Message = "Email already in use";
                 }
 
+                entity.ModifyDate = DateTime.Now;
 
-                query.Query = @"Update Employers Set Name = @Name, Email = @Email
-                            where EmployerID = @EmployerID and Active = 1";
-                query.Entity = new { EmployerID = entity.EmployerId, Email = entity.Email, Name = entity.EmployerName };
+                query.Query = @"Update Employers Set 
+
+                                                    [EmployerName] = ISNULL( @EmployerName , EmployerName ) ,
+                                                    [AgentFirstName] = ISNULL( @AgentFirstName , AgentFirstName ) ,
+                                                    [AgentLastName] = ISNULL( @AgentLastName , AgentLastName ) ,
+                                                    [Active] = ISNULL( @Active , Active ) ,
+                                                    [Email] = ISNULL( @Email , Email ) ,
+                                                    [ModifyDate] = ISNULL( @ModifyDate , ModifyDate ) ,
+                                                    [Area] = ISNULL( @Area , Area ) ,
+                                                    [Country] = ISNULL( @Country , Country ) ,
+                                                    [State] = ISNULL( @State , State ) ,
+                                                    [Suburb] = ISNULL( @Suburb , Suburb ) ,
+                                                    [PostalCode] = ISNULL( @PostalCode , PostalCode ) ,
+                                                    [AddressLine1] = ISNULL( @AddressLine1 , AddressLine1 ) ,
+                                                    [AddressLine2] = ISNULL( @AddressLine2 , AddressLine2 ) ,
+                                                    [MembershipType] = ISNULL( @MembershipType , MembershipType ) ,
+                                                    [CanViewDetails] = ISNULL( @CanViewDetails , CanViewDetails ) ,
+                                                    [MembershipStartDate] = ISNULL( @MembershipStartDate , MembershipStartDate ) ,
+                                                    [MembershipEndDate] = ISNULL( @MembershipEndDate , MembershipEndDate ) 
+                            where EmployerID = @EmployerID";
+                query.Entity = entity;
                 result = con.ExecuteQuery<EmployerEntity>(query);
                 result.Message = result.Success ? "The user details has been updated" : "An error has occurred";
             }
@@ -570,5 +590,32 @@ namespace MyNursingFuture.BL.Managers
             result.Message = result.Success ? "The user has been deleted" : "An error has occurred";
             return result;
         }
+        public Result GetEmployerById(int employerId)
+        {
+            Result result = null;
+            try {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+
+                query.Query = @"SELECT * FROM Employers
+                            where EmployerId = @EmployerId";
+                query.Entity = new { EmployerId = employerId };
+
+                result = con.ExecuteGetOneItemQuery<EmployerEntity>(query);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result = result ?? new Result(false);
+                result.Message = "An error occurred" + ex.Message;
+            }
+
+            return result;
+
+
+        }
+
     }
 }
