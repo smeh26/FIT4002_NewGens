@@ -32,7 +32,7 @@ namespace MyNursingFuture.BL.Managers
     {
         private Result ValidateJL(JobListingEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -79,7 +79,7 @@ namespace MyNursingFuture.BL.Managers
         }
         public Result CreateJobListing(JobListingEntity entity, EmployerEntity employer)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -177,7 +177,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result CreateJobListingById(JobListingEntity entity, int employerId)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -274,7 +274,7 @@ INSERT INTO [dbo].[JobListings]
 
         public Result EditJobListing(JobListingEntity entity, EmployerEntity employer)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -350,7 +350,7 @@ INSERT INTO [dbo].[JobListings]
         public Result PublishJobListing(JobListingEntity entity, EmployerEntity employer)
         {
             //Validate required fields
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -423,7 +423,7 @@ INSERT INTO [dbo].[JobListings]
         {
 
 
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -463,7 +463,7 @@ INSERT INTO [dbo].[JobListings]
 
         public Result GetListingById(int listingId)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
 
@@ -500,7 +500,7 @@ INSERT INTO [dbo].[JobListings]
 
         public Result GetAllListings()
         {
-            Result result = null;
+            var result = new Result();
             try
             {
 
@@ -539,7 +539,7 @@ INSERT INTO [dbo].[JobListings]
 
         private Result ValidateEmployer(JobListingEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -587,7 +587,7 @@ INSERT INTO [dbo].[JobListings]
 
         public Result GetPotentialApplicantsByCriteria(List<JobListingCriteriaEntity> criteria)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -629,7 +629,7 @@ INSERT INTO [dbo].[JobListings]
 
         public Result GetPotentialApplicantsByListingId(int jobListingId)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -639,7 +639,23 @@ INSERT INTO [dbo].[JobListings]
                 var JLM = new JobListingManager();
                 var JLCM = new JobListingCriteriaManager();
 
-                // get criteria list 
+                //Get Listing 
+
+                var listing = (JobListingEntity)JLM.GetListingById(jobListingId).Entity;
+                if (listing == null)
+                {
+                    result.Success = false;
+                    result.Message = "Listing not exist";
+                    return result;
+                }
+
+                
+                listing.maxSalary = listing.maxSalary == 0 ? 200000 : listing.maxSalary;
+                listing.minSalary = listing.minSalary == 0 ? 40000 : listing.minSalary;
+
+
+
+                // get criteria  
                 var Listing_Re = JLCM.GetCriteriaByListingId(jobListingId);
                 if (!Listing_Re.Success)
                 {
@@ -650,7 +666,7 @@ INSERT INTO [dbo].[JobListings]
                 var criteria = (List<JobListingCriteriaEntity>)Listing_Re.Entity;
 
                 // Assemble inner join query
-                string query_string = "SELECT DISTINCT T0.UserId FROM NurseSelfAssessmentAnswers AS T0 ";
+                string query_string = String.Format(@"WITH SRC AS (SELECT UserId FROM Users WHERE {0} > = minsalary  AND maxsalary >=  {1} AND IsLookingForJob = 1 ) SELECT DISTINCT T0.UserId FROM SRC AS T0 ", listing.maxSalary,  listing.minSalary);
                 List<String> select_queries = new List<String>();
                 int counter = 1;
                 foreach (JobListingCriteriaEntity criterion in criteria)

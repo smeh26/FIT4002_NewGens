@@ -63,7 +63,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
             if (!string.IsNullOrEmpty(entity.Password))
             {
                 if (entity.Password.Length < 6)
@@ -135,7 +135,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result Insert(AdministratorEntity entity, bool seal = false)
         {
-            Result result = null;
+            var result = new Result();
             if (entity.Password.Length < 6)
             {
                 result = new Result(false);

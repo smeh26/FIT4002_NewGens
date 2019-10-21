@@ -35,7 +35,7 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/v1/EmployerLogin")]
         public async Task<HttpResponseMessage> Post([FromBody]EmployerEntity value)
         {
-            Result result = null;
+            var result = new Result();
             var tokenLogin = false;
             var apnaLogin = false;
 

@@ -34,7 +34,7 @@ namespace MyNursingFuture.Api.Controllers
         {
             //System.Diagnostics.Debugger.Break();
 
-            Result result = null;
+            var result = new Result();
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Password) || string.IsNullOrEmpty(value.Name))
             {
                 result = new Result(false);
@@ -232,7 +232,7 @@ namespace MyNursingFuture.Api.Controllers
         // DELETE: api/Users/5
         public HttpResponseMessage Delete(int id)
         {
-            Result result = null;
+            var result = new Result();
             object objuser = null;
             Request.Properties.TryGetValue("user", out objuser);
             var user = objuser as UserEntity;

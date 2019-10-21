@@ -142,7 +142,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result GetArticles()
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -172,7 +172,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result GetArticles(int id)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();

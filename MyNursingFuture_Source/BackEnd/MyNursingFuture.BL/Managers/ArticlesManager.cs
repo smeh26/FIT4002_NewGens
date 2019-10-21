@@ -112,7 +112,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
             using (var scope = new TransactionScope())
             {
                 var linkEntity = new LinkEntity
@@ -203,7 +203,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
 
 
             query.Query = @"SELECT * FROM Reasons";
@@ -218,7 +218,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
 
             using(var scope = new TransactionScope())
             {

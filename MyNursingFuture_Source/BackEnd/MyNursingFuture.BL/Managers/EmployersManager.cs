@@ -31,7 +31,7 @@ namespace MyNursingFuture.BL.Managers
     {
         public Result Register(EmployerEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 if (entity.Password.Length < 6)
@@ -122,7 +122,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result Login(EmployerEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -178,7 +178,7 @@ namespace MyNursingFuture.BL.Managers
 
 /*        public Result LoginApna(EmployerEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -305,7 +305,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result GenerateRecoveringCode(EmployerEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
             var credentials = new CredentialsManager();
@@ -355,7 +355,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result ResetPassword(EmployerEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 //Double validation
@@ -420,7 +420,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result ChangePassword(EmployerEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var credentials = new CredentialsManager();
@@ -487,7 +487,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result UpdateDetails(EmployerEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 if (!entity.Email.Contains("@") || entity.Email.Length < 3)
@@ -592,7 +592,7 @@ namespace MyNursingFuture.BL.Managers
         }
         public Result GetEmployerById(int employerId)
         {
-            Result result = null;
+            var result = new Result();
             try {
                 var con = new DapperConnectionManager();
                 var query = new QueryEntity();

@@ -30,7 +30,7 @@ namespace MyNursingFuture.BL.Managers
                 var con = new DapperConnectionManager();
                 var query = new QueryEntity();
                 query.Entity = quizz;
-                Result result = null;
+                var result = new Result();
 
 
                 string queryString = @"

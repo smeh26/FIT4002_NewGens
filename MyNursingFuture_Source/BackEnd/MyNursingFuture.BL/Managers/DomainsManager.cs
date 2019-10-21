@@ -141,7 +141,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
             ImageManager imageManager = new ImageManager();
             if (entity.IconFile != null)
             {

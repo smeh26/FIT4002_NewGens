@@ -53,7 +53,7 @@ namespace MyNursingFuture.Api.Controllers
         {
             //Woking , tested
 
-            Result result = null;
+            var result = new Result();
 
             //Employer vertification 
             object objemployer = null;
@@ -61,11 +61,12 @@ namespace MyNursingFuture.Api.Controllers
             if (objemployer == null)
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
             var employer = objemployer as EmployerEntity;
+            var employerentity_full = (EmployerEntity) _employersManager.GetEmployerById(employer.EmployerId).Entity;
 
-            if (employer.MembershipEndDate == null ||  DateTime.Compare(employer.MembershipEndDate, DateTime.Now) < 0 ) 
+            if (employerentity_full.MembershipEndDate == DateTime.MinValue ||  DateTime.Compare(employerentity_full.MembershipEndDate, DateTime.Now) < 0 ) 
                 {
                 // membership expired
-
+                result = new Result();
                 result.Success = false;
                 result.Message = "Membership expired";
 
@@ -74,6 +75,7 @@ namespace MyNursingFuture.Api.Controllers
 
 
             jobListing.CreateDate = DateTime.Now;
+            jobListing.EmployerId = employer.EmployerId;
             jobListing.ModificationDate = jobListing.CreateDate;
             result = _jobListingManager.CreateJobListingById(jobListing, employer.EmployerId);
 
@@ -97,7 +99,7 @@ namespace MyNursingFuture.Api.Controllers
         public HttpResponseMessage GetAllListings()
         {
             //Working, tested
-            Result result = null;
+            var result = new Result();
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
             var employer = objemployer as EmployerEntity;
@@ -121,7 +123,7 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/v1/JobListings/Criteria")]
         public HttpResponseMessage PutCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
         {
-            Result result = null;
+            var result = new Result();
             if (jobListingCriteria.Count == 0)
             {
                 result = new Result(false);
@@ -137,7 +139,7 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/v1/JobListings/Criteria")]
         public HttpResponseMessage PutCriteria_V1([FromBody] ListingCriteriaModel listingCriteriaModel)
         {
-            Result result = null;
+            var result = new Result();
 
             //Employer vertification 
             object objemployer = null;
@@ -192,7 +194,7 @@ namespace MyNursingFuture.Api.Controllers
         public HttpResponseMessage GetListingById(int id)
         {
             //Working, tested
-            Result result = null;
+            var result = new Result();
 
             result = _jobListingManager.GetListingById(id);
 
@@ -213,7 +215,7 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/v1/JobListings/PotentialApplicants/{id}")]
         public HttpResponseMessage GetPotentialApplicantsByListingId(int id)
         {
-            Result result = null;
+            var result = new Result();
 
             //Employer vertification 
             object objemployer = null;
@@ -246,7 +248,7 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/v1/JobListings/PotentialApplicants/")]
         public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
         {
-            Result result = null;
+            var result = new Result();
 
             result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
             if (!result.Success)

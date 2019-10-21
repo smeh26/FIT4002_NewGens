@@ -41,7 +41,7 @@ namespace MyNursingFuture.Api.Controllers
   
             //
             Console.WriteLine(dump);
-            Result result = null;
+            var result = new Result();
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Password) || string.IsNullOrEmpty(value.EmployerName))
             {
                 result = new Result(false);
@@ -195,6 +195,8 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/employers/edit")]
         public HttpResponseMessage EditDetails([FromBody]EmployerEntity value)
         {
+            var result = new Result();
+
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.EmployerName))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
@@ -203,12 +205,15 @@ namespace MyNursingFuture.Api.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var employer = objuser as EmployerEntity;
-            employer.Email = value.Email;
-            employer.EmployerName = value.EmployerName;
-            var result = _employersManager.UpdateDetails(employer);
+            object objemp = null;
+            Request.Properties.TryGetValue("employer", out objemp);
+            var employer = objemp as EmployerEntity;
+
+            if (value.EmployerId != employer.EmployerId) {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, result);
+            }
+
+            result = _employersManager.UpdateDetails(value);
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
@@ -240,7 +245,7 @@ namespace MyNursingFuture.Api.Controllers
         // DELETE: api/employers/5
         public HttpResponseMessage Delete([FromBody] int id)
         {
-            Result result = null;
+            var result = new Result();
             object objuser = null;
             Request.Properties.TryGetValue("employer", out objuser);
             var employer = objuser as EmployerEntity;
@@ -261,7 +266,7 @@ namespace MyNursingFuture.Api.Controllers
             var employerId = mbm.EmployerId;
             var duration = mbm.Duration;
 
-            Result result = null;
+            var result = new Result();
             var employer = (EmployerEntity) _employersManager.GetEmployerById(employerId).Entity;
             if (employer == null)
             {

@@ -101,7 +101,7 @@ namespace MyNursingFuture.DL
                 {
                     Logger.Log(e);
                     result.Success = false;
-                    result.Message = e.Message;
+                    result.Message = e.Message + e.StackTrace;
                 }
             }
             return result;

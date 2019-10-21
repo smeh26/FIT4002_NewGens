@@ -35,7 +35,7 @@ namespace MyNursingFuture.Api.Controllers
         // POST: api/Login
         public async Task<HttpResponseMessage> Post([FromBody]UserEntity value)
         {
-            Result result = null;
+            var result = new Result();
             var tokenLogin = false;
             var apnaLogin = false;
 
@@ -119,7 +119,7 @@ namespace MyNursingFuture.Api.Controllers
         // DELETE: api/Login/5
         public HttpResponseMessage Delete(int id, [FromBody]UserEntity value)
         {
-            Result result = null;
+            var result = new Result();
             if (string.IsNullOrEmpty(value.Token) || value.UserId == 0)
             {
                 result = new Result(false);

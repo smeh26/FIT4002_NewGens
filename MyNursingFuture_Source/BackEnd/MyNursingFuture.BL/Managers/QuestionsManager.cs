@@ -157,7 +157,7 @@ WHERE AspectId IS NOT NULL
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
 
 
             query.Query = @"SELECT QuestionId, Text FROM Questions
@@ -193,7 +193,7 @@ WHERE AspectId IS NOT NULL
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
             using (var scope = new TransactionScope())
             {
                 query.Query = @"DELETE FROM UserDataQuestions where QuestionId = @QuestionId";
@@ -230,7 +230,7 @@ WHERE AspectId IS NOT NULL
         public Result Insert(QuestionEntity entity)
         {
             var con = new DapperConnectionManager();
-            Result result = null;
+            var result = new Result();
             using (var scope = new TransactionScope())
             {
                 var query = new QueryEntity();
@@ -292,7 +292,7 @@ WHERE AspectId IS NOT NULL
         public Result Update(QuestionEntity entity)
         {
             var con = new DapperConnectionManager();
-            Result result = null;
+            var result = new Result();
 
             using (var scope = new TransactionScope())
             {

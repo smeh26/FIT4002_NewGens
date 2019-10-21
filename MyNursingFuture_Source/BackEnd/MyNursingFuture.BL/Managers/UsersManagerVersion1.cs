@@ -33,7 +33,7 @@ namespace MyNursingFuture.BL.Managers
     {
         public Result Register(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 if(entity.Password.Length < 6)
@@ -122,7 +122,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result Login(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -178,7 +178,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result LoginApna (UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -512,7 +512,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result GenerateRecoveringCode(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
             var credentials = new CredentialsManager();
@@ -561,7 +561,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result ResetPassword(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 //Double validation
@@ -626,7 +626,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result ChangePassword(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var credentials = new CredentialsManager();
@@ -693,7 +693,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result UpdateDetails(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 if (!entity.Email.Contains("@") || entity.Email.Length < 3)

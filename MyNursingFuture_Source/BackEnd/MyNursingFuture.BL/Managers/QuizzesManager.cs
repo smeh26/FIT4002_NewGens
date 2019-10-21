@@ -31,7 +31,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
 
             //ASSeSSMENT QUIZZES GET BY DOMAIN NO TYPE
             if(QuizTypes.ASSESSMENT == type)
@@ -83,7 +83,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
             
 
             query.Query = @"SELECT * FROM Quizzes
@@ -145,7 +145,7 @@ namespace MyNursingFuture.BL.Managers
         private Result GetQuestionsByQuiz(int quizId, DapperConnectionManager con)
         {
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
 
 
             query.Query = @"SELECT  udq.FieldName, q.QuestionId, q.QuizId, q.Type, q.AspectId, q.Text, q.SubText, q.Active, q.Requirements, q.Position, q.Examples FROM Questions as q
