@@ -753,10 +753,11 @@ namespace MyNursingFuture.BL.Managers
                                             [IsLookingForJob] = ISNULL(@IsLookingForJob, IsLookingForJob) ,
                                             [minsalary] = ISNULL(@minsalary, minsalary) ,
                                             [maxsalary] = ISNULL(@maxsalary, maxsalary),
-                                            [defaultQuizId] = ISNULL(@defaultQuizId, NULL)
+                                            [defaultQuizId] = ISNULL(@defaultQuizId, defaultQuizId),
+                                            [salary] = ISNULL(@salary, NULL)
 
                             where UserId = @UserId and Active = 1";
-                query.Entity = new { UserId = entity.UserId, Email = entity.Email, Name = entity.Name };
+                query.Entity = entity;
                 result = con.ExecuteQuery<UserEntity>(query);
                 result.Message = result.Success ? "The user details has been updated" : "An error has occurred";
             }

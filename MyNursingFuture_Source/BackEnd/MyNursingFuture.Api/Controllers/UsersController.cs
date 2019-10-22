@@ -28,7 +28,7 @@ namespace MyNursingFuture.Api.Controllers
             _usersManager = usersManager;
             _cacheManager = cacheManager;
         }
-        
+        [HttpPost]
         // POST: api/Users
         public HttpResponseMessage Post([FromBody]UserEntity value)
         {
@@ -139,7 +139,7 @@ namespace MyNursingFuture.Api.Controllers
         [JwtAuthorized]
         [HttpDelete]
         [Route("api/users/quizzes/{id}")]
-        public HttpResponseMessage GetAllQuizzes(int id)
+        public HttpResponseMessage GetQuizzesby(int id)
         {
             object objuser = null;
             Request.Properties.TryGetValue("user", out objuser);
@@ -183,6 +183,7 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        [HttpPost]
         [JwtAuthorized]
         [Route("api/users/edit")]
         public HttpResponseMessage EditDetails([FromBody]UserEntity value)
@@ -198,9 +199,10 @@ namespace MyNursingFuture.Api.Controllers
             object objuser = null;
             Request.Properties.TryGetValue("user", out objuser);
             var user = objuser as UserEntity;
-            user.Email = value.Email;
-            user.Name = value.Name;
-            var result = _usersManager.UpdateDetails(user);
+            value.UserId = user.UserId;
+  
+
+            var result = _usersManager.UpdateDetails(value);
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 

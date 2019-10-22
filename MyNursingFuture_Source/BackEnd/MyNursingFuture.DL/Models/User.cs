@@ -32,7 +32,7 @@ namespace MyNursingFuture.DL.Models
         public bool IsLookingForJob { get; set; }
         public int MaxSalary { get; set; }
         public int MinSalary { get; set; }
-
+        public int salary { get; set; }
         public int defaultQuizId { get; set; }
 
     }
