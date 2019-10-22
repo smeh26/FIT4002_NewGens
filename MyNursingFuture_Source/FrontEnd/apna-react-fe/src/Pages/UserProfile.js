@@ -17,9 +17,9 @@ class UserProfile extends Component {
     this.state = {
       nameEditing: false,
       emailEditing: false,
-      minSalaryEditing: false,
-      locationPrefEditing: false,
-      isLookingForJobEditing: false,
+      // minSalaryEditing: false,
+      // locationPrefEditing: false,
+      // isLookingForJobEditing: false,
       passwordEditing: false,
       salaryEditing: false,
       inputs: {

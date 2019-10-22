@@ -609,6 +609,7 @@ export function fetchFrameworkData(type){
       'Authorization': 'Bearer ' + cookies.getItem('token')
       } 
     }
+    console.log(options);
     return fetch(config.apiUrl+config.apiBaseUrl+'Framework/nocache', options).then(function(response){
       return response.json();
     }).then(json => {

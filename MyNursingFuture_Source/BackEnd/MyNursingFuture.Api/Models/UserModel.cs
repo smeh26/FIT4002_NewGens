@@ -1,6 +1,7 @@
 ﻿using MyNursingFuture.BL.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -27,7 +28,8 @@ namespace MyNursingFuture.Api.Models
         public string Qualification { get; set; }
         public string Setting { get; set; }
 
-        public string MinSalaryReq { get; set; }
+        [Column("minsalary")]
+        public string  Salary{ get; set; }
         public IEnumerable<UsersQuizzesEntity> Quizzes { get; set; }
     }
 }

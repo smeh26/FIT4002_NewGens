@@ -779,9 +779,9 @@ namespace MyNursingFuture.BL.Managers
                 }
                 
 
-                query.Query = @"Update Users Set Name = @Name, Email = @Email, MinSalaryReq = @MinSalaryReq
+                query.Query = @"Update Users Set Name = @Name, Email = @Email, minsalary = @Salary
                             where UserId = @UserId and Active = 1";
-                query.Entity = new { UserId = entity.UserId, Email = entity.Email, Name = entity.Name, MinSalaryReq = entity.MinSalaryReq };
+                query.Entity = new { UserId = entity.UserId, Email = entity.Email, Name = entity.Name, Salary = entity.Salary};
                 result = con.ExecuteQuery<UserEntity>(query);
                 result.Message = result.Success ? "The user details has been updated" : "An error has occurred";
             }

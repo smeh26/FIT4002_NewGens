@@ -187,7 +187,7 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/users/edit")]
         public HttpResponseMessage EditDetails([FromBody]UserEntity value)
         {
-            if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Name) || string.IsNullOrEmpty(value.MinSalaryReq) )
+            if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Name) || string.IsNullOrEmpty(value.Salary))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
@@ -198,7 +198,7 @@ namespace MyNursingFuture.Api.Controllers
             object objuser = null;
             Request.Properties.TryGetValue("user", out objuser);
             var user = objuser as UserEntity;
-            user.MinSalaryReq = value.MinSalaryReq;
+            user.Salary = value.Salary;
             user.Email = value.Email;
             user.Name = value.Name;
             var result = _usersManager.UpdateDetails(user);
