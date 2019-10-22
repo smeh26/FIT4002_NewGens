@@ -203,7 +203,36 @@ namespace MyNursingFuture.Api.Controllers
   
 
             var result = _usersManager.UpdateDetails(value);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+            if (result.Success)
+            {
+                var updated_user = _usersManager.GetUserDetails(user);
+                if (updated_user.Success)
+                    return Request.CreateResponse(HttpStatusCode.OK, updated_user.Entity);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
+        }
+
+        [HttpGet]
+        [JwtAuthorized]
+        [Route("api/users")]
+        public HttpResponseMessage GetCurrentUserDetails()
+        {
+
+            object objuser = null;
+            Request.Properties.TryGetValue("user", out objuser);
+            var user = objuser as UserEntity;
+
+            if ( user == null)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
+
+            var updated_user = _usersManager.GetUserDetails(user);
+
+            if (updated_user.Success)
+                return Request.CreateResponse(HttpStatusCode.OK, updated_user.Entity);
+
+            return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
         }
 
         [JwtAuthorized]

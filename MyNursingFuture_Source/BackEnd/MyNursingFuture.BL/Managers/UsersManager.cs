@@ -28,6 +28,7 @@ namespace MyNursingFuture.BL.Managers
         Result SaveQuiz(UsersQuizzesEntity quiz, Dictionary<int, object> questionsAnswers);
         Result UpdateDetails(UserEntity entity);
         Result ResetPassword(UserEntity entity);
+        Result GetUserDetails(UserEntity entity);
     }
     public class UsersManager: IUsersManager
     {
@@ -771,6 +772,59 @@ namespace MyNursingFuture.BL.Managers
             
             return result;
         }
+
+        public Result GetUserDetails(UserEntity entity)
+        {
+            var result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+
+                
+                query.Query = @"SELECT [UserId]
+                                        ,[Name]
+                                        ,[Email]
+                                        ,[ApnaMemberId]
+                                        ,[ApnaUser]
+                                        ,[NurseType]
+                                        ,[Area]
+                                        ,[Age]
+                                        ,[Country]
+                                        ,[Suburb]
+                                        ,[PostalCode]
+                                        ,[State]
+                                        ,[Patients]
+                                        ,[PatientsTitle]
+                                        ,[Qualification]
+                                        ,[IsLookingForJob]
+                                        ,[defaultQuizId]
+                                        ,[salary] 
+                                        FROM Users
+                            where UserId = @UserId";
+                query.Entity = entity;
+                result = con.ExecuteGetOneItemQuery<UserEntity>(query);
+
+                if (!result.Success)
+                {
+                    result.Entity = null;
+                    result.Message = "Login error";
+                    return result;
+                }
+
+                result.Message = "The current user details";
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result = result ?? new Result(false);
+                result.Message = "An error occurred";
+                throw;
+            }
+
+            return result;
+        }
+
 
 
         public Result Delete(UserEntity entity)
