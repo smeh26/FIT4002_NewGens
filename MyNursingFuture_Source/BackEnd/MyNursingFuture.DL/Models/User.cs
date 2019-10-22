@@ -16,7 +16,7 @@ namespace MyNursingFuture.DL.Models
         public string RecoverToken { get; set; }
         public string NurseType { get; set; }
         public bool IsLookingForWork { get; set; }
-        public int MinSalaryReq { get; set; }
+        public string MinSalaryReq { get; set; }
         public string Area { get; set; }
         public string State { get; set; }
         public string ActiveWorking { get; set; }

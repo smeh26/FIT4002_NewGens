@@ -78,21 +78,21 @@ class UserProfile extends Component {
         break;
       case 'salary':
         this.setState({ salaryEditing: !this.state.salaryEditing });
-      case 'passwordCancel':
-        this.setState({ passwordEditing: false });
-        this.setState({ inputs: Object.assign({}, this.state.inputs, { oldPassword: '', newPassword: '' }) });
-        this.props.unsetUserError();
-      case 'minSalaryReq' :
-        this.setState({minSalaryEditing: !this.state.minSalaryEditing});
-        break;
-      case 'locationPref' :
-        this.setState({locationPrefEditing: !this.state.locationPrefEditing});
-        break;
-      case 'isLookingForJob' :
-        this.setState({isLookingForJobEditing: !this.state.isLookingForJobEditing});
-        break;
-      default:
-        break;
+      // case 'passwordCancel':
+      //   this.setState({ passwordEditing: false });
+      //   this.setState({ inputs: Object.assign({}, this.state.inputs, { oldPassword: '', newPassword: '' }) });
+      //   this.props.unsetUserError();
+      // case 'minSalaryReq' :
+      //   this.setState({minSalaryEditing: !this.state.minSalaryEditing});
+      //   break;
+      // case 'locationPref' :
+      //   this.setState({locationPrefEditing: !this.state.locationPrefEditing});
+      //   break;
+      // case 'isLookingForJob' :
+      //   this.setState({isLookingForJobEditing: !this.state.isLookingForJobEditing});
+      //   break;
+      // default:
+      //   break;
     }
   }
   

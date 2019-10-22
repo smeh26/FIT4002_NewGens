@@ -25,10 +25,10 @@ class Sidebar extends Component{
         ]
     } else {
       loginMenu = [
-    //     { href: "#", title: 'Nurse Sign in', className: 'sign-in', action: 'authModal'},
-    //     { href: "/user/register", title: 'Register', className:'sign-in'},
-    //   ];
-    // }
+        { href: "#", title: 'Nurse Sign in', className: 'sign-in', action: 'authModal'},
+        { href: "/user/register", title: 'Register', className:'sign-in'},
+      ];
+    }
     // if (this.props.loggedIn){
     //   employerLoginMenu = [
     //     { href: "#", title: 'Hi, ' + this.props.name, className: 'no-decoration'},
@@ -43,8 +43,8 @@ class Sidebar extends Component{
     //     { href: "#", title: 'Employer Sign in', className: 'sign-in', action: 'authModal'},
     //     { href: "", spacer: true }
         
-      ];
-    }
+      // ];
+    // }
     
     let sidebarMenuItems = [];
     if (this.props.menus && this.props.menus.length > 0){
