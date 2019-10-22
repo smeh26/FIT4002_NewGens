@@ -45,7 +45,20 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-
+        /// <summary>
+        /// API to post a job listing 
+        /// </summary>
+        /// <remarks> 
+        /// Joblisting requires the following minimum fields:
+        /// employerId
+        /// maxsalary
+        /// minsalary
+        /// 
+        /// TODO: enforce required fields
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpPut]
         [EmployerJWTAuthorized]
         [Route("api/v1/JobListings")]
@@ -94,6 +107,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        /// <summary>
+        /// API to retrieve all listing on the system
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpGet]
         [Route("api/v1/JobListings")]
         public HttpResponseMessage GetAllListings()
@@ -118,22 +138,32 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-/*        [HttpPut]
-        [EmployerJWTAuthorized]
-        [Route("api/v1/JobListings/Criteria")]
-        public HttpResponseMessage PutCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
-        {
-            var result = new Result();
-            if (jobListingCriteria.Count == 0)
-            {
-                result = new Result(false);
-                return Request.CreateResponse(HttpStatusCode.NotFound, result);
-            }
-            result = _jobListingCriteriaManager.InsertCriteria(jobListingCriteria);
+        /*        [HttpPut]
+                [EmployerJWTAuthorized]
+                [Route("api/v1/JobListings/Criteria")]
+                public HttpResponseMessage PutCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
+                {
+                    var result = new Result();
+                    if (jobListingCriteria.Count == 0)
+                    {
+                        result = new Result(false);
+                        return Request.CreateResponse(HttpStatusCode.NotFound, result);
+                    }
+                    result = _jobListingCriteriaManager.InsertCriteria(jobListingCriteria);
 
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }
-*/
+                    return Request.CreateResponse(HttpStatusCode.OK, result);
+                }
+        */
+
+        /// <summary>
+        /// API to put in list of required answers 
+        /// </summary>
+        /// <remarks> 
+        /// 
+        /// All fields are required  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpPut]
         [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/Criteria")]
@@ -186,7 +216,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-
+        /// <summary>
+        /// Get a single listing object by Id
+        /// </summary>
+        /// <remarks> TODO : return the listing  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         //[JwtAuthorized]
         [HttpGet]
         [GenericJWTAuthorized]
@@ -210,6 +246,24 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
+
+        /// <summary>
+        /// Get all applicants (ID only) meeting the requirement of a listing (indexed by Id) 
+        /// </summary>
+        /// <remarks> 
+        /// Check list:
+        /// - check if looking for job - done
+        /// - check if salary is in prefered range - done 
+        /// - check if nurse meet the attached citeria - done 
+        /// Return a list of nurse ID
+        /// -> use this to estimate the number of matches. 
+        /// -> use 
+        /// //TODO : filter 
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpGet]
         [EmployerJWTAuthorized]
         [Route("api/v1/JobListings/PotentialApplicants/{id}")]
