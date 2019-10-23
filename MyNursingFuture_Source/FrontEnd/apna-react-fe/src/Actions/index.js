@@ -544,7 +544,7 @@ export function fetchGlossaryData() {
   }
 }
 
-export function fetchCheckUserAuth(token) {
+export function fetchCheckNurseAuth(token) {
   return function (dispatch, getState) {
     dispatch(requestLogin());
     dispatch(unsetUserError());
@@ -561,20 +561,26 @@ export function fetchCheckUserAuth(token) {
     return fetch(config.apiUrl + config.apiBaseUrl + 'login', options).then(function (response) {
       return response.json();
     }).then(function (response) {
-      console.log("response:", response);
       if (!response.success) {
         throw response.message;
       }
       dispatch(setUserData(response.entity));
       dispatch(mapUserDataToAboutYouAnswers());
-      if (!cookies.hasItem('token')) {
-        cookies.setItem('token', token);
-        dispatch(fetchSaveInProgressQuizzes());
+      if (cookies.hasItem('token')) {
+        cookies.removeItem('token');
       }
+      cookies.setItem('token', response.entity.token);
+
+      if (cookies.hasItem('_ut')) {
+        cookies.removeItem('_ut');
+      }
+      cookies.setItem('_ut', 'nurse');
+
+      dispatch(fetchSaveInProgressQuizzes());
+
       dispatch(setUserLoggedIn());
       dispatch(unsetUserError());
     }).catch(function (error) {
-      console.log(error);
       if (error && error.message) {
         dispatch(setUserError(error.message));
       } else {
@@ -587,7 +593,49 @@ export function fetchCheckUserAuth(token) {
   }
 }
 
-export function fetchCheckEmpAuth(email, password) {
+export function fetchCheckEmployerAuth(token) {
+  return (dispatch, getState) => {
+    dispatch(requestLogin());
+    dispatch(unsetUserError());
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    }
+    return fetch(config.apiUrl + config.apiBaseUrl + 'v1/EmployerLogin', options)
+      .then((response) => response.json())
+      .then((response) => {
+        if (!response.success) {
+          throw response.message;
+        }
+        dispatch(setUserData(response.entity));
+        if (cookies.hasItem('token')) {
+          cookies.removeItem('token');
+        }
+        cookies.setItem('token', response.entity.token);
+
+        if (cookies.hasItem('_ut')) {
+          cookies.removeItem('_ut');
+        }
+        cookies.setItem('_ut', 'employer');
+
+        dispatch(setUserLoggedIn());
+        dispatch(unsetUserError());
+      }).catch(function (error) {
+        if (error && error.message) {
+          dispatch(setUserError(error.message));
+        } else {
+          dispatch(setUserError('An unknown error occurred.'));
+        }
+      }).finally(() => dispatch(endLogin()));
+  }
+}
+
+export function fetchLoginEmployer(email, password) {
   return function (dispatch, getState) {
     dispatch(requestLogin());
     dispatch(unsetUserError());
@@ -612,10 +660,14 @@ export function fetchCheckEmpAuth(email, password) {
       }
       cookies.setItem('token', response.entity.token);
 
+      if (cookies.hasItem('_ut')) {
+        cookies.removeItem('_ut');
+      }
+      cookies.setItem('_ut', 'employer');
+
       dispatch(setUserLoggedIn());
       dispatch(unsetUserError());
     }).catch(function (error) {
-      console.log(error);
       if (error && error.message) {
         dispatch(setUserError(error.message));
       } else {
@@ -632,6 +684,7 @@ export function logOutUser() {
   return function (dispatch, getState) {
     dispatch(setUserLoggedOut());
     cookies.removeItem('token');
+    cookies.removeItem('_ut');
   }
 }
 
@@ -682,7 +735,6 @@ export function fetchFrameworkData(type) {
         'Authorization': 'Bearer ' + cookies.getItem('token')
       }
     }
-    console.log(options);
     return fetch(config.apiUrl + config.apiBaseUrl + 'Framework/nocache', options).then(function (response) {
       return response.json();
     }).then(json => {
@@ -844,16 +896,10 @@ export function fetchSubmitArticleFeedback(articleId, title, feedback, positive)
 
 
 export function fetchJobListings() {
-  console.log('etchokagf')
   return (dispatch, getState) => {
     if (!cookies.hasItem('token')) {
       return;
     }
-
-    // const cachedJobListing = getState().app.user.joblistings;
-    // if (cachedJobListing.length > 0) {
-    //   return;
-    // }
 
     const options = {
       method: 'GET',
@@ -873,7 +919,6 @@ export function fetchJobListings() {
         }
         if (response.success) {
           dispatch(setJobListingData(response.entity));
-          console.log('joblising', response)
         }
       })
       .finally(() => dispatch(completeRequestJobListingData));
@@ -883,7 +928,6 @@ export function fetchJobListings() {
 export function fetchUserQuizzes(forceUpdate) {
   return function (dispatch, getState) {
     if (!cookies.hasItem('token')) {
-      // console.log( "User is not logged in");
       return;
     }
     const cached = getState().app.user.quizzes;
@@ -963,7 +1007,7 @@ export function loadQuiz(type, id) {
   }
 }
 
-export function fetchLogIn(e, p) {
+export function fetchLoginNurse(e, p) {
   return function (dispatch, getState) {
     dispatch(requestLogin());
     dispatch(unsetUserError());
@@ -979,7 +1023,6 @@ export function fetchLogIn(e, p) {
     return fetch(config.apiUrl + config.apiBaseUrl + 'login', options).then(function (response) {
       return response.json();
     }).then(function (response) {
-      console.log("response:", response);
       if (!response.success) {
         throw response;
       }
@@ -1004,7 +1047,6 @@ export function fetchLogIn(e, p) {
   }
 }
 
-// 'Authentication': 'bearer ' + cookies.getItem('token')
 export function fetchRegisterEmployer(n, e, p) {
   return function (dispatch, getState) {
     dispatch(requestRegister());
@@ -1027,7 +1069,7 @@ export function fetchRegisterEmployer(n, e, p) {
         }
         dispatch(setUserData(response.entity));
         if (response.entity.token) {
-          dispatch(fetchCheckEmpAuth(e, p));
+          dispatch(fetchLoginEmployer(e, p));
         }
       }).catch(function (error) {
         if (error && error.message) {
@@ -1063,7 +1105,7 @@ export function fetchRegister(n, e, p) {
         }
         dispatch(setUserData(response.entity));
         if (response.entity.token) {
-          dispatch(fetchCheckUserAuth(response.entity.token));
+          dispatch(fetchCheckNurseAuth(response.entity.token));
         }
       }).catch(function (error) {
         if (error && error.message) {
@@ -1105,7 +1147,6 @@ export function fetchUpdateUserDetails(name, email, salary) {
       body: data
     };
 
-    console.log(data);
     return fetch(config.apiUrl + config.apiBaseUrl + 'users/edit', options).then(function (response) {
       return response.json();
     }).then(function (response) {

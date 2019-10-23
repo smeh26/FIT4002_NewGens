@@ -23,6 +23,7 @@ import Endorsedlogo from './ContentItems/Endorsedlogo';
 import Accordion from './ContentItems/Accordion';
 import AuthNurse from './ContentItems/AuthNurse';
 import AuthEmployer from './ContentItems/AuthEmployer';
+import JobListings from './ContentItems/JobListings';
 // import AuthEmployer from './ContentItems/AuthEmployer';
 // contentItem types:
 // default
@@ -44,6 +45,8 @@ var PageContent = (props) => {
     switch(contentItem.type){
       case 'DEFAULT':
         return <Default content={contentItem} key={index} />
+      case 'JOBLISTINGS':
+            return <JobListings  key={index} />
       case 'HEADING':
         return <Heading content={contentItem} key={index} />
       case 'SINGLELINELINK':

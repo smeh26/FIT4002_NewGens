@@ -97,6 +97,9 @@ namespace MyNursingFuture.Cms.Models
         [Category("GenericItem")]
         [Description("Auth Employer")]
         AUTHEMPLOYER,
+        [Category("GenericItem")]
+        [Description("Job Listings")]
+        JOBLISTINGS,
     }
 
     public class ContentItemViewModel
