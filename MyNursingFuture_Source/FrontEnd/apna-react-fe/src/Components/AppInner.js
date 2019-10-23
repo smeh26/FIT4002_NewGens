@@ -4,6 +4,7 @@ import { Route } from 'react-router'
 import { ConnectedRouter } from 'react-router-redux'
 import cookies from '../Misc/cookies';
 import RegisterUser from './RegisterUser'
+import RegisterEmployer from './RegisterEmployer'
 
 import { fetchFrameworkData, 
   closeModal, 
@@ -15,7 +16,8 @@ import { fetchFrameworkData,
   fetchResetPassword,
   fetchRequestResetPassword,
   fetchSubmitArticleFeedback,
-  fetchUserQuizzes } from '../Actions'
+  fetchUserQuizzes,
+  fetchCheckEmpAuth } from '../Actions'
 
 // Top-level components
 import Header from './Header';
@@ -111,9 +113,13 @@ class AppInner extends Component {
     }
 
   }
+  
+  handleEmpLogIn = () => {
+    this.props.empLogIn(this.state.inputs.email,this.state.inputs.password);
+    
+  }
 
-
-handleLogIn() {
+  handleLogIn() {
     this.props.logIn(this.state.inputs.email,this.state.inputs.password);
   }
   
@@ -156,7 +162,7 @@ handleLogIn() {
     const modalContainerClass = 'container-fluid modal-container' + (this.props.modal.showing ? '' : ' normal-bg' );
 
     //console.log('rendering of modals', this.props.user.name, this.props.user.email);
-   
+    console.log(this.props.userMessage);
     return (
       <ConnectedRouter history={history}>
         <div className="App">
@@ -213,6 +219,54 @@ handleLogIn() {
               </div>
             </div>
             }
+
+  { this.props.modal.showing && this.props.modal.showingId == 'employerlogin' &&
+            <div className={modalContainerClass}>
+              <div className="modal-inner">
+                <span className="oi modal-close" data-glyph="x" onClick={this.handleModalCloseClick}></span>
+                <div className="modal">
+                    {this.props.userMessage &&
+                    <p>{this.props.userMessage}</p>
+                    }
+                    {this.props.loggedIn && 
+                    <div className="row">
+                      <div className="col-8 offset-2">
+                        <h2> {this.props.user.employerName}</h2>
+                        <p>You are now logged in. Click the button below to continue.</p>
+                        <button className="btn" onClick={this.handleModalCloseClick}>Close</button>
+                      </div>
+                    </div>
+                    }
+                    {!this.props.loggedIn && !this.props.userLoading &&
+                    <div className="row">
+                        <div className="col-8 offset-2">
+                        
+                        <h1>Sign in</h1>
+                        <p>Sign in to create job listings and match with the perfect nurse for your needs!</p>
+                        <div className="input-block">
+                          <input type="text" value={this.state.inputs.email} name="email" placeholder="Email address" onChange={this.handleChangeInput} />
+                          <input type="password" value={this.state.inputs.password} name="password" placeholder="Password" onChange={this.handleChangeInput} />
+                        </div>
+                        
+                        {this.props.userError &&
+                        <p>{this.props.userError}</p>
+                        }
+                        <button className="btn" onClick={this.handleEmpLogIn} disabled={!this.state.inputs.email || !this.state.inputs.password}>Log in</button>
+                        <div><a href="/employer/register">Register</a></div>
+                        {/* <a href="" onClick={this.handleRequestResetPassword}>Reset password</a>
+                        <p>
+                          If you are using your APNA member login details and need to reset your password click <a href="https://www.apna.asn.au/account/getanewpassword" target="_blank">here</a>.
+                        </p> */}
+                      </div>
+                    </div>
+                    }
+
+                    {this.props.userLoading && <div className="loading-wrapper"><img src="/img/loading.gif" /></div>}
+
+                </div>
+              </div>
+            </div>
+            } 
           
             { this.props.modal.showing && this.props.modal.showingId == 'emailreport' &&
             <div className={modalContainerClass}>
@@ -529,6 +583,7 @@ handleLogIn() {
             
             <Route exact path="/user" component={UserHub} />
             <Route exact path="/user/register" component={RegisterUser} />
+            <Route exact path="/employer/register" component={RegisterEmployer} />
 
             <Footer />
             </div>
@@ -593,6 +648,12 @@ const mapDispatchToProps = (dispatch, props) => {
     submitArticleFeedback: function(articleId,title,feedback,positive){
       dispatch(fetchSubmitArticleFeedback(articleId,title,feedback,positive));
     },
+    empLogIn: function(e,p){
+      dispatch(fetchCheckEmpAuth(e,p));
+    },
+
+
+
     logIn: function(e,p){
       dispatch(fetchLogIn(e,p));
     },

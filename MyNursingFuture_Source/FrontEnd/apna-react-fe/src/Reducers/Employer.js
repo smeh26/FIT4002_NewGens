@@ -9,13 +9,13 @@ const initialState = {
 
 const employer = (state = initialState, action) => {
     switch (action.type) {
-        case 'START_LOGIN':
-        case 'START_REGISTER':
+        case 'EMP_START_LOGIN':
+        case 'EMP_START_REGISTER':
         case 'START_EMPLOYER_DATA':
             return Object.assign({}, state, {
                 isLoading: true
             });
-        case 'END_LOGIN':
+        case 'EMP_END_LOGIN':
             return Object.assign({}, state, {
                 isLoading: false,
                 message: action.message
@@ -36,12 +36,12 @@ const employer = (state = initialState, action) => {
             return Object.assign({}, state, {
                 loggedIn: false
             });
-        case 'START_LOGOUT':
+        case 'EMP_START_LOGOUT':
             return Object.assign({}, state, {
                 isLoading: false
             });
-        case 'END_LOGOUT':
-        case 'END_REGISTER':
+        case 'EMP_END_LOGOUT':
+        case 'EMP_END_REGISTER':
         case 'END_EMPLOYER_DATA':
             return Object.assign({}, state, {
                 isLoading: false,

@@ -1,8 +1,8 @@
 var conf;
 
 conf = {
-  // apiUrl: 'https://mynursingfutureapi.azurewebsites.net/',
-  apiUrl: 'http://localhost:5056/',
+  apiUrl: 'https://mynursingfutureapi.azurewebsites.net/',
+  // apiUrl: 'http://localhost:5056/',
   apiBaseUrl: 'api/',
   siteUrl: 'http://localhost:3000/',
   shareBaseUrl: 'http://localhost:3000/',

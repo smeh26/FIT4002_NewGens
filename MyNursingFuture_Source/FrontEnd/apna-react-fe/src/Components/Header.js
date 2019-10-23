@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { sidebarToggle } from '../Actions'
 import { Link } from 'react-router-dom';
@@ -10,11 +10,21 @@ class Header extends Component {
   }
 
   render() {
+    let homeUrl = '/';
+    if (this.props.loggedIn) {
+      if (this.props.isEmployer) {
+        homeUrl = '/sections/15';
+      } else {
+        // Nurse Portal
+        homeUrl = '/sections/1';
+      }
+    }
+
     const backgroundClass = (this.props.locationLabel == 'Career Advice'
       ? 'article-gradient-background'
       : '');
 
-    const  showMenu = window.location.pathname !== "/";
+    const showMenu = window.location.pathname !== "/";
 
     return (
       <div>
@@ -23,7 +33,7 @@ class Header extends Component {
           <div className="container-fluid">
             <div className={'row ' + backgroundClass}>
               <div className="header-col home-col">
-                <Link to="/">
+                <Link to={homeUrl}>
                   <img src="/img/MNF_tree-White.png" />
                 </Link>
               </div>
@@ -45,7 +55,11 @@ class Header extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return { locationLabel: state.app.headerFooterMenus.locationLabel, loggedIn: state.app.user.loggedIn }
+  return {
+    locationLabel: state.app.headerFooterMenus.locationLabel,
+    loggedIn: state.app.user.loggedIn,
+    isEmployer: state.app.user.employerName,
+  }
 };
 
 const mapDispatchToProps = (dispatch) => {
