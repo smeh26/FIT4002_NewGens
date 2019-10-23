@@ -258,7 +258,7 @@ namespace MyNursingFuture.Api.Controllers
         /// Return a list of nurse ID
         /// -> use this to estimate the number of matches. 
         /// -> use 
-        /// //TODO : filter 
+        /// //TODO : filter Applicant by their prefered quiz result only ( currently it take into account everything )
         /// 
         /// </remarks>
         /// <response code="200"></response>

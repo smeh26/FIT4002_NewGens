@@ -28,6 +28,14 @@ namespace MyNursingFuture.Api.Controllers
             _usersManager = usersManager;
             _cacheManager = cacheManager;
         }
+
+        /// <summary>
+        /// API For retrieving a Job Application by its Id
+        /// </summary>
+        /// <remarks> UNTESTED  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpPost]
         // POST: api/Users
         public HttpResponseMessage Post([FromBody]UserEntity value)
@@ -57,6 +65,14 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+
+        /// <summary>
+        /// Get 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/users/quiz/career/{complete}")]
         public HttpResponseMessage GetCareerQuizzes(string complete)
@@ -70,6 +86,13 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/users/quiz/career/save")]
         public HttpResponseMessage SaveQuizCareer([FromBody]UsersQuizzesEntity entity)
@@ -83,6 +106,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/users/quiz/selfassessment/{complete}")]
         public HttpResponseMessage GetAssessmentQuizzes(string complete)
@@ -96,6 +126,13 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/users/quiz/selfassessment/save")]
         public HttpResponseMessage SaveAssessmentQuiz([FromBody]UsersQuizzesEntity entity)
@@ -109,6 +146,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/users/quiz/aboutyou/save")]
         public HttpResponseMessage SaveAboutyouQuiz([FromBody]UsersQuizzesEntity entity)
@@ -124,6 +168,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/users/quizzes")]
         public HttpResponseMessage GetAllQuizzes()
@@ -136,6 +187,13 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [HttpDelete]
         [Route("api/users/quizzes/{id}")]
@@ -148,6 +206,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [Route("api/users/recover")]
         public HttpResponseMessage Recover([FromBody]UserEntity value)
         {
@@ -163,6 +228,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [Route("api/users/recover/reset")]
         public HttpResponseMessage ResetPassword([FromBody]UserEntity value)
         {
@@ -183,6 +255,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpPost]
         [JwtAuthorized]
         [Route("api/users/edit")]
@@ -214,6 +293,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpGet]
         [JwtAuthorized]
         [Route("api/users")]

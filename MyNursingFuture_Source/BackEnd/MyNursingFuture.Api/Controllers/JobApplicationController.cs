@@ -41,6 +41,15 @@ namespace MyNursingFuture.Api.Controllers
             _jobApplicationManager = jobApplicationManager;
 
         }
+
+
+        /// <summary>
+        /// API For creating Job Application
+        /// </summary>
+        /// <remarks> UNTESTED  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpPost]
         [JwtAuthorized]
         [Route("api/v1/Applications")]
@@ -77,7 +86,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-
+        /// <summary>
+        /// API For shortlisting a Job Application
+        /// </summary>
+        /// <remarks> UNTESTED  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpPost]
         [EmployerJWTAuthorized]
         [Route("api/v1/Applications/Shorlist/{applicationId}")]
@@ -112,6 +127,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        /// <summary>
+        /// API For shortlisting a Job Application
+        /// </summary>
+        /// <remarks> UNTESTED  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/v1/Applications/Users/{id}")]
         public HttpResponseMessage GetApplicationByUserId(int id)
@@ -141,6 +163,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        /// <summary>
+        /// API For retrieving a Job Application by Listing Id
+        /// </summary>
+        /// <remarks> UNTESTED  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [EmployerJWTAuthorized]
         [Route("api/v1/Applications/Listing/{id}")]
         public HttpResponseMessage GetApplicationByListingId(int id)
@@ -161,6 +190,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        /// <summary>
+        /// API For retrieving a Job Application by its Id
+        /// </summary>
+        /// <remarks> UNTESTED  </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [HttpGet]
         [GenericJWTAuthorized]
         [Route("api/v1/Applications/{id}")]

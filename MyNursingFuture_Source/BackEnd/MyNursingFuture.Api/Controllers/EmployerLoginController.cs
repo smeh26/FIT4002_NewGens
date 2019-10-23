@@ -31,6 +31,18 @@ namespace MyNursingFuture.Api.Controllers
             _cacheManager = cacheManager;
 
         }
+
+        /// <summary>
+        /// Employer registration API
+        /// </summary>
+        /// <remarks> TODO: enforce required fields
+        /// 
+        /// Implement object copy function to Filter out unnessary fields  
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpPost]
         // POST: api/Login
         [Route("api/v1/EmployerLogin")]
         public async Task<HttpResponseMessage> Post([FromBody]EmployerEntity value)
