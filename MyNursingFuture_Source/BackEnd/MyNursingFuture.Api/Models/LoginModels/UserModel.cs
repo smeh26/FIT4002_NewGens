@@ -27,7 +27,7 @@ namespace MyNursingFuture.Api.Models
         public string Qualification { get; set; }
         public string Setting { get; set; }
         public IEnumerable<UsersQuizzesEntity> Quizzes { get; set; }
-        public bool IsLookingForJob { get; set; }
+        public Nullable<bool> IsLookingForJob { get; set; }
         public int salary { get; set; }
         public int defaultQuizId { get; set; }
 

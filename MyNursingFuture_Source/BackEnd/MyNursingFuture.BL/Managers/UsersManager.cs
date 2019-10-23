@@ -876,5 +876,26 @@ namespace MyNursingFuture.BL.Managers
             return new Result(false);
 
         }
+
+        public Result GetAllPreferedQuizzId()
+        {
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = new { };
+                query.Query = @"SELECT defaultQuizId FROM Users Where defaultQuizId <> 0";
+                var result = con.ExecuteQuery<int>(query);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+
+        }
+
+
     }
 }

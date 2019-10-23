@@ -265,7 +265,7 @@ namespace MyNursingFuture.BL.Managers
         public Result Login(string token)
         {
             var credentials = new CredentialsManager();
-            var result = credentials.ValidateUserToken(token);
+            var result = credentials.ValidateEmployerToken(token);
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
 

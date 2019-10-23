@@ -10,5 +10,6 @@ namespace MyNursingFuture.BL.Entities
     public class JobListingEntity : JobListing, IEntity
     {
         public List<JobListingCriteriaEntity> JobListingCriteria { get; set; }
+        public Dictionary<int, decimal> JobListingCriteria_Dict_QuestionID_Value { get; set; }
     }
 }

@@ -264,8 +264,11 @@ namespace MyNursingFuture.Api.Controllers
         [HttpPost]
         [JwtAuthorized]
         [Route("api/users/edit")]
-        public HttpResponseMessage EditDetails([FromBody]UserEntity value)
+        public HttpResponseMessage EditDetails([FromBody]UserModel userModel)
         {
+            var value = new UserEntity();
+            PropertyCopier<UserModel, UserEntity>.Copy(userModel, value);
+
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Name))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
@@ -278,6 +281,7 @@ namespace MyNursingFuture.Api.Controllers
             Request.Properties.TryGetValue("user", out objuser);
             var user = objuser as UserEntity;
             value.UserId = user.UserId;
+            value.ModifyDate = DateTime.Now;
   
 
             var result = _usersManager.UpdateDetails(value);
@@ -286,7 +290,13 @@ namespace MyNursingFuture.Api.Controllers
             {
                 var updated_user = _usersManager.GetUserDetails(user);
                 if (updated_user.Success)
-                    return Request.CreateResponse(HttpStatusCode.OK, updated_user.Entity);
+                {
+                    var user_temp = (UserEntity)updated_user.Entity;
+
+                    PropertyCopier<UserEntity, UserModel>.Copy(user_temp, userModel);
+                    return Request.CreateResponse(HttpStatusCode.OK, userModel);
+                }
+                    
             }
 
             return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
@@ -313,12 +323,16 @@ namespace MyNursingFuture.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
 
             var updated_user = _usersManager.GetUserDetails(user);
+            var usermodel = new UserModel();
+            PropertyCopier<UserEntity, UserModel>.Copy((UserEntity)updated_user.Entity, usermodel);
 
             if (updated_user.Success)
                 return Request.CreateResponse(HttpStatusCode.OK, updated_user.Entity);
 
             return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
         }
+
+       
 
         [JwtAuthorized]
         [Route("api/users/changepassword")]

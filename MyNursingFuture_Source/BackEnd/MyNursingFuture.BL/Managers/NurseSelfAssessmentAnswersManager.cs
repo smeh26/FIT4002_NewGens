@@ -105,14 +105,16 @@ namespace MyNursingFuture.BL.Managers
 
                 String query_string = String.Format(@"
                 BEGIN TRAN
-                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = {0} and AspectId = @AspectId )
+                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = {0} and QuestionId = @QuestionId )
                 BEGIN
                     UPDATE NurseSelfAssessmentAnswers SET Value = @Value 
                                                         , LastUpdate= @LastUpdate 
                                                         , QuestionId = @QuestionId 
                                                         , AnswerId = @AnswerId
+                                                        , AspectId = @AspectId
                                                         , TextAnswerField = @TextAnswerField
-                    WHERE UserId = {0} and AspectId = @AspectId
+                                                        ,UserQuizId = @UserQuizId
+                    WHERE UserId = {0} and QuestionId = @QuestionId
                 END 
                 ELSE
                 BEGIN 
@@ -122,14 +124,16 @@ namespace MyNursingFuture.BL.Managers
                                                         ,QuestionId
                                                         ,AnswerId
                                                         ,TextAnswerField
-                                                        ,LastUpdate)
+                                                        ,LastUpdate
+                                                        ,UserQuizId)
                                                     VALUES({0}
                                                             , @AspectId
                                                             , @Value 
                                                             , @QuestionId
                                                             ,@AnswerId
                                                             ,@TextAnswerField
-                                                            ,@LastUpdate)
+                                                            ,@LastUpdate
+                                                            ,@UserQuizId)
                 END
                 COMMIT TRAN
 

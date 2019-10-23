@@ -177,6 +177,37 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+        /// <summary>
+        /// API to retrieve all listings of the current logged in employer
+        /// </summary>
+        /// <remarks> Return type is in the QuestionId / Value format </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
+        [HttpGet]
+        [Route("api/v2/JobListings/Employers")]
+        public HttpResponseMessage GetAllListingsOfCurrentEmployerV2()
+        {
+            //Working, tested
+            var result = new Result();
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            var employer = objemployer as EmployerEntity;
+
+            result = _jobListingManager.GetAllListingsByEmployerV2(employer);
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
 
 
         /*        [HttpPut]
@@ -339,23 +370,25 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-/*        [EmployerJWTAuthorized]
-        [Route("api/v1/JobListings/PotentialApplicants/")]
-        public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
-        {
-            var result = new Result();
+        /*        [EmployerJWTAuthorized]
+                [Route("api/v1/JobListings/PotentialApplicants/")]
+                public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
+                {
+                    var result = new Result();
 
-            result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
-            if (!result.Success)
-                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+                    result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
+                    if (!result.Success)
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, result);
 
-            if (result.Entity == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+                    if (result.Entity == null)
+                        return Request.CreateResponse(HttpStatusCode.NotFound, result);
 
 
-            return Request.CreateResponse(HttpStatusCode.OK, result);
+                    return Request.CreateResponse(HttpStatusCode.OK, result);
 
-        }*/
+                }*/
+
+        
 
 
 

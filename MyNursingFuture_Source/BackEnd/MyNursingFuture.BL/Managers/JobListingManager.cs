@@ -24,6 +24,7 @@ namespace MyNursingFuture.BL.Managers
         Result GetPotentialApplicantsByListingId(int jobListingId);
         Result GetAllListings();// working, tested 
         Result GetAllListingsByEmployer(EmployerEntity employer);
+        Result GetAllListingsByEmployerV2(EmployerEntity employer);
         //Boolean IsListingBelongToEmployer(int ListingId, int EmployerId);
 
 
@@ -718,6 +719,26 @@ INSERT INTO [dbo].[JobListings]
 
         }
 
+        private enum Mode { DICTQuestionIdValue, DICTQuestionIdObject, LISTObject }
+        private dynamic transformCriteria(List<JobListingCriteriaEntity> criteria, Mode mode)
+        {
+            switch (mode)
+            {
+                case Mode.DICTQuestionIdValue:
+
+
+                    return criteria.ToDictionary(x => x.QuestionId, x => x.Value);
+                case Mode.DICTQuestionIdObject:
+                    return criteria.ToDictionary(x => x.QuestionId, x => x);
+                case Mode.LISTObject:
+                    return criteria;
+                default:
+                    return null;
+            }
+
+
+        }
+
         public Result GetAllListingsByEmployer(EmployerEntity employer) {
             var result = new Result();
             try
@@ -766,6 +787,60 @@ INSERT INTO [dbo].[JobListings]
             return result;
 
         }
+
+
+        public Result GetAllListingsByEmployerV2(EmployerEntity employer)
+        {
+            var result = new Result();
+            try
+            {
+
+                var credentials = new CredentialsManager();
+
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity
+                {
+                    Entity = employer,
+                    Query = @"SELECT *
+                          FROM JobListings
+                          WHERE EmployerId= @EmployerId
+                    "
+                };
+
+                result = con.ExecuteQuery<JobListingEntity>(query);
+                var listing_list = (List<JobListingEntity>)result.Entity;
+
+                var formatted_listing_list = new List<dynamic>();
+                var listing_cri_man = new JobListingCriteriaManager();
+                foreach (JobListingEntity listing in listing_list)
+                {
+
+                    var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                    var formatted_Criteria = transformCriteria(criteria, Mode.DICTQuestionIdValue);
+                    listing.JobListingCriteria_Dict_QuestionID_Value = formatted_Criteria;
+                }
+
+                result.Entity = listing_list;
+                return result;
+
+
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = "An error occurred" + ex.Message;
+            }
+            return result;
+
+        }
+
 
 
 

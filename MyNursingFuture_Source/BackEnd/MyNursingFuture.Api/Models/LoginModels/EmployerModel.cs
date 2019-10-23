@@ -13,7 +13,7 @@ namespace MyNursingFuture.Api.Models
     public class EmployerModel
     {
         public string Token { get; set; }
-        public int EmployerID { get; set; }
+        public int EmployerId { get; set; }
         public string Email { get; set; }
         public string EmployerName { get; set; }
         public string Company { get; set; }

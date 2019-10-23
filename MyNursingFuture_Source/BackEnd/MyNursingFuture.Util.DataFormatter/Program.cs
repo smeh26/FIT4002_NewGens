@@ -33,7 +33,6 @@ namespace MyNursingFuture.Util.DataFormatter
             AspectsManager AM = new AspectsManager();
             AnswersManager ASWM = new AnswersManager();
             QuestionsManager QM = new QuestionsManager();
-            SelfAssessmentQuizzesManager SAQ = new SelfAssessmentQuizzesManager();
 
 
             NurseSelfAssessmentAnswersManager NSAM = new NurseSelfAssessmentAnswersManager();
@@ -57,7 +56,7 @@ namespace MyNursingFuture.Util.DataFormatter
             //Get Questions
             var questions_result = QM.Get();
             var questions_List = (List<QuestionEntity>)questions_result.Entity;
-            var question_Dict = questions_List.ToDictionary(x => x.AspectId, x => x);
+            var question_Dict = questions_List.ToDictionary(x => x.QuestionId, x => x);
 
 
 
@@ -71,17 +70,6 @@ namespace MyNursingFuture.Util.DataFormatter
                 JObject parent_json = JObject.Parse(entity.Results);
                 var answer = parent_json.Value<JObject>("answers").Properties();
 
-                var saq_ans = new SelfAssessmentQuizzesEntity();
-                saq_ans.Answers = entity.Answers;
-                saq_ans.UserId = entity.UserId;
-                saq_ans.UserQuizId = entity.UserQuizId;
-                saq_ans.Type = entity.Type;
-                saq_ans.Date = entity.Date;
-                saq_ans.DateVal = entity.DateVal;
-                saq_ans.Completed = entity.Completed;
-
-                var SAQ_type = saq_ans.GetType();
-
                 var result = new Result();
 
                 if (answer != null)
@@ -91,24 +79,24 @@ namespace MyNursingFuture.Util.DataFormatter
                     foreach (KeyValuePair<int, decimal> ans in nurse_answer_dict)
                     {
                         NurseSelfAssessmentAnswersEntity ans_entity = new NurseSelfAssessmentAnswersEntity();
-                        ans_entity.AspectId = ans.Key;
+                        ans_entity.QuestionId = ans.Key;
                         ans_entity.Value = ans.Value;
                         ans_entity.LastUpdate = entity.DateVal;
-                        PropertyInfo prop = SAQ_type.GetProperty("Aspect_" + ans.Key.ToString());
-                        prop.SetValue(saq_ans, ans_entity.Value, null);
+                        ans_entity.UserId = entity.UserId;
+                        ans_entity.UserQuizId = entity.UserQuizId;
 
-
+                        AnswerEntity answer_entity = null;
+                        if (answers_Dict.TryGetValue((ans_entity.QuestionId, ans_entity.Value), out answer_entity))
+                        {
+                            ans_entity.AnswerId = answer_entity.AnswerId;
+                        }
 
                         QuestionEntity question_entity = null;
                         if (question_Dict.TryGetValue(ans.Key, out question_entity))
                         {
-                            ans_entity.QuestionId = question_entity.QuestionId;
+                            ans_entity.AspectId = (int) question_entity.AspectId;
 
-                            AnswerEntity answer_entity = null;
-                            if (answers_Dict.TryGetValue((ans_entity.QuestionId, ans_entity.Value), out answer_entity))
-                            {
-                                ans_entity.AnswerId = answer_entity.AnswerId;
-                            }
+                            
                         }
                         // insert answer into database
                          result = NSAM.InsertAnswer(entity.UserId, ans_entity);
@@ -124,7 +112,6 @@ namespace MyNursingFuture.Util.DataFormatter
 
                 }
 
-                 result = SAQ.InsertQuizz(saq_ans);
 
                 if (!result.Success)
                 {

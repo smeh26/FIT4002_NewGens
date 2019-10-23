@@ -73,7 +73,7 @@ namespace MyNursingFuture.Api.Controllers
             employer.Token = employerEntity.Token;
             employer.EmployerName = employerEntity.EmployerName;
             //employer.ApnaUser = false;
-            employer.EmployerID = employerEntity.EmployerId;
+            employer.EmployerId = employerEntity.EmployerId;
             result.Entity = employer;
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
@@ -224,7 +224,8 @@ namespace MyNursingFuture.Api.Controllers
         /// </summary>
         /// <remarks>
         /// This is the original API to update details of an entity
-        /// Use this to update any field of interest. 
+        /// Use this to update any field of interest.
+        /// TODO: Bug fix
         /// </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
@@ -247,11 +248,14 @@ namespace MyNursingFuture.Api.Controllers
             Request.Properties.TryGetValue("employer", out objemp);
             var employer = objemp as EmployerEntity;
 
-            if (value.EmployerId != employer.EmployerId) {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized, result);
-            }
+
 
             result = _employersManager.UpdateDetails(value);
+
+            var emp = (EmployerEntity)_employersManager.GetEmployerById(employer.EmployerId).Entity;
+            var em_mod = new EmployerModel();
+            PropertyCopier<EmployerEntity, EmployerModel>.Copy(emp, em_mod);
+            result.Entity = em_mod;
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 

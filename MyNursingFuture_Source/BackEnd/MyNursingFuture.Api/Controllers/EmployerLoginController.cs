@@ -60,6 +60,7 @@ namespace MyNursingFuture.Api.Controllers
             var tokenLogin = false;
             var apnaLogin = false;
 
+
             var employer = new EmployerEntity();
 
             PropertyCopier<LoginObject, EmployerEntity>.Copy(value, employer);
@@ -84,15 +85,20 @@ namespace MyNursingFuture.Api.Controllers
             }
 
 
+            var employer_model = new EmployerModel();
+            var employerEntity = (EmployerEntity)result.Entity;
 
             if (!result.Success)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
-
-            var employer_model  = new EmployerModel();
-            var employerEntity = (EmployerEntity)result.Entity;
-
             employer_model.Token = employerEntity.Token;
             PropertyCopier<EmployerEntity, EmployerModel>.Copy(employerEntity, employer_model);
+
+            if (token != null)
+            {
+                employer_model.Token = token.Parameter;
+            }
+
+
             result.Entity = employer_model;
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }

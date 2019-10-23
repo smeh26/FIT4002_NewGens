@@ -235,8 +235,8 @@ WHERE AspectId IS NOT NULL
             {
                 var query = new QueryEntity();
                 query.Entity = entity;
-                query.Query = @"INSERT INTO Questions (QuizId, Type, AspectId, Text, SubText, Requirements, Examples) 
-                            VALUES(@QuizId, @Type, @AspectId, @Text, @SubText, @Requirements, @Examples)";
+                query.Query = @"INSERT INTO Questions (QuizId, Type, AspectId, Text, SubText, EmployerText, EmployerSubText, Requirements, Examples) 
+                            VALUES(@QuizId, @Type, @AspectId, @Text, @SubText, @EmployerText, @EmployerSubText, @Requirements, @Examples)";
                 result = con.InsertQueryUnScoped(query);
 
                 if (!result.Success)
@@ -252,8 +252,8 @@ WHERE AspectId IS NOT NULL
                 {
                     q.QuestionId = questionId;
                     queryAnswers.Entity = q;
-                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, Value, MatchText, Type, TextValue) 
-                            VALUES(@QuestionId, @Text, @Value, @MatchText, @Type, @TextValue)";
+                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, EmployerText, Value, MatchText, Type, TextValue) 
+                            VALUES(@QuestionId, @Text, @EmployerText, @Value, @MatchText, @Type, @TextValue)";
                     resultAnswers = con.InsertQueryUnScoped(queryAnswers);
                     if (!resultAnswers.Success)
                     {
@@ -298,7 +298,7 @@ WHERE AspectId IS NOT NULL
             {
                 var query = new QueryEntity();
                 query.Entity = entity;
-                query.Query = @"UPDATE Questions set Text = @Text, SubText = @SubText, Requirements = @Requirements, Examples = @Examples WHERE QuestionId = @QuestionId";
+                query.Query = @"UPDATE Questions set Text = @Text, SubText = @SubText, EmployerText = IFNULL(@EmployerText, @EmployerText), EmployerSubText = IFNULL(@EmployerSubText, @EmployerSubText)  , SubText = @SubText , Requirements = @Requirements, Examples = @Examples WHERE QuestionId = @QuestionId";
                 result = con.ExecuteQueryUnScoped(query);
 
                 if (!result.Success)
@@ -330,8 +330,8 @@ WHERE AspectId IS NOT NULL
                 {
                     q.QuestionId = questionId;
                     queryAnswers.Entity = q;
-                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, Value, MatchText, Type, TextValue) 
-                            VALUES(@QuestionId, @Text, @Value, @MatchText, @Type, @TextValue)";
+                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, EmployerText , Value, MatchText, Type, TextValue) 
+                            VALUES(@QuestionId, @Text, @EmployerText, @Value, @MatchText, @Type, @TextValue)";
                     resultAnswers = con.InsertQueryUnScoped(queryAnswers);
                     if (!resultAnswers.Success)
                     {
