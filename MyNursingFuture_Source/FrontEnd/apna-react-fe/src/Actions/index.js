@@ -493,6 +493,25 @@ export const setActionsData = (data) => {
   }
 }
 
+export const setJobListingData = (data) => {
+  return {
+    type: 'SET_JOBLISTING_DATA',
+    data,
+  }
+}
+
+export const requestJobListingData = () => {
+  return {
+    type: 'START_JOBLISTING_REQUEST',
+  }
+};
+
+export const completeRequestJobListingData = () => {
+  return {
+    type: 'END_JOBLISTING_REQUEST',
+  }
+};
+
 export const setSectorScores = (data) => {
   return {
     type: 'SET_SECTOR_SCORES',
@@ -588,11 +607,11 @@ export function fetchCheckEmpAuth(email, password) {
         throw response.message;
       }
       dispatch(setUserData(response.entity));
-      // dispatch(mapUserDataToAboutYouAnswers());
-      if (!cookies.hasItem('token')) {
-        cookies.setItem('token', response.entity.token);
-        // dispatch(fetchSaveInProgressQuizzes());
+      if (cookies.hasItem('token')) {
+        cookies.removeItem('token');
       }
+      cookies.setItem('token', response.entity.token);
+
       dispatch(setUserLoggedIn());
       dispatch(unsetUserError());
     }).catch(function (error) {
@@ -820,6 +839,44 @@ export function fetchSubmitArticleFeedback(articleId, title, feedback, positive)
         dispatch(openModal('thanks'));
       }
     })
+  }
+}
+
+
+export function fetchJobListings() {
+  console.log('etchokagf')
+  return (dispatch, getState) => {
+    if (!cookies.hasItem('token')) {
+      return;
+    }
+
+    // const cachedJobListing = getState().app.user.joblistings;
+    // if (cachedJobListing.length > 0) {
+    //   return;
+    // }
+
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
+      }
+    }
+
+    dispatch(requestJobListingData);
+    return fetch(config.apiUrl + config.apiBaseUrl + 'v1/JobListings/Employers', options)
+      .then((response) => response.json())
+      .then((response) => {
+        if (!response.success) {
+          throw response.message;
+        }
+        if (response.success) {
+          dispatch(setJobListingData(response.entity));
+          console.log('joblising', response)
+        }
+      })
+      .finally(() => dispatch(completeRequestJobListingData));
   }
 }
 
@@ -1772,15 +1829,15 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
       // -- Start get actions and push them into our action list.
       /*let actionsToAdd = aspectsByDomain[""+currentDomain.domainId];
       var hasDuplicateAction = false;
-
+ 
       for (var e in actionsToAdd){
         let actionsToGrow = actionsToAdd["" + e].actionsToGrow;
-
+ 
         for (var f in actionsToGrow) {
           if (currentDomain.actionsList.length > 9) { // getting only a max limit of 10 items
             break;
           }
-
+ 
           // Check for duplicates before adding to actions.
           hasDuplicateAction = false;
           for (var g in currentDomain.actionsList) {
@@ -1788,7 +1845,7 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
               hasDuplicateAction = true;
             }
           }
-
+ 
           if (!hasDuplicateAction) { // If false, push to array otherwise we found a duplicate so skip..
             currentDomain.actionsList.push(actionsToGrow["" + f]);
           }

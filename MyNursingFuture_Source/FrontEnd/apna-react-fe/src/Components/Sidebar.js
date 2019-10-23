@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Menu from './Menu';
 import { connect } from 'react-redux';
-import { sidebarToggle } from '../Actions';
+import { sidebarToggle, fetchJobListings } from '../Actions';
+import JobListings from '../Reducers/JobListings';
 
 class Sidebar extends Component {
   constructor(props) {
@@ -11,7 +12,7 @@ class Sidebar extends Component {
       section: 0,
     }
   }
-
+  
   componentDidUpdate() {
     const paths = window.location.pathname.split("/");
     const section = paths[paths.length - 1];
@@ -27,6 +28,8 @@ class Sidebar extends Component {
     }
 
     this.setState({ section, userType });
+    this.props.getJobListings();
+
   }
 
   render() {
@@ -109,7 +112,11 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onMenuIconClick: () => {
       dispatch(sidebarToggle());
+    },
+    getJobListings: () => {
+      dispatch(fetchJobListings());
     }
+    
   }
 }
 
