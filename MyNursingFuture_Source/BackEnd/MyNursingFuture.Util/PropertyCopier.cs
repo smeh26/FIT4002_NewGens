@@ -15,6 +15,8 @@ namespace MyNursingFuture.Util
     {
         public static void Copy(TParent parent, TChild child)
         {
+            if (parent == null )
+                return;
             var parentProperties = parent.GetType().GetProperties();
             var childProperties = child.GetType().GetProperties();
 

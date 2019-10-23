@@ -30,13 +30,12 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// API For retrieving a Job Application by its Id
+        /// API for registering a user
         /// </summary>
         /// <remarks> UNTESTED  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
-        [HttpPost]
         // POST: api/Users
         public HttpResponseMessage Post([FromBody]UserEntity value)
         {
@@ -67,7 +66,7 @@ namespace MyNursingFuture.Api.Controllers
 
 
         /// <summary>
-        /// Get 
+        /// Get API to get Career quizz
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -87,7 +86,7 @@ namespace MyNursingFuture.Api.Controllers
 
 
         /// <summary>
-        /// 
+        /// API to save quizz career quizz
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -107,7 +106,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// API to get assessment
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -127,7 +126,7 @@ namespace MyNursingFuture.Api.Controllers
 
 
         /// <summary>
-        /// 
+        /// API to save self assessment
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -147,7 +146,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// APi to save about you quizz
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -169,7 +168,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// API to get user quizzes
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -188,7 +187,7 @@ namespace MyNursingFuture.Api.Controllers
 
 
         /// <summary>
-        /// 
+        /// API to get user quizzes
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -207,7 +206,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// API to recover account
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -229,7 +228,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// API to reset your password
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -256,7 +255,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// API to update Useer details
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -294,7 +293,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// 
+        /// API to get users details
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -302,7 +301,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="500"></response>
         [HttpGet]
         [JwtAuthorized]
-        [Route("api/users")]
+        [Route("api/users/details")]
         public HttpResponseMessage GetCurrentUserDetails()
         {
 

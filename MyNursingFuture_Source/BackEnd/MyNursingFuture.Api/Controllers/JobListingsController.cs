@@ -16,8 +16,7 @@ using System.Web.Hosting;
 using Newtonsoft.Json;
 using System.Configuration;
 using System.Threading.Tasks;
-
-
+using Swashbuckle.Swagger.Annotations;
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -45,6 +44,12 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        struct PostListingResponse {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public JobListingEntity Entity { get; set; }
+        }
+
         /// <summary>
         /// API to post a job listing 
         /// </summary>
@@ -61,6 +66,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="500"></response>
         [HttpPut]
         [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PostListingResponse))]
         [Route("api/v1/JobListings")]
         public HttpResponseMessage PostListing(JobListingEntity jobListing)
         {
@@ -98,11 +104,14 @@ namespace MyNursingFuture.Api.Controllers
 
 
             // if success
+            if (jobListing.JobListingCriteria != null || jobListing.JobListingCriteria.Count > 0) {
+                var cri_res = _jobListingCriteriaManager.InsertCriteria(jobListing.JobListingCriteria);
+            }
 
             //Result cri_result = null;
             var listingID = (int)result.Entity;
-            jobListing.JobListingId = listingID;
-            result.Entity = jobListing;
+            var listing = (JobListingEntity) _jobListingManager.GetListingById(listingID).Entity;
+            result.Entity = listing;
             return Request.CreateResponse(HttpStatusCode.Created, result);
 
         }
@@ -137,6 +146,38 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+        /// <summary>
+        /// API to retrieve all listings of the current logged in employer
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
+        [HttpGet]
+        [Route("api/v1/JobListings/Employers")]
+        public HttpResponseMessage GetAllListingsOfCurrentEmployer()
+        {
+            //Working, tested
+            var result = new Result();
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            var employer = objemployer as EmployerEntity;
+
+            result = _jobListingManager.GetAllListingsByEmployer(employer);
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
+
 
         /*        [HttpPut]
                 [EmployerJWTAuthorized]

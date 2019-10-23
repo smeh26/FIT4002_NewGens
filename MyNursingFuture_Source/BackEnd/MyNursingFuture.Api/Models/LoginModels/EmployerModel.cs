@@ -6,6 +6,10 @@ using MyNursingFuture.BL.Entities;
 
 namespace MyNursingFuture.Api.Models
 {
+    /// <summary>
+    /// Employer Model for API return
+    /// 
+    /// </summary>
     public class EmployerModel
     {
         public string Token { get; set; }
@@ -14,8 +18,8 @@ namespace MyNursingFuture.Api.Models
         public string EmployerName { get; set; }
         public string Company { get; set; }
         public string Password { get; set; }
-        public string Hash { get; set; }
-        public DateTime? CreateDate { get; set; }
+ //       public string Hash { get; set; }
+//        public DateTime? CreateDate { get; set; }
         public DateTime? ModifyDate { get; set; }
         public string RecoverToken { get; set; }
         public string Area { get; set; }
@@ -27,5 +31,8 @@ namespace MyNursingFuture.Api.Models
         public string AddressLine2 { get; set; }
         public string Setting { get; set; }
         public bool SaveOnly { get; set; }
+        public bool CanViewDetails { get; set; }
+        public DateTime MembershipStartDate { get; set; }
+        public DateTime MembershipEndDate { get; set; }
     }
 }

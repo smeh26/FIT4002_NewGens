@@ -297,6 +297,7 @@ namespace MyNursingFuture.BL.Managers
             user = r.FirstOrDefault();
             user.Password = null;
             user.Hash = null;
+            user.Token = token;
             result.Entity = user;
             return result;
         }

@@ -23,7 +23,7 @@ namespace MyNursingFuture.BL.Managers
         Result GetPotentialApplicantsByCriteria(List<JobListingCriteriaEntity> criteria);
         Result GetPotentialApplicantsByListingId(int jobListingId);
         Result GetAllListings();// working, tested 
-
+        Result GetAllListingsByEmployer(EmployerEntity employer);
         //Boolean IsListingBelongToEmployer(int ListingId, int EmployerId);
 
 
@@ -479,8 +479,18 @@ INSERT INTO [dbo].[JobListings]
                 };
 
 
-                return con.ExecuteGetOneItemQuery<JobListingEntity>(query);
+                result = con.ExecuteGetOneItemQuery<JobListingEntity>(query);
 
+                var listing = (JobListingEntity)result.Entity;
+                var listing_cri_man = new JobListingCriteriaManager();
+
+
+                var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                listing.JobListingCriteria = criteria;
+
+                result.Entity = listing;
+
+                return result;
 
 
             }
@@ -515,8 +525,18 @@ INSERT INTO [dbo].[JobListings]
                     "
                 };
 
+                result = con.ExecuteQuery<JobListingEntity>(query);
+                var listing_list = (List<JobListingEntity>)result.Entity;
 
-                return con.ExecuteQuery<JobListingEntity>(query);
+                var listing_cri_man = new JobListingCriteriaManager();
+                foreach (JobListingEntity listing in listing_list) {
+
+                    var criteria = (List<JobListingCriteriaEntity>) listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                    listing.JobListingCriteria = criteria;
+                }
+
+                result.Entity = listing_list;
+                return result;
 
 
 
@@ -693,6 +713,55 @@ INSERT INTO [dbo].[JobListings]
                 result.Entity = null;
                 result.Success = false;
                 result.Message = ex.Message;
+            }
+            return result;
+
+        }
+
+        public Result GetAllListingsByEmployer(EmployerEntity employer) {
+            var result = new Result();
+            try
+            {
+
+                var credentials = new CredentialsManager();
+
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity
+                {
+                    Entity = employer,
+                    Query = @"SELECT *
+                          FROM JobListings
+                          WHERE EmployerId= @EmployerId
+                    "
+                };
+
+                result = con.ExecuteQuery<JobListingEntity>(query);
+                var listing_list = (List<JobListingEntity>)result.Entity;
+
+                var listing_cri_man = new JobListingCriteriaManager();
+                foreach (JobListingEntity listing in listing_list)
+                {
+
+                    var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                    listing.JobListingCriteria = criteria;
+                }
+
+                result.Entity = listing_list;
+                return result;
+
+
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = "An error occurred" + ex.Message;
             }
             return result;
 
