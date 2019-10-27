@@ -116,6 +116,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+
+        private struct GetAllListingsResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<JobListingEntity> Entity { get; set; }
+        }
         /// <summary>
         /// API to retrieve all listing on the system
         /// </summary>
@@ -124,6 +131,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="400"></response>
         /// <response code="500"></response>
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponse))]
         [Route("api/v1/JobListings")]
         public HttpResponseMessage GetAllListings()
         {
@@ -146,6 +154,9 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+
+
+
         /// <summary>
         /// API to retrieve all listings of the current logged in employer
         /// </summary>
@@ -155,6 +166,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="500"></response>
         [EmployerJWTAuthorized]
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponse))]
         [Route("api/v1/JobListings/Employers")]
         public HttpResponseMessage GetAllListingsOfCurrentEmployer()
         {
@@ -177,15 +189,66 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+
+
+
+        //========================================================================================================================
+        private struct JLModel
+        {
+            public int JobListingId { get; set; }
+            public int EmployerId { get; set; }
+            public string Title { get; set; }
+            public string NurseType { get; set; }
+            public string SpecialRequirements { get; set; }
+            public bool PublishStatus { get; set; }
+            public int minSalary { get; set; }
+            public int maxSalary { get; set; }
+            public DateTime CreateDate { get; set; }
+            public DateTime ApplicationDeadline { get; set; }
+
+            public DateTime ModificationDate { get; set; }
+            public string Area { get; set; }
+            public string State { get; set; }
+            public string Country { get; set; }
+            public string Suburb { get; set; }
+            public string PostalCode { get; set; }
+            public string AddressLine1 { get; set; }
+            public string AddressLine2 { get; set; }
+            public bool Completed { get; set; }
+            public string JobType { get; set; }
+
+            public Dictionary<int, decimal> jobListingCriteria_Dict_QuestionID_Value { get; set; }
+        }
+        private struct GetAllListingsResponseV2
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<JLModel>  Entity { get; set; }
+       
+        }
         /// <summary>
         /// API to retrieve all listings of the current logged in employer
         /// </summary>
-        /// <remarks> Return type is in the QuestionId / Value format </remarks>
+        /// <remarks> The type  of jobListingCriteria_Dict_QuestionID_Value is in a dictionary which the key is the question id and the value is the value of the anwser
+        /// 
+        /// 
+        /// <code>
+        /// jobListingCriteria_Dict_QuestionID_Value :
+        ///     {
+        ///     int  : decimal  # QuestionID : Value  
+        /// } 
+        /// 
+        /// </code>
+        /// 
+        /// 
+        /// 
+        ///  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
         [EmployerJWTAuthorized]
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponseV2))]
         [Route("api/v2/JobListings/Employers")]
         public HttpResponseMessage GetAllListingsOfCurrentEmployerV2()
         {
@@ -288,6 +351,8 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+
+
         /// <summary>
         /// Get a single listing object by Id
         /// </summary>
@@ -298,6 +363,7 @@ namespace MyNursingFuture.Api.Controllers
         //[JwtAuthorized]
         [HttpGet]
         [GenericJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PostListingResponse))]
         [Route("api/v1/JobListings/{id}")]
         public HttpResponseMessage GetListingById(int id)
         {
@@ -319,6 +385,13 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+
+        struct GetUserByListingResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<int> Entity { get; set; }
+        }
         /// <summary>
         /// Get all applicants (ID only) meeting the requirement of a listing (indexed by Id) 
         /// </summary>
@@ -338,6 +411,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="500"></response>
         [HttpGet]
         [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetUserByListingResponse))]
         [Route("api/v1/JobListings/PotentialApplicants/{id}")]
         public HttpResponseMessage GetPotentialApplicantsByListingId(int id)
         {
@@ -370,23 +444,40 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-        /*        [EmployerJWTAuthorized]
-                [Route("api/v1/JobListings/PotentialApplicants/")]
-                public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
-                {
-                    var result = new Result();
 
-                    result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
-                    if (!result.Success)
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+        struct GetNumberofUserByCriteriaResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public int Entity { get; set; }
+        }
+        /// <summary>
+        /// Get the number of nurses meeting the requirement 
+        /// </summary>
+        /// <remarks> 
+        /// To perform this, payment not required.
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
+        [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetNumberofUserByCriteriaResponse))]
+        [Route("api/v1/JobListings/PreviewPotentialApplicants/")]
+        public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
+        {
+            var result = new Result();
 
-                    if (result.Entity == null)
-                        return Request.CreateResponse(HttpStatusCode.NotFound, result);
+            result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
 
+            result.Entity = ((List<int>)result.Entity).Count();
+            result.Message = "Total number of nurses meet the criteria in the system";
 
-                    return Request.CreateResponse(HttpStatusCode.OK, result);
-
-                }*/
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
 
         
 

@@ -303,7 +303,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// API to get users details
+        /// API to get the loggedin  users details
         /// </summary>
         /// <remarks> TODO: enforce required fields </remarks>
         /// <response code="200"></response>
@@ -332,8 +332,14 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
         }
 
-       
 
+        /// <summary>
+        /// API to change users password
+        /// </summary>
+        /// <remarks> UNTESTED </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         [Route("api/users/changepassword")]
         public HttpResponseMessage ChangePassword([FromBody]UserEntity value)
@@ -357,7 +363,13 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-
+        /// <summary>
+        /// API to delete/deactivate a nurse
+        /// </summary>
+        /// <remarks> UNTESTED </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [JwtAuthorized]
         // DELETE: api/Users/5
         public HttpResponseMessage Delete(int id)

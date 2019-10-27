@@ -208,7 +208,7 @@ namespace MyNursingFuture.BL.Managers
                 query.Query = @"
 
 
-INSERT INTO [dbo].[JobListings]
+                        INSERT INTO [dbo].[JobListings]
                                            ([EmployerId]
                                            ,[Title]
                                            ,[NurseType]
@@ -614,22 +614,32 @@ INSERT INTO [dbo].[JobListings]
                 var con = new DapperConnectionManager();
                 var query = new QueryEntity();
                 var credentials = new CredentialsManager();
+                string query_stringa = @"DECLARE @Starter table (defaultQuizId  int);
+                                        DECLARE @Quizz table ( UserId int, QuestionId int, [Value] Money)
 
-                string query_string = "SELECT UserId FROM NurseSelfAssessmentAnswers  ";
+                                        INSERT INTO @Starter 
+                                        SELECT defaultQuizId FROM Users WHERE  defaultQuizId <> 0 OR defaultQuizId <> NULL;
+
+                                        INSERT INTO @Quizz
+                                        SELECT  
+                                        UserId, QuestionId,  [Value]
+                                        FROM NurseSelfAssessmentAnswers NSAA
+                                        INNER JOIN @Starter Stt
+                                        ON NSAA.UserQuizId = Stt.defaultQuizId;";
+                string query_string = query_stringa + "SELECT DISTINCT UserId FROM @Quizz    ";
                 List<String> select_queries = new List<String>();
                 int counter = 0;
                 foreach (JobListingCriteriaEntity criterion in criteria)
                 {
-                    /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
-                                            , criterion.AspectId, criterion.Value , counter));*/
-                    // query_string += String.Format("INNER JOIN (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
-                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) ", criterion.AspectId, criterion.Value);
+                    query_string += String.Format("INTERSECT (SELECT DISTINCT UserId FROM @Quizz WHERE QuestionId = {0} AND Value >= {1} ) ", criterion.QuestionId, criterion.Value);
 
+                  
+                   
                     counter++;
                 }
 
                 query.Query = query_string;
-                return con.ExecuteQuery(query);
+                return con.ExecuteQuery<int>(query);
 
             }
             catch (Exception ex)
