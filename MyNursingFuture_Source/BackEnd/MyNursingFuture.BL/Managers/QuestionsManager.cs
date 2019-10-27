@@ -160,7 +160,7 @@ WHERE AspectId IS NOT NULL
             var result = new Result();
 
 
-            query.Query = @"SELECT QuestionId, Text FROM Questions
+            query.Query = @"SELECT QuestionId, Text, EmployerText FROM Questions
                             where QuizId = @QuizId and Active = 1";
             query.Entity = new { QuizId = id};
 
