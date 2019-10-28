@@ -159,6 +159,7 @@
     <Compile Include="Models\ApnaResponse.cs" />
     <Compile Include="Models\ArticleFeedback.cs" />
     <Compile Include="Models\ContactModel.cs" />
+    <Compile Include="Models\LoginModels\EmployerModelSecured.cs" />
     <Compile Include="Models\LoginModels\LoginObject.cs" />
     <Compile Include="Models\LoginModels\EmployerModel.cs" />
     <Compile Include="Models\JobListingModel.cs" />

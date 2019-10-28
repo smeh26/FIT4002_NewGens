@@ -13,7 +13,7 @@ namespace MyNursingFuture.DL.Models
         public string Title { get; set; }
         public string NurseType { get; set; }
         public string SpecialRequirements { get; set; }
-        public bool PublishStatus { get; set; }
+        public Nullable<bool> PublishStatus { get; set; }
         public int minSalary { get; set; }
         public int maxSalary { get; set; }
         public DateTime CreateDate { get; set; }

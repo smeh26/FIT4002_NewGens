@@ -258,7 +258,6 @@ namespace MyNursingFuture.Api.Controllers
             public string Message { get; set; }
             public bool Success { get; set; }
         }
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AdjustMembershipResponse))]
         /// <summary>
         /// API to manage the membership of an employer
         /// </summary>
@@ -272,6 +271,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="500"></response>
         [HttpPut]
         [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AdjustMembershipResponse))]
         [Route("api/v1/employers/membership")]
         public HttpResponseMessage AdjustMembership ( [FromBody] MembershipModel mbm )
         {
@@ -307,6 +307,42 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+
+
+
+        private struct GetEmployerDetailsSecuredResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public EmployerModel Entity { get; set; }
+        }
+        /// <summary>
+        /// This API is used for a nurse to get info of the employer 
+        /// </summary>
+        /// <remarks> 
+        /// This API Is called by Nurses only
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [Route("api/v1/employers/{employerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetEmployerDetailsSecuredResponse))]
+        public HttpResponseMessage RegisterEmployer(int employerId)
+        {
+
+            var result = _employersManager.GetEmployerById(employerId);
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            var employer = new EmployerModelSecured();
+            var employerEntity = (EmployerEntity)result.Entity;
+            PropertyCopier<EmployerEntity, EmployerModelSecured>.Copy(employerEntity, employer);
+            result.Entity = employer;
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
 
     }
 }

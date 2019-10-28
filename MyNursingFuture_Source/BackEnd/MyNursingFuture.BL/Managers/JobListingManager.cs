@@ -16,7 +16,7 @@ namespace MyNursingFuture.BL.Managers
     {
         Result CreateJobListing(JobListingEntity entity, EmployerEntity employer);
         Result CreateJobListingById(JobListingEntity entity, int employerId); // Working, tested
-        Result EditJobListing(JobListingEntity entity, EmployerEntity employer);
+        Result EditJobListing(JobListingEntity entity);
         Result PublishJobListing(JobListingEntity entity, EmployerEntity employer);
         Result DeleteJobListing(JobListingEntity entity, EmployerEntity employer);
         Result GetListingById(int listingId); //working, tested
@@ -273,7 +273,7 @@ namespace MyNursingFuture.BL.Managers
 
         }
 
-        public Result EditJobListing(JobListingEntity entity, EmployerEntity employer)
+        public Result EditJobListing(JobListingEntity entity)
         {
             var result = new Result();
             try
@@ -283,13 +283,6 @@ namespace MyNursingFuture.BL.Managers
                 var credentials = new CredentialsManager();
 
                 // Check if employer is valid
-
-                result = ValidateEmployer(entity);
-
-                if (result.Success == false)
-                {
-                    return result;
-                }
 
                 // check if the listing has required fields
                 if (entity.Title == null ||
@@ -307,30 +300,28 @@ namespace MyNursingFuture.BL.Managers
 
 
                 query.Entity = entity;
-                query.Query = @"UPDATE [dbo].[JobListings] set 
-                                           [EmployerId] = @EmployerId 
-                                           ,[Title] = @Title
-                                           ,[NurseType] = ,@NurseType
-                                           ,[SpecialRequirements] = @SpecialRequirements
-                                           ,[PublishStatus] = @PublishStatus
-                                           ,[MinSalary] = @MinSalary
-                                           ,[MaxSalary] = @MaxSalary
-                                           ,[ApplicationDeadline] = @ApplicationDeadline
-                                           ,[ModificationDate] = @ModificationDate
-                                           ,[PublishStatus] = @PublishStatus
-                                           ,[Area] = @Area
-                                           ,[State] = @State
-                                           ,[Country] = @Country
-                                           ,[Suburb] = @Suburb
-                                           ,[PostalCode] = @PostalCode
-                                           ,[AddressLine1] = @AddressLine1
-                                           ,[AddressLine2] = @AddressLine2
-                                           ,[Completed] = @Completed
-                                           ,[JobType] =@JobType
+                query.Query = @"UPDATE JobListings SET  
+                                            [Title] = ISNULL( @Title , Title ) ,
+                                            [NurseType] = ISNULL( @NurseType , NurseType ) ,
+                                            [SpecialRequirements] = ISNULL( @SpecialRequirements , SpecialRequirements ) ,
+                                            [PublishStatus] = ISNULL( @PublishStatus , PublishStatus ) ,
+                                            [MinSalary] = ISNULL( @MinSalary , MinSalary ) ,
+                                            [MaxSalary] = ISNULL( @MaxSalary , MaxSalary ) ,
+                                            [ApplicationDeadline] = ISNULL( @ApplicationDeadline , ApplicationDeadline ) ,
+                                            [ModificationDate] = ISNULL( @ModificationDate , ModificationDate ) ,
+                                            [Area] = ISNULL( @Area , Area ) ,
+                                            [State] = ISNULL( @State , State ) ,
+                                            [Country] = ISNULL( @Country , Country ) ,
+                                            [Suburb] = ISNULL( @Suburb , Suburb ) ,
+                                            [PostalCode] = ISNULL( @PostalCode , PostalCode ) ,
+                                            [AddressLine1] = ISNULL( @AddressLine1 , AddressLine1 ) ,
+                                            [AddressLine2] = ISNULL( @AddressLine2 , AddressLine2 ) ,
+                                            [Completed] = ISNULL( @Completed , Completed ) ,
+                                            [JobType] = ISNULL( @JobType , JobType )   
                                      WHERE JobListingId = @JobListingId";
 
 
-                result = con.InsertQuery(query);
+                result = con.ExecuteQueryUnScoped(query);
                 return result;
             }
             catch (Exception ex)
