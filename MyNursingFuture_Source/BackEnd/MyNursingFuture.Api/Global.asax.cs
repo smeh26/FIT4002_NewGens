@@ -31,12 +31,12 @@ namespace MyNursingFuture.Api
             container.Register<IJobListingCriteriaManager, JobListingCriteriaManager>(Lifestyle.Scoped);
             container.Register<IJobListingManager, JobListingManager>(Lifestyle.Scoped);
             container.Register<INurseSelfAssessmentAnswersManager, NurseSelfAssessmentAnswersManager>(Lifestyle.Scoped);
-
+            container.Register<IAnswersManager, AnswersManager>(Lifestyle.Scoped);
+            container.Register<IQuestionsManager, QuestionsManager>(Lifestyle.Scoped);
             //Template for further 
-/*            container.Register<>(Lifestyle.Scoped);
-            container.Register<>(Lifestyle.Scoped);
-            container.Register<>(Lifestyle.Scoped);
-            container.Register<>(Lifestyle.Scoped);*/
+            /*            
+                        container.Register<>(Lifestyle.Scoped);
+                        container.Register<>(Lifestyle.Scoped);*/
 
             container.Register<ICredentialsManager, CredentialsManager>(Lifestyle.Singleton);
             // This is an extension method from the integration package.

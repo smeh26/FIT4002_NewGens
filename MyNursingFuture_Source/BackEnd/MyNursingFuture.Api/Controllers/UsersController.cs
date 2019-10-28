@@ -15,6 +15,8 @@ using System.Web;
 using System.Web.Hosting;
 using Newtonsoft.Json;
 using System.Configuration;
+using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -23,10 +25,37 @@ namespace MyNursingFuture.Api.Controllers
     {
         private readonly IUsersManager _usersManager;
         private readonly ICacheManager _cacheManager;
-        public UsersController(IUsersManager usersManager, ICacheManager cacheManager)
+        private readonly IAnswersManager _answersManager;
+        private readonly IQuestionsManager _questionsManager;
+        private readonly INurseSelfAssessmentAnswersManager _nurseSelfAssessmentAnswersManager;
+        private readonly Dictionary<Tuple<int, decimal>, AnswerEntity> answerDictionary;
+        private readonly Dictionary<int, QuestionEntity> questionDictionary;
+        public UsersController(IUsersManager usersManager,
+            ICacheManager cacheManager,
+  
+             IAnswersManager answersManager,
+             IQuestionsManager questionsManager,
+             INurseSelfAssessmentAnswersManager nurseSelfAssessmentAnswersManager
+            )
         {
             _usersManager = usersManager;
             _cacheManager = cacheManager;
+            _answersManager = answersManager;
+            _questionsManager = questionsManager;
+            _nurseSelfAssessmentAnswersManager = nurseSelfAssessmentAnswersManager;
+
+
+
+            //Get Answers
+            var answers_result = _answersManager.Get();
+            var answers_List = (List<AnswerEntity>)answers_result.Entity;
+            answerDictionary = answers_List.ToDictionary(x => new Tuple<int, decimal>(x.QuestionId, x.Value), x => x);
+
+            //Get Questions
+            var questions_result = _questionsManager.Get();
+            var questions_List = (List<QuestionEntity>)questions_result.Entity;
+            questionDictionary = questions_List.ToDictionary(x => x.QuestionId, x => x);
+
         }
 
         /// <summary>
@@ -47,14 +76,14 @@ namespace MyNursingFuture.Api.Controllers
                 result = new Result(false);
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
             }
-            
+
             result = _usersManager.Register(value);
-           
+
             if (!result.Success)
                 return Request.CreateResponse(HttpStatusCode.OK, result);
 
             var user = new UserModel();
-            var userEntity = (UserEntity) result.Entity;
+            var userEntity = (UserEntity)result.Entity;
             user.Email = userEntity.Email;
             user.Token = userEntity.Token;
             user.Name = userEntity.Name;
@@ -80,7 +109,7 @@ namespace MyNursingFuture.Api.Controllers
             object objuser = null;
             Request.Properties.TryGetValue("user", out objuser);
             var user = objuser as UserEntity;
-            var result = _usersManager.GetQuizzes(user.UserId, QuizTypes.PATHWAY.ToString(),completeLook);
+            var result = _usersManager.GetQuizzes(user.UserId, QuizTypes.PATHWAY.ToString(), completeLook);
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
@@ -142,7 +171,68 @@ namespace MyNursingFuture.Api.Controllers
             entity.UserId = user.UserId;
             entity.Type = QuizTypes.ASSESSMENT.ToString();
             var result = _usersManager.SaveQuiz(entity);
+
+            var error_counter = 0;
+
+            if (!result.Success)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
+
+            }
+            if (result.Success)
+            {
+
+                var userQuizid = (int) result.Entity;
+                //Console.WriteLine(entity.Results);
+                JObject parent_json = JObject.Parse(entity.Results);
+                var answer = parent_json.Value<JObject>("answers").Properties();
+
+                var temp_result = new Result();
+
+                if (answer != null)
+                {
+                    var nurse_answer_dict = answer.ToDictionary(k => Int32.Parse(k.Name), v => Decimal.Parse(v.Value.ToString()));
+
+                    foreach (KeyValuePair<int, decimal> ans in nurse_answer_dict)
+                    {
+                        NurseSelfAssessmentAnswersEntity ans_entity = new NurseSelfAssessmentAnswersEntity();
+                        ans_entity.QuestionId = ans.Key;
+                        ans_entity.Value = ans.Value;
+                        ans_entity.LastUpdate = entity.DateVal;
+                        ans_entity.UserId = entity.UserId;
+                        ans_entity.UserQuizId = userQuizid;
+
+                        AnswerEntity answer_entity = null;
+                        if (answerDictionary.TryGetValue(new Tuple<int, decimal>(ans_entity.QuestionId, ans_entity.Value), out answer_entity))
+                        {
+                            ans_entity.AnswerId = answer_entity.AnswerId;
+                        }
+
+                        QuestionEntity question_entity = null;
+                        if (questionDictionary.TryGetValue(ans.Key, out question_entity))
+                        {
+                            ans_entity.AspectId = (int)question_entity.AspectId;
+
+
+                        }
+                        // insert answer into database
+                        temp_result = _nurseSelfAssessmentAnswersManager.InsertAnswer(entity.UserId, ans_entity);
+
+                        if (!temp_result.Success)
+                        {
+                            error_counter++;
+                        }
+
+                    }
+
+
+                }
+            }
+
+            result.Message += String.Format(" Process ended with {0} error ", error_counter);
+
             return Request.CreateResponse(HttpStatusCode.OK, result);
+
         }
 
         /// <summary>
@@ -161,7 +251,7 @@ namespace MyNursingFuture.Api.Controllers
             var user = objuser as UserEntity;
             entity.UserId = user.UserId;
             entity.Type = QuizTypes.ASSESSMENT.ToString();
-            
+
             var dictionary = JsonConvert.DeserializeObject<Dictionary<int, object>>(entity.Answers);
             var result = _usersManager.SaveQuiz(entity, dictionary);
             return Request.CreateResponse(HttpStatusCode.OK, result);
@@ -215,7 +305,8 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/users/recover")]
         public HttpResponseMessage Recover([FromBody]UserEntity value)
         {
-            if(string.IsNullOrEmpty (value.Email)){
+            if (string.IsNullOrEmpty(value.Email))
+            {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
             if (!value.Email.Contains("@") || value.Email.Length < 3)
@@ -245,7 +336,7 @@ namespace MyNursingFuture.Api.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
-            if ( value.Password.Length < 6)
+            if (value.Password.Length < 6)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
@@ -282,7 +373,7 @@ namespace MyNursingFuture.Api.Controllers
             var user = objuser as UserEntity;
             value.UserId = user.UserId;
             value.ModifyDate = DateTime.Now;
-  
+
 
             var result = _usersManager.UpdateDetails(value);
 
@@ -296,7 +387,7 @@ namespace MyNursingFuture.Api.Controllers
                     PropertyCopier<UserEntity, UserModel>.Copy(user_temp, userModel);
                     return Request.CreateResponse(HttpStatusCode.OK, userModel);
                 }
-                    
+
             }
 
             return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
@@ -319,7 +410,7 @@ namespace MyNursingFuture.Api.Controllers
             Request.Properties.TryGetValue("user", out objuser);
             var user = objuser as UserEntity;
 
-            if ( user == null)
+            if (user == null)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
 
             var updated_user = _usersManager.GetUserDetails(user);
@@ -349,7 +440,7 @@ namespace MyNursingFuture.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
 
-            if (value.NewPassword.Length < 6|| value.Password.Length < 6)
+            if (value.NewPassword.Length < 6 || value.Password.Length < 6)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
