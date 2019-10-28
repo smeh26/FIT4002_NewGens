@@ -28,18 +28,21 @@ namespace MyNursingFuture.Api.Controllers
         private readonly ICacheManager _cacheManager;
         private readonly IJobListingManager _jobListingManager;
         private readonly IJobListingCriteriaManager _jobListingCriteriaManager;
+        private readonly INurseSelfAssessmentAnswersManager _nurseSelfAssessmentManager;
         public JobListingsController(IUsersManager usersManager,
          IEmployersManager employersManager,
          ICacheManager cacheManager,
          IJobListingManager jobListingManager,
-         IJobListingCriteriaManager jobListingCriteriaManager)
+         IJobListingCriteriaManager jobListingCriteriaManager,
+         INurseSelfAssessmentAnswersManager nurseSelfAssessmentAnswersManager
+         )
         {
             _usersManager = usersManager;
             _employersManager = employersManager;
             _cacheManager = cacheManager;
             _jobListingCriteriaManager = jobListingCriteriaManager;
             _jobListingManager = jobListingManager;
-
+            _nurseSelfAssessmentManager = nurseSelfAssessmentAnswersManager;
 
 
         }
@@ -187,6 +190,72 @@ namespace MyNursingFuture.Api.Controllers
             if (result.Entity == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound, result);
 
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
+        //======================================================================================================================
+
+        /// <summary>
+        /// API to retrieve all potential Job listing for the current logged in nurse
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [JwtAuthorized]
+        [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponse))]
+        [Route("api/v1/JobListings/User")]
+        public HttpResponseMessage GetAllListingsOfCurrentNurse()
+        {
+            //Working, tested
+            var result = new Result();
+            object objuser = null;
+            Request.Properties.TryGetValue("user", out objuser);
+            var user = objuser as UserEntity;
+            if (user == null)
+            {
+                result = new Result(false);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, result);
+            }
+
+            var nurse = (UserEntity)_usersManager.GetUserDetails(user).Entity;
+
+            if (nurse.defaultQuizId == 0 ) {
+                result.Success = false;
+                result.Message = "User must complete and nominate a Quizz to use as their profile";
+                result.Entity = null;
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+            }
+
+            result = _nurseSelfAssessmentManager.GetAnswersbyUserQuizzId(nurse.defaultQuizId);
+            var answersList = (List<NurseSelfAssessmentAnswersEntity>) result.Entity;
+
+            result = _jobListingManager.GetAllListingsByNurseSelfAssessmentAnswer(answersList);
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+            var listings = (List<int>)result.Entity;
+            var listingEntityLists = new List<JobListingEntity>();
+
+            foreach(int listingId in listings)
+            {
+                var lt_entity = (JobListingEntity)_jobListingManager.GetListingById(listingId).Entity;
+                if ( lt_entity.maxSalary >= nurse.salary) {
+                    listingEntityLists.Add(lt_entity);
+
+                }
+
+
+            }
+
+            result.Entity = listingEntityLists;
 
             return Request.CreateResponse(HttpStatusCode.OK, result);
 

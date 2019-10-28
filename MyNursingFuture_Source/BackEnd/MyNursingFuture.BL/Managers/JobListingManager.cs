@@ -26,6 +26,7 @@ namespace MyNursingFuture.BL.Managers
         Result GetAllListingsByEmployer(EmployerEntity employer);
         Result GetAllListingsByEmployerV2(EmployerEntity employer);
         //Boolean IsListingBelongToEmployer(int ListingId, int EmployerId);
+        Result GetAllListingsByNurseSelfAssessmentAnswer(List<NurseSelfAssessmentAnswersEntity> nurseSelfAssessmentAnswersList);
 
 
     }
@@ -521,9 +522,10 @@ namespace MyNursingFuture.BL.Managers
                 var listing_list = (List<JobListingEntity>)result.Entity;
 
                 var listing_cri_man = new JobListingCriteriaManager();
-                foreach (JobListingEntity listing in listing_list) {
+                foreach (JobListingEntity listing in listing_list)
+                {
 
-                    var criteria = (List<JobListingCriteriaEntity>) listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                    var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
                     listing.JobListingCriteria = criteria;
                 }
 
@@ -624,8 +626,8 @@ namespace MyNursingFuture.BL.Managers
                 {
                     query_string += String.Format("INTERSECT (SELECT DISTINCT UserId FROM @Quizz WHERE QuestionId = {0} AND Value >= {1} ) ", criterion.QuestionId, criterion.Value);
 
-                  
-                   
+
+
                     counter++;
                 }
 
@@ -671,7 +673,7 @@ namespace MyNursingFuture.BL.Managers
                     return result;
                 }
 
-                
+
                 listing.maxSalary = listing.maxSalary == 0 ? 200000 : listing.maxSalary;
                 listing.minSalary = listing.minSalary == 0 ? 40000 : listing.minSalary;
 
@@ -683,12 +685,12 @@ namespace MyNursingFuture.BL.Managers
                 {
                     result.Success = false;
                     result.Message = Listing_Re.Message;
-                    return result; 
+                    return result;
                 }
                 var criteria = (List<JobListingCriteriaEntity>)Listing_Re.Entity;
 
                 // Assemble inner join query
-                string query_string = String.Format(@"WITH SRC AS (SELECT UserId FROM Users WHERE {0} > = minsalary  AND maxsalary >=  {1} AND IsLookingForJob = 1 ) SELECT DISTINCT T0.UserId FROM SRC AS T0 ", listing.maxSalary,  listing.minSalary);
+                string query_string = String.Format(@"WITH SRC AS (SELECT UserId FROM Users WHERE {0} > = minsalary  AND maxsalary >=  {1} AND IsLookingForJob = 1 ) SELECT DISTINCT T0.UserId FROM SRC AS T0 ", listing.maxSalary, listing.minSalary);
                 List<String> select_queries = new List<String>();
                 int counter = 1;
                 foreach (JobListingCriteriaEntity criterion in criteria)
@@ -740,7 +742,8 @@ namespace MyNursingFuture.BL.Managers
 
         }
 
-        public Result GetAllListingsByEmployer(EmployerEntity employer) {
+        public Result GetAllListingsByEmployer(EmployerEntity employer)
+        {
             var result = new Result();
             try
             {
@@ -842,9 +845,59 @@ namespace MyNursingFuture.BL.Managers
 
         }
 
+        public Result GetAllListingsByNurseSelfAssessmentAnswer(List<NurseSelfAssessmentAnswersEntity> nurseSelfAssessmentAnswersList)
+        {
+            var result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                var credentials = new CredentialsManager();
+
+                string query_stringa = @"DECLARE @Starter table (JobListingId  int);
+                                        DECLARE @Quizz table ( JobListingId int, QuestionId int, [Value] Money)
+
+                                        INSERT INTO @Starter 
+                                        SELECT JobListingId FROM JobListings WHERE ApplicationDeadline > GETDATE() AND PublishStatus = 1   ;
+
+                                        INSERT INTO @Quizz
+                                        SELECT  
+                                        JLC.JobListingId, QuestionId,  [Value]
+                                        FROM  [JobListingCriteria] JLC
+                                        INNER JOIN @Starter Stt
+                                        ON JLC.JobListingId = Stt.JobListingId;";
+                string query_string = query_stringa + "SELECT DISTINCT JobListingId FROM [JobListingCriteria]    ";
+                List<String> select_queries = new List<String>();
+                int counter = 0;
+                foreach (NurseSelfAssessmentAnswersEntity NAAEntity in nurseSelfAssessmentAnswersList)
+                {
+                    query_string += String.Format("INTERSECT (SELECT DISTINCT JobListingId FROM  [JobListingCriteria] WHERE QuestionId = {0} AND Value <= {1} ) ", NAAEntity.QuestionId, NAAEntity.Value);
 
 
 
+                    counter++;
+                }
+
+                query.Query = query_string;
+                return con.ExecuteQuery<int>(query);
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+            return result;
+
+
+
+        }
     }
 }
 

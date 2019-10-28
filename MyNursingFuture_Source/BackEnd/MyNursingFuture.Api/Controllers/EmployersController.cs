@@ -326,7 +326,9 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
-        [Route("api/v1/employers/{employerId}")]
+        [HttpGet]
+        [JwtAuthorized]
+        [Route("api/v1/employers/sercured/{employerId}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetEmployerDetailsSecuredResponse))]
         public HttpResponseMessage RegisterEmployer(int employerId)
         {

@@ -68,12 +68,6 @@ namespace MyNursingFuture.Api.Controllers
             jobApplication.AppliedDate = DateTime.Now;
             jobApplication.LastModifiedDate = jobApplication.AppliedDate;
             jobApplication.IsShortlisted = false;
-            jobApplication.Name = user.Name;
-            jobApplication.Qualification = user.Qualification;
-            jobApplication.EmailAddress = user.Email;
-            jobApplication.Country = user.Country;
-            jobApplication.PostalCode = user.PostalCode;
-            jobApplication.Suburb = user.Suburb;
             result = _jobApplicationManager.CreateJobApplication(jobApplication);
 
 

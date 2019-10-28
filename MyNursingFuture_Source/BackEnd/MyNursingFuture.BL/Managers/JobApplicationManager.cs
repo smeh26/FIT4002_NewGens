@@ -186,5 +186,40 @@ namespace MyNursingFuture.BL.Managers
             return result;
         }
 
+        public Result ShortListApplication(int applicationId)
+        {
+            Result result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = new { ApplicationId = applicationId,
+                                    ApplicationStatus = "SHORTLISTED",
+                                    IsShortlisted = true,
+                                    ShortListedDate = DateTime.Now,
+                                    IsDeclined = false
+                };
+                query.Query = @"
+                Update JobApplications SET 
+                                            IsShortlisted = @IsShortlisted,
+                                            ShortListedDate = @ShortListedDate,
+                                            IsDeclined = @IsDeclined
+                WHERE ApplicationId = @ApplicationId
+                ";
+                result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+
+            return result;
+
+        }
+
     }
 }
