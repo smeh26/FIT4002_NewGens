@@ -44,6 +44,8 @@ namespace MyNursingFuture.Api
            
             container.Verify();
 
+            AutoMapperConfig.Initialize();
+
             GlobalConfiguration.Configuration.DependencyResolver =
                 new SimpleInjectorWebApiDependencyResolver(container);
 
@@ -51,6 +53,8 @@ namespace MyNursingFuture.Api
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
             GlobalConfiguration.Configure(WebApiConfig.Register);
+
+            
         }
     }
 }

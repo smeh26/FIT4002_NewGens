@@ -135,7 +135,7 @@ namespace MyNursingFuture.BL.Managers
 
                 String query_string = String.Format(@"
                 BEGIN TRAN
-                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = {0} and QuestionId = @QuestionId )
+                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = {0} and QuestionId = @QuestionId and UserQuizId = @UserQuizId)
                 BEGIN
                     UPDATE NurseSelfAssessmentAnswers SET Value = @Value 
                                                         , LastUpdate= @LastUpdate 
@@ -143,8 +143,7 @@ namespace MyNursingFuture.BL.Managers
                                                         , AnswerId = @AnswerId
                                                         , AspectId = @AspectId
                                                         , TextAnswerField = @TextAnswerField
-                                                        ,UserQuizId = @UserQuizId
-                    WHERE UserId = {0} and QuestionId = @QuestionId
+                    WHERE UserId = {0} and QuestionId = @QuestionId and UserQuizId = @UserQuizId
                 END 
                 ELSE
                 BEGIN 

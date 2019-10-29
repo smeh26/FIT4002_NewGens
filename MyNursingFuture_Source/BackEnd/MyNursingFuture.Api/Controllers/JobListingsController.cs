@@ -105,7 +105,7 @@ namespace MyNursingFuture.Api.Controllers
             var employer = objemployer as EmployerEntity;
             var employerentity_full = (EmployerEntity) _employersManager.GetEmployerById(employer.EmployerId).Entity;
 
-            if (employerentity_full.MembershipEndDate == DateTime.MinValue ||  DateTime.Compare(employerentity_full.MembershipEndDate, DateTime.Now) < 0 ) 
+            if (employerentity_full.MembershipEndDate == DateTime.MinValue ||  employerentity_full.MembershipEndDate < (DateTime?) DateTime.Now ) 
                 {
                 // membership expired
                 result = new Result();
@@ -591,7 +591,7 @@ namespace MyNursingFuture.Api.Controllers
             if (employer.EmployerId != employer_entity.EmployerId)
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
 
-            if (DateTime.Compare(employer_entity.MembershipEndDate, DateTime.Now) < 0 )
+            if (employer_entity.MembershipEndDate < (DateTime?)DateTime.Now )
             {
                 joblisting.PublishStatus = false;
                 

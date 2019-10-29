@@ -25,9 +25,12 @@ namespace MyNursingFuture.BL.Managers
     {
         Result CreateJobApplication(JobApplicationEntity jobApplication);
         Result UpdateJobApplication(JobApplicationEntity jobApplication);
+        Result ShortlistOrDeclineJobApplication(JobApplicationEntity jobApplication);
         Result GetJobApplicationByUserId(int userId);
         Result GetJobApplicationByListingId(int listingId);
         Result GetJobApplicationByApplicationId(int applicationId);
+        Result UpdateFeedbackFromNurse(JobApplicationEntity entity);
+        Result UpdateFeedbackFromEmployer(JobApplicationEntity entity);
 
 
     }
@@ -120,6 +123,43 @@ namespace MyNursingFuture.BL.Managers
 
             return result;
         }
+
+        public Result ShortlistOrDeclineJobApplication(JobApplicationEntity jobApplication)
+        {
+            Result result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = jobApplication;
+                query.Query = @"
+                UPDATE JobApplications SET  
+                                                ApplicationStatus = @ApplicationStatus , 
+                                                IsShortlisted = @IsShortlisted,
+                                                IsDeclined = @IsDeclined,
+                                                ShortListedDate = ISNULL(@ShortListedDate, NULL),
+                                                DeclinedDate = ISNULL(@DeclinedDate, NULL)
+
+                WHERE JobApplicationId = @JobApplicationId AND JobListingId = @JobListingId AND UserId = @UserId;
+                SELECT * FROM JobApplications WHERE JobApplicationId = @JobApplicationId AND JobListingId = @JobListingId and UserId = @UserId;
+               
+                ";
+                result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+
+            return result;
+
+        }
+       
+
         public Result GetJobApplicationByUserId( int userId)
         {
             Result result = new Result();
@@ -178,7 +218,7 @@ namespace MyNursingFuture.BL.Managers
                 var query = new QueryEntity();
                 query.Entity = new { ApplicationId = applicationId };
                 query.Query = @"
-                SELECT * FROM JobApplications WHERE ApplicationId = @ApplicationId
+                SELECT * FROM JobApplications WHERE JobApplicationId = @ApplicationId
                 ";
                 result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
 
@@ -214,6 +254,73 @@ namespace MyNursingFuture.BL.Managers
                                             IsDeclined = @IsDeclined
                 WHERE ApplicationId = @ApplicationId
                 ";
+                result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+
+            return result;
+
+        }
+
+
+        public Result UpdateFeedbackFromNurse(JobApplicationEntity entity)
+        {
+            Result result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = entity;
+                query.Query = @"
+                BEGIN TRAN
+                Update JobApplications SET 
+                                          FeedbackFromNurse   = @FeedbackFromNurse
+                WHERE                           JobApplicationId = @JobApplicationId;
+                Select * From JobApplications                
+                WHERE                           JobApplicationId = @JobApplicationId;
+                COMMIT TRAN
+                ";
+                result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+
+            return result;
+
+        }
+
+        public Result UpdateFeedbackFromEmployer(JobApplicationEntity entity)
+        {
+            Result result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = entity;
+                query.Query = @"
+                BEGIN TRAN   
+                Update JobApplications SET 
+                                          FeedbackFromEmployer   = @FeedbackFromEmployer
+                WHERE                           JobApplicationId = @JobApplicationId;
+                Select * From JobApplications 
+                WHERE                           JobApplicationId = @JobApplicationId;
+                COMMIT TRAN   
+                
+
+";
                 result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
 
                 return result;

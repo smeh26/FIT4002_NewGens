@@ -16,8 +16,8 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-
-
+using AutoMapper;
+using System.Collections.Generic;
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -29,13 +29,15 @@ namespace MyNursingFuture.Api.Controllers
         private readonly IJobListingManager _jobListingManager;
         private readonly IJobListingCriteriaManager _jobListingCriteriaManager;
         private readonly IJobApplicationManager _jobApplicationManager;
+        private readonly INurseSelfAssessmentAnswersManager _nurseSelfAssessmentAnswersManager;
 
         public JobApplicationController(IUsersManager usersManager,
          IEmployersManager employersManager,
          ICacheManager cacheManager,
          IJobListingManager jobListingManager,
          IJobListingCriteriaManager jobListingCriteriaManager,
-         IJobApplicationManager jobApplicationManager
+         IJobApplicationManager jobApplicationManager,
+         INurseSelfAssessmentAnswersManager nurseSelfAssessmentAnswersManager
          )
         {
             _usersManager = usersManager;
@@ -44,7 +46,7 @@ namespace MyNursingFuture.Api.Controllers
             _jobListingCriteriaManager = jobListingCriteriaManager;
             _jobListingManager = jobListingManager;
             _jobApplicationManager = jobApplicationManager;
-
+            _nurseSelfAssessmentAnswersManager = nurseSelfAssessmentAnswersManager;
         }
 
         //==============================================================================
@@ -70,6 +72,18 @@ namespace MyNursingFuture.Api.Controllers
             public string Message { get; set; }
             public bool Success { get; set; }
             public ApplicationWithInfo Entity { get; set; }
+        }
+        private struct JobApplicationList_NurseResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<ApplicationWithInfo> Entity { get; set; }
+        }
+        private struct JobApplicationList_EmployerResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<ApplicationWithInfo> Entity { get; set; }
         }
 
         private struct ApplicationWithInfo
@@ -153,6 +167,8 @@ namespace MyNursingFuture.Api.Controllers
             // if success
             var response = new ApplicationWithInfo();
             response.jobApplicationEntity = (JobApplicationEntity)result.Entity;
+
+         
             result.Entity = response;
             return Request.CreateResponse(HttpStatusCode.Created, result);
 
@@ -169,12 +185,15 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API For shortlisting a Job Application
         /// </summary>
-        /// <remarks> UNTESTED  </remarks>
+        /// <remarks>  Functional
+        /// 
+        /// TODO - Unit tests  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
         [HttpPost]
         [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationResponse))]
         [Route("api/v1/Applications/Shorlist/{applicationId}")]
         public HttpResponseMessage ShortListApplicationByApplicationId(int applicationId)
         {
@@ -189,13 +208,66 @@ namespace MyNursingFuture.Api.Controllers
 
             // verify if the employer owns the listing
             var listing = (JobListingEntity)_jobListingManager.GetListingById(jobApplication.JobListingId).Entity;
-            if (employer.EmployerId != listing.EmployerId)
+            if (employer.EmployerId != listing.EmployerId || jobApplication.IsDraft)
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
-
+            jobApplication.ApplicationStatus = ApplicationStatus.Shortlisted.ToString();
             jobApplication.IsShortlisted = true;
             jobApplication.ShortListedDate = DateTime.Now;
+            jobApplication.IsDeclined = false;
+            jobApplication.DeclinedDate = null;
 
-            result = _jobApplicationManager.UpdateJobApplication(jobApplication);
+            result = _jobApplicationManager.ShortlistOrDeclineJobApplication(jobApplication);
+
+
+            // return failed 
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            // if success
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+        }
+
+
+
+
+
+        //=====================================================================================================
+        /// <summary>
+        /// API For Employer to Decline a Job Application
+        /// </summary>
+        /// <remarks> Functional
+        /// 
+        /// TODO - Unit tests   
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpPost]
+        [EmployerJWTAuthorized]
+        [Route("api/v1/Applications/Decline/{applicationId}")]
+        public HttpResponseMessage DeclineApplicationByApplicationId(int applicationId)
+        {
+            Result result = new Result();
+            //Employer vertification 
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var employer = objemployer as EmployerEntity;
+            var jobApplication = (JobApplicationEntity)_jobApplicationManager.GetJobApplicationByApplicationId(applicationId).Entity;
+
+            // verify if the employer owns the listing
+            var listing = (JobListingEntity)_jobListingManager.GetListingById(jobApplication.JobListingId).Entity;
+            if (employer.EmployerId != listing.EmployerId || jobApplication.IsDraft)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            jobApplication.ApplicationStatus = ApplicationStatus.Declined.ToString();
+            jobApplication.IsShortlisted = true;
+            jobApplication.ShortListedDate = null;
+            jobApplication.IsDeclined = false;
+            jobApplication.DeclinedDate = DateTime.Now;
+
+            result = _jobApplicationManager.ShortlistOrDeclineJobApplication(jobApplication);
 
 
             // return failed 
@@ -216,15 +288,18 @@ namespace MyNursingFuture.Api.Controllers
 
         //===============================================================================
         /// <summary>
-        /// [Employer] - API For shortlisting a Job Application
+        /// [Nurse] - API For getting all Job Applications from a nurse, by userId
         /// </summary>
-        /// <remarks> UNTESTED  </remarks>
+        /// <remarks> Functional
+        /// 
+        /// TODO - Unit tests   </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
-        [EmployerJWTAuthorized]
-        [Route("api/v1/Applications/Users/{id}")]
-        public HttpResponseMessage GetApplicationByUserId(int id)
+        [JwtAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationList_NurseResponse))]
+        [Route("api/v1/Applications/Users/")]
+        public HttpResponseMessage GetApplicationsByUser()
         {
             Result result = new Result();
 
@@ -236,7 +311,7 @@ namespace MyNursingFuture.Api.Controllers
             var user = objuser as UserEntity;
 
 
-            result = _jobApplicationManager.GetJobApplicationByUserId(id);
+            result = _jobApplicationManager.GetJobApplicationByUserId(user.UserId);
 
             //If failed
             if (!result.Success)
@@ -260,27 +335,48 @@ namespace MyNursingFuture.Api.Controllers
 
         //===============================================================================
         /// <summary>
-        /// API For retrieving all job applications by Listing Id
+        /// [Employers] API For retrieving all job applications by Listing Id
         /// </summary>
-        /// <remarks> UNTESTED  </remarks>
+        /// <remarks> Functional
+        /// 
+        /// TODO - Unit tests   </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
         [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationList_EmployerResponse))]
         [Route("api/v1/Applications/Listing/{id}")]
-        public HttpResponseMessage GetApplicationByListingId(int id)
+        public HttpResponseMessage GetApplicationsByListingId(int id)
         {
             Result result = new Result();
 
+            //Employer vertification 
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var employer = objemployer as EmployerEntity;
+            var listing = (JobListingEntity) _jobListingManager.GetListingById(id).Entity;
+            if (listing == null || listing.EmployerId != employer.EmployerId)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
             result = _jobApplicationManager.GetJobApplicationByListingId(id);
+            var applications = (List<JobApplicationEntity>)result.Entity;
 
+            foreach (JobApplicationEntity application in applications) {
+                var nurse = (UserEntity)_usersManager.GetSecuredUserDetails(application.UserId).Entity;
+                var quizzAnswers = (List<NurseSelfAssessmentAnswersEntity>)_nurseSelfAssessmentAnswersManager.GetAnswersbyUserQuizzId(nurse.defaultQuizId).Entity;
+                application.PreferedQuizz = quizzAnswers;
+
+            }
+
+            result.Entity = applications;
             //If failed
             if (!result.Success)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
             //If if not found
             if (result.Entity == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound, result);
-
+           
             //If it is good
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
@@ -297,15 +393,19 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API For retrieving a Job Application by its Id
         /// </summary>
-        /// <remarks> UNTESTED  </remarks>
+        /// <remarks> Functional
+        /// 
+        /// TODO - Unit tests   </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
         [HttpGet]
         [GenericJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationResponse))]
         [Route("api/v1/Applications/{id}")]
         public HttpResponseMessage GetApplicationById(int id)
         {
+
             Result result = new Result();
             result = _jobApplicationManager.GetJobApplicationByApplicationId(id);
 
@@ -319,17 +419,17 @@ namespace MyNursingFuture.Api.Controllers
             // Authentication verify block 
             object objuser = null;
             Request.Properties.TryGetValue("user", out objuser);
-
             var user = objuser as UserEntity;
 
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
-
             var employer = objemployer as EmployerEntity;
 
             var application = (JobApplicationEntity)result.Entity;
 
+            var response = new ApplicationWithInfo();
 
+            response.jobApplicationEntity = application;
             if (user != null)
             {
                 // User logged in 
@@ -342,17 +442,131 @@ namespace MyNursingFuture.Api.Controllers
                 var listing = (JobListingEntity)_jobListingManager.GetListingById(application.JobListingId).Entity;
 
 
-                if (employer.EmployerId != listing.EmployerId)
+                if (employer.EmployerId != listing.EmployerId || application.IsDraft)
                     return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
             }
 
+            
+
+            if (!application.IsDraft && (application.IsShortlisted == true) && (application.IsDeclined != true))
+            {
+                // get details only if the application is shortlisted;
+                var nurseEntity = (UserEntity)_usersManager.GetSecuredUserDetails(application.UserId).Entity;
+                var nurseDetails = new UserModelSecured();
+                PropertyCopier<UserEntity, UserModelSecured>.Copy(nurseEntity, nurseDetails);
+
+                var employerEntity = (EmployerEntity)_employersManager.GetEmployerById(application.EmployerId).Entity;
+                var employerDetails = new EmployerModelSecured();
+                PropertyCopier<EmployerEntity, EmployerModelSecured>.Copy(employerEntity, employerDetails);
+
+                var quizAnswers = (List<NurseSelfAssessmentAnswersEntity>)_nurseSelfAssessmentAnswersManager.GetAnswersbyUserQuizzId(nurseEntity.defaultQuizId).Entity;
+                response.jobApplicationEntity.PreferedQuizz = quizAnswers;
+                response.employerInfo = employerDetails;
+                response.nurseInfo = nurseDetails;
+
+            }
 
             //If it is good
+
+            result.Entity = response;
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
 
 
+
+
+
+        //===============================================================================
+        /// <summary>
+        /// [Nurse] - API For Nurse to leave feedback for Nurse on an Application
+        /// </summary>
+        /// <remarks> Functional
+        /// 
+        /// TODO - Unit tests   </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [JwtAuthorized]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationResponse))]
+        [Route("api/v1/Applications/FeedbackFromNurse/")]
+        public HttpResponseMessage UpdateFeedbackFromNurse([FromBody] JobApplicationEntity applicationEntity)
+        {
+            Result result = new Result();
+
+            // Authentication verify block 
+            object objuser = null;
+            Request.Properties.TryGetValue("user", out objuser);
+            if (objuser == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var user = objuser as UserEntity;
+
+            if (applicationEntity.UserId != user.UserId) {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            }
+            if (String.IsNullOrEmpty(applicationEntity.FeedbackFromNurse) || String.IsNullOrWhiteSpace(applicationEntity.FeedbackFromNurse)) {
+                result.Message = "Feedback cannot be empty";
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            }
+
+            result = _jobApplicationManager.UpdateFeedbackFromNurse(applicationEntity);
+
+            //If failed
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            //If if not found
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+            //If it is good
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
+
+
+        //===============================================================================
+        /// <summary>
+        /// [Employer] - API for Employer to leave feedback for Nurse on an Application
+        /// </summary>
+        /// <remarks> Functional
+        /// 
+        /// TODO - Unit tests   </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpPost]
+        [EmployerJWTAuthorized]
+        [Route("api/v1/Applications/FeedbackFromEmployer/")]
+        public HttpResponseMessage UpdateFeedbackFromEmployer([FromBody] JobApplicationEntity applicationEntity)
+        {
+            Result result = new Result();
+            //Employer vertification 
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            var employer = objemployer as EmployerEntity;
+            if (objemployer == null || employer.EmployerId != applicationEntity.EmployerId)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+
+            if (String.IsNullOrEmpty(applicationEntity.FeedbackFromEmployer) || String.IsNullOrWhiteSpace(applicationEntity.FeedbackFromEmployer))
+            {
+                result.Message = "Feedback cannot be empty";
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            }
+
+            result = _jobApplicationManager.UpdateFeedbackFromEmployer(applicationEntity);
+
+
+            // return failed 
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            // if success
+            return Request.CreateResponse(HttpStatusCode.Created, result);
+
+        }
 
 
     }

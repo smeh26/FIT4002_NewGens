@@ -198,8 +198,9 @@ namespace MyNursingFuture.Api.Controllers
             Request.Properties.TryGetValue("employer", out objemp);
             var employer = objemp as EmployerEntity;
 
+            value.EmployerId = employer.EmployerId;
 
-
+            value.ModifyDate = DateTime.Now;
             result = _employersManager.UpdateDetails(value);
 
             var emp = (EmployerEntity)_employersManager.GetEmployerById(employer.EmployerId).Entity;
@@ -323,15 +324,15 @@ namespace MyNursingFuture.Api.Controllers
 
             employer.MembershipType = "STANDARD";
 
-            if (DateTime.Compare(employer.MembershipEndDate, DateTime.Now) >= 0)
+            if (employer.MembershipEndDate != null && employer.MembershipEndDate > (Nullable<DateTime>)DateTime.Now )
             {
-                employer.MembershipEndDate = employer.MembershipEndDate.AddDays(duration);
+                employer.MembershipEndDate = ((DateTime)employer.MembershipEndDate).AddDays(mbm.Duration);
             }
             else {
                 employer.MembershipEndDate = DateTime.Now.AddDays(duration);
                 employer.MembershipStartDate = DateTime.Now;
             }
-            result = _employersManager.UpdateDetails(employer);
+            result = _employersManager.UpdateMembership(employer);
             //If failed
             if (!result.Success)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
