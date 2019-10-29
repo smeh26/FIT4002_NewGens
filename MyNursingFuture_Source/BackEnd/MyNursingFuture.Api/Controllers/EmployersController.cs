@@ -91,7 +91,12 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-
+        
+        
+        
+        
+        
+        //=========================================================================================================
 
         /// <summary>
         /// API to recover password
@@ -120,6 +125,12 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+
+
+
+
+
+        //=========================================================================================================
         /// <summary>
         /// API to reset password
         /// </summary>
@@ -152,6 +163,12 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
+
+
+
+
+
+        //=========================================================================================================
         /// <summary>
         /// API to update details of an employer enity
         /// </summary>
@@ -193,6 +210,12 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
+
+
+
+
+
+        //=========================================================================================================
         /// <summary>
         /// API to change password of an employer entity
         /// </summary>
@@ -226,6 +249,12 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+
+
+
+
+
+        //=========================================================================================================
         /// <summary>
         /// API to detele an employer entity
         /// </summary>
@@ -253,6 +282,12 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+
+
+
+
+
+        //=========================================================================================================
         private struct AdjustMembershipResponse
         {
             public string Message { get; set; }
@@ -310,12 +345,19 @@ namespace MyNursingFuture.Api.Controllers
 
 
 
+
+
+
+
+
+        //=========================================================================================================
         private struct GetEmployerDetailsSecuredResponse
         {
             public string Message { get; set; }
             public bool Success { get; set; }
             public EmployerModel Entity { get; set; }
         }
+
         /// <summary>
         /// This API is used for a nurse to get info of the employer 
         /// </summary>

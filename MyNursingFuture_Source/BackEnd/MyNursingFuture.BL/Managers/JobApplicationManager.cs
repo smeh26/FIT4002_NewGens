@@ -1,4 +1,12 @@
-﻿using System;
+﻿/**
+ * 
+ * <Author> Nguyen Pham - 27348032  </Author>
+ * <copyright> The following code is the work of Nguyen Pham unless other wise specified  </copyright>
+ * <remarks> This is a part of the FIT4002 project. Product owner is APNA. Project supervisor is Robyn McNamara  </remarks>
+ * <date>  </date>
+ * <summary> </summary>
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +47,8 @@ namespace MyNursingFuture.BL.Managers
                 BEGIN TRAN
                 IF EXISTS (SELECT * FROM JobApplications WHERE JobListingId = @JobListingId and UserId = @UserId )
                 BEGIN
-                    UPDATE JobApplications SET  Summary = @Summary , 
+                    UPDATE JobApplications SET  Summary = @Summary ,
+                                                EmployerId = @EmployerId,
                                                 IsDraft = @IsDraft, 
                                                 ApplicationStatus = @ApplicationStatus , 
                                                 AppliedDate = @AppliedDate , 
@@ -48,12 +57,13 @@ namespace MyNursingFuture.BL.Managers
                 END 
                 ELSE
                 BEGIN 
-                    INSERT INTO JobApplications  (JobListingId, UserId, Summary, IsDraft, ApplicationStatus, AppliedDate, LastModifiedDate)
-                                            VALUES  (@JobListingId, @UserId, @Summary, @IsDraft, @ApplicationStatus, @AppliedDate, @LastModifiedDate)
-                END TRAN
-                COMMIT 
+                    INSERT INTO JobApplications  (JobListingId, UserId, EmployerId, Summary, IsDraft, ApplicationStatus, AppliedDate, LastModifiedDate)
+                                            VALUES  (@JobListingId,  @UserId, @EmployerId,  @Summary, @IsDraft, @ApplicationStatus, @AppliedDate, @LastModifiedDate)
+                END
+                SELECT * FROM JobApplications WHERE JobListingId = @JobListingId and UserId = @UserId
+                COMMIT TRAN
                 "; 
-                result = con.ExecuteQuery(query);
+                result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
 
                 return result;
             }
@@ -81,23 +91,21 @@ namespace MyNursingFuture.BL.Managers
                     UPDATE JobApplications SET  Summary = @Summary , 
                                                 IsDraft = @IsDraft, 
                                                 ApplicationStatus = @ApplicationStatus , 
-                                                AppliedDate = @AppliedDate , 
                                                 LastModifiedDate= @LastModifiedDate
                     WHERE JobListingId = @JobListingId and UserId = @UserId
                 END 
                 ELSE
                 BEGIN 
-                    INSERT INTO JobApplications  (JobListingId, UserId, Summary, IsDraft, ApplicationStatus, AppliedDate, LastModifiedDate)
+                    INSERT INTO JobApplications  (JobListingId, UserId, Summary, IsDraft, ApplicationStatus, LastModifiedDate)
                                             VALUES  (@JobListingId, 
                                                         @UserId, 
                                                         @Summary, 
                                                         @IsDraft, 
                                                         @ApplicationStatus,
-                                                        @AppliedDate, 
                                                         @LastModifiedDate
 )
-                END TRAN
-                COMMIT 
+                END 
+                COMMIT TRAN
                 ";
                 result = con.ExecuteQuery(query);
 

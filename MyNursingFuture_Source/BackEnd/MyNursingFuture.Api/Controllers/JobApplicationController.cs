@@ -1,20 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Cors;
-using System.Web.Http.Results;
+﻿/**
+ * 
+ * <Author> Nguyen Pham - 27348032  </Author>
+ * <copyright> The following code is the work of Nguyen Pham unless other wise specified  </copyright>
+ * <remarks> This is a part of the FIT4002 project. Product owner is APNA. Project supervisor is Robyn McNamara  </remarks>
+ * <date>  </date>
+ * <summary> </summary>
+ */
+using MyNursingFuture.Api.Filters;
 using MyNursingFuture.Api.Models;
 using MyNursingFuture.BL.Entities;
 using MyNursingFuture.BL.Managers;
 using MyNursingFuture.Util;
-using MyNursingFuture.Api.Filters;
-using System.Web;
-using System.Web.Hosting;
-using Newtonsoft.Json;
-using System.Configuration;
+using Swashbuckle.Swagger.Annotations;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+
+
+
 namespace MyNursingFuture.Api.Controllers
 {
     public class JobApplicationController : ApiController
@@ -25,6 +29,7 @@ namespace MyNursingFuture.Api.Controllers
         private readonly IJobListingManager _jobListingManager;
         private readonly IJobListingCriteriaManager _jobListingCriteriaManager;
         private readonly IJobApplicationManager _jobApplicationManager;
+
         public JobApplicationController(IUsersManager usersManager,
          IEmployersManager employersManager,
          ICacheManager cacheManager,
@@ -42,16 +47,52 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        //==============================================================================
+        public enum ApplicationStatus
+        {
+            Draft,
+            Submitted,
+            Withdrawn,
+            Shortlisted,
+            Declined
+
+        }
+
+
+
+
+
+
+
+        //===============================================================================
+        private struct JobApplicationResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public ApplicationWithInfo Entity { get; set; }
+        }
+
+        private struct ApplicationWithInfo
+        {
+            public JobApplicationEntity jobApplicationEntity { get; set; }
+            public EmployerModelSecured employerInfo { get; set; }
+            public UserModelSecured nurseInfo { get; set; }
+
+        }
 
         /// <summary>
-        /// API For creating Job Application
+        /// [Nurse] API For creating Job Application
         /// </summary>
-        /// <remarks> UNTESTED  </remarks>
+        /// <remarks> Functionally working  
+        /// 
+        /// TODO - Unit tests 
+        /// </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
         [HttpPost]
         [JwtAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationResponse))]
         [Route("api/v1/Applications")]
         public HttpResponseMessage Post([FromBody] JobApplicationEntity jobApplication)
         {
@@ -64,11 +105,45 @@ namespace MyNursingFuture.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, result);
             var user = objuser as UserEntity;
 
+            // check if listing is valid
+            var jobListingEntity_Result = _jobListingManager.GetListingById(jobApplication.JobListingId);
+            if (!jobListingEntity_Result.Success || jobListingEntity_Result.Entity == null)
+            {
+                result.Entity = null;
+                result.Message = "Job Listing not exists";
+                result.Success = false;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            }
+            var jobListingEntity = (JobListingEntity)jobListingEntity_Result.Entity;
+
+            // check if listing expired
+            if (DateTime.Compare(jobListingEntity.ApplicationDeadline, DateTime.Now) < 0)
+            {
+                result.Entity = null;
+                result.Message = "Job Listing expired";
+                result.Success = false;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            }
+
+            if (jobApplication.IsDraft)
+            {
+                jobApplication.ApplicationStatus = ApplicationStatus.Draft.ToString();
+            }
+            else
+            {
+                jobApplication.ApplicationStatus = ApplicationStatus.Submitted.ToString();
+            }
+
+            jobApplication.EmployerId = jobListingEntity.EmployerId;
             jobApplication.UserId = user.UserId;
             jobApplication.AppliedDate = DateTime.Now;
             jobApplication.LastModifiedDate = jobApplication.AppliedDate;
             jobApplication.IsShortlisted = false;
+            jobApplication.IsDeclined = false;
             result = _jobApplicationManager.CreateJobApplication(jobApplication);
+
+
+
 
 
             // return failed 
@@ -76,10 +151,21 @@ namespace MyNursingFuture.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
 
             // if success
+            var response = new ApplicationWithInfo();
+            response.jobApplicationEntity = (JobApplicationEntity)result.Entity;
+            result.Entity = response;
             return Request.CreateResponse(HttpStatusCode.Created, result);
 
         }
 
+
+
+
+
+
+
+
+        //===============================================================================
         /// <summary>
         /// API For shortlisting a Job Application
         /// </summary>
@@ -121,14 +207,22 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+
+
+
+
+
+
+
+        //===============================================================================
         /// <summary>
-        /// API For shortlisting a Job Application
+        /// [Employer] - API For shortlisting a Job Application
         /// </summary>
         /// <remarks> UNTESTED  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
-        [JwtAuthorized]
+        [EmployerJWTAuthorized]
         [Route("api/v1/Applications/Users/{id}")]
         public HttpResponseMessage GetApplicationByUserId(int id)
         {
@@ -157,8 +251,16 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+
+
+
+
+
+
+
+        //===============================================================================
         /// <summary>
-        /// API For retrieving a Job Application by Listing Id
+        /// API For retrieving all job applications by Listing Id
         /// </summary>
         /// <remarks> UNTESTED  </remarks>
         /// <response code="200"></response>
@@ -184,6 +286,14 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+
+
+
+
+
+
+
+        //===============================================================================
         /// <summary>
         /// API For retrieving a Job Application by its Id
         /// </summary>
@@ -217,7 +327,7 @@ namespace MyNursingFuture.Api.Controllers
 
             var employer = objemployer as EmployerEntity;
 
-            var application = (JobApplicationEntity) result.Entity;
+            var application = (JobApplicationEntity)result.Entity;
 
 
             if (user != null)
@@ -242,7 +352,7 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
-       
+
 
 
     }

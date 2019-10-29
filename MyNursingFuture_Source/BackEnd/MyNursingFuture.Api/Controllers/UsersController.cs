@@ -1,4 +1,13 @@
-﻿using System;
+﻿/**
+ * 
+ * <Author> APNA </Author>
+ * <copyright> The following code was the orignial work of APNA.  Edited by Nguyen Pham - 27348032 .  </copyright>
+ * <remarks> This is a part of the FIT4002 project. Product owner is APNA. Project supervisor is Robyn McNamara  </remarks>
+ * <date>  </date>
+ * <summary> </summary>
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,6 +30,8 @@ using System.Reflection;
 namespace MyNursingFuture.Api.Controllers
 {
     [ExceptionFilter]
+
+
     public class UsersController : ApiController
     {
         private readonly IUsersManager _usersManager;
@@ -61,7 +72,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API for registering a user
         /// </summary>
-        /// <remarks> UNTESTED  </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -97,7 +108,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// Get API to get Career quizz
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -137,7 +148,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to get assessment
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> Original API - Untouched - Untested </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -157,7 +168,17 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to save self assessment
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> 
+        /// 
+        /// The API was modified by Nguyen Pham 29-Oct-2019
+        /// Due to the original implementation was used with multiple purposes, 
+        /// and the saving of JASON object is not useful for scanning anf filtering records
+        /// The code was modified to accomodate JSON parsing of the selfassessment result
+        /// into separare objects and trace back to the Question and the Anwser
+        /// 
+        /// With this method, new records was added to / updated into the NurseSelfAssessmentAnswer table 
+        /// Please use the according manager to perform any action with those records,
+        /// </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -229,7 +250,7 @@ namespace MyNursingFuture.Api.Controllers
                 }
             }
 
-            result.Message += String.Format(" Process ended with {0} error ", error_counter);
+            result.Message += String.Format(". Process ended with {0} error ", error_counter);
 
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
@@ -238,7 +259,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// APi to save about you quizz
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -260,7 +281,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to get user quizzes
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -279,7 +300,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to get user quizzes
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> Original API - Untouched - Untested </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -298,7 +319,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to recover account
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -321,7 +342,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to reset your password
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -346,9 +367,12 @@ namespace MyNursingFuture.Api.Controllers
         }
 
         /// <summary>
-        /// API to update Useer details
+        /// API to update User details
         /// </summary>
-        /// <remarks> TODO: enforce required fields </remarks>
+        /// <remarks> 
+        /// 
+        /// * TODO Insert comment
+        /// </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -427,7 +451,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to change users password
         /// </summary>
-        /// <remarks> UNTESTED </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
@@ -457,7 +481,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API to delete/deactivate a nurse
         /// </summary>
-        /// <remarks> UNTESTED </remarks>
+        /// <remarks> Original API - Untouched - Untested  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>

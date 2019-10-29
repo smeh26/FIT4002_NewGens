@@ -1,4 +1,11 @@
-﻿using System;
+﻿/**
+ * 
+ * <Author> Nguyen Pham - 27348032  </Author>
+ * <copyright>  The following code is the work of Nguyen Pham unless otherwise specified  </copyright>
+ * <date> 29/10/2019 </date>
+ * <summary> </summary>
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +16,7 @@ namespace MyNursingFuture.DL.Models
     public class JobApplication:IModel
     {
         public int UserId { set; get; }
+        public int EmployerId { set; get; }
         public int JobApplicationId { set; get; }
         public int JobListingId { set; get; }
         public string Summary { set; get; }
