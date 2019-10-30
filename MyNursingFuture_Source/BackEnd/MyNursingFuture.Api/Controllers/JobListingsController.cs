@@ -521,6 +521,64 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
+        /// <summary>
+        /// Get all applicants (ID only) meeting the requirement of a listing (indexed by Id) 
+        /// </summary>
+        /// <remarks> 
+        /// Check list:
+        /// - check if looking for job - done
+        /// - check if salary is in prefered range - done 
+        /// - check if nurse meet the attached citeria - done 
+        /// Return a list of nurse ID
+        /// -> use this to estimate the number of matches. 
+        /// -> use 
+        /// //TODO : filter Applicant by their prefered quiz result only ( currently it take into account everything )
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpGet]
+        [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetUserByListingResponse))]
+        [Route("api/v1/JobListings/NumberPotentialApplicants/{id}")]
+        public HttpResponseMessage GetNumberPotentialApplicantsByListingId(int id)
+        {
+            var result = new Result();
+
+            //Employer vertification 
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var employer = objemployer as EmployerEntity;
+
+            var listing = (JobListingEntity)_jobListingManager.GetListingById(id).Entity;
+
+
+            if (employer.EmployerId != listing.EmployerId)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+
+
+
+            result = _jobListingManager.GetPotentialApplicantsByListingId(id);
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+            var number = ((List<int>)result.Entity).Count();
+            result.Entity = number;
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+        }
+
+
+
+
+
+
 
         //======================================================================================================================
         struct GetNumberofUserByCriteriaResponse

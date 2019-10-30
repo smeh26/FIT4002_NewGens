@@ -698,7 +698,7 @@ namespace MyNursingFuture.BL.Managers
                     /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
                                             , criterion.AspectId, criterion.Value , counter));*/
                     //query_string += String.Format(" INNER JOIN (SELECT DISTINCT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON T{3}.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter, counter - 1);
-                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) ", criterion.AspectId, criterion.Value);
+                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE QuestionId = {0} AND Value >= {1} ) ", criterion.QuestionId, criterion.Value);
 
                     counter++;
                 }
