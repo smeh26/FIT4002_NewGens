@@ -37,7 +37,8 @@ namespace MyNursingFuture.Api.Filters
             Object roles;
             if (payload.TryGetValue("roles" , out roles))
                 {
-                var roles_l = roles as List<String> ;
+                var role_temp = (string)roles;
+                var roles_l = role_temp;
                 if (roles_l.Contains("employer"))
                     {
 

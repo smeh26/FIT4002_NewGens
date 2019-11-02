@@ -9,6 +9,7 @@ namespace MyNursingFuture.DL.Models
     public class NurseSelfAssessmentAnswers
     {
         public int UserId { get; set; }
+        public int UserQuizId { get; set; }
         public int AspectId { get; set; }
         public int QuestionId { get; set; }
         public int AnswerId { get; set; }

@@ -1,4 +1,11 @@
-﻿using System;
+﻿/**
+ * 
+ * <Author> Nguyen Pham - 27348032  </Author>
+ * <copyright>  The following code is the work of Nguyen Pham unless otherwise specified  </copyright>
+ * <date> 29/10/2019 </date>
+ * <summary> </summary>
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +16,7 @@ namespace MyNursingFuture.DL.Models
     public class JobApplication:IModel
     {
         public int UserId { set; get; }
+        public int EmployerId { set; get; }
         public int JobApplicationId { set; get; }
         public int JobListingId { set; get; }
         public string Summary { set; get; }
@@ -17,18 +25,11 @@ namespace MyNursingFuture.DL.Models
         public string FeedbackFromEmployer { get; set; }
         public string FeedbackFromNurse { get; set; }
         public DateTime AppliedDate { get; set; }
-        public bool IsShortlisted { set; get; }
-        public DateTime ShortListedDate { get; set; }
+        public Nullable<bool> IsShortlisted { set; get; }
+        public Nullable<DateTime> ShortListedDate { get; set; }
+        public Nullable<bool> IsDeclined { set; get; }
+        public Nullable<DateTime> DeclinedDate { get; set; }
         public DateTime LastModifiedDate { get; set; }
-        public string Name { get; set; }
-        public string EmailAddress { get; set; }
-        public int PhoneNumber { get; set; }
-        public string Country { get; set; }
-        public string Suburb { get; set; }
-        public string PostalCode { get; set; }
-        public string Qualification { get; set; }
-
-
 
     }
 }

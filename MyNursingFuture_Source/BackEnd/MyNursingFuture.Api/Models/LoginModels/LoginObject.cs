@@ -6,21 +6,23 @@
  * <date>  </date>
  * <summary> </summary>
  */
-
+ 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using MyNursingFuture.BL.Entities;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyNursingFuture.Api.Models
-{
-    public class ListingCriteriaModel
+{/// <summary>
+///  Used for loging in
+/// </summary>
+    public class LoginObject
     {
-        public int JobListingId { get; set; }
-        public int EmmployerId { get; set; }
-        public Dictionary<int, AnswerEntity> Answers { get; set; } // Aspect ID / AnswerId
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Token { get; set; }
 
     }
-    
 }

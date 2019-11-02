@@ -6,6 +6,7 @@ namespace MyNursingFuture.DL.Models
         public int AnswerId { get; set; }
         public int QuestionId { get; set; }
         public string Text { get; set; }
+        public string EmployerText { get; set; }
         public decimal Value { get; set; }
         public bool Active { get; set; }
         public string MatchText { get; set; }

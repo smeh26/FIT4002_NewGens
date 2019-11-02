@@ -103,8 +103,9 @@ namespace MyNursingFuture.BL.Managers
                 //questions
                 query.Query = @"SELECT DISTINCT
                                    q.QuestionId, q.QuizId, q.Type, q.AspectId, q.Text,
-                                   q.SubText, q.Requirements, q.Position,
-                                   q.Examples, a.AnswerId, a.Text as AnswerText, a.Value, a.MatchText, qu.Type as QuizType, usd.FieldName, a.Type as AnswerType, a.TextValue
+                                   q.SubText, q.EmployerText,
+                                   q.EmployerSubText, q.Requirements, q.Position,
+                                   q.Examples, a.AnswerId, a.Text as AnswerText, a.EmployerText as EmployerAnswerText,  a.Value, a.MatchText, qu.Type as QuizType, usd.FieldName, a.Type as AnswerType, a.TextValue
                             FROM Questions  as q
                             LEFT JOIN Answers as a on q.QuestionId = a.QuestionId
                             LEFT JOIN Quizzes as qu on q.QuizId = qu.QuizId
@@ -347,7 +348,9 @@ namespace MyNursingFuture.BL.Managers
                     entity.AspectId = item.AspectId;
                     entity.Answers = new List<AnswerEntity>();
                     entity.Text = item.Text;
+                    entity.EmployerText = item.EmployerText;
                     entity.SubText = item.SubText;
+                    entity.SubText = item.EmployerSubText;
                     entity.Requirements = item.Requirements;
                     entity.Position = item.Position;
                     entity.Examples = item.Examples;
@@ -362,6 +365,7 @@ namespace MyNursingFuture.BL.Managers
                 var answerItem = new AnswerEntity
                 {
                     Text = item.AnswerText,
+                    EmployerText = item.EmployerAnswerText,
                     AnswerId = item.AnswerId,
                     MatchText = item.MatchText,
                     QuestionId = item.QuestionId,

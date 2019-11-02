@@ -16,15 +16,17 @@ namespace MyNursingFuture.BL.Managers
     {
         Result CreateJobListing(JobListingEntity entity, EmployerEntity employer);
         Result CreateJobListingById(JobListingEntity entity, int employerId); // Working, tested
-        Result EditJobListing(JobListingEntity entity, EmployerEntity employer);
+        Result EditJobListing(JobListingEntity entity);
         Result PublishJobListing(JobListingEntity entity, EmployerEntity employer);
         Result DeleteJobListing(JobListingEntity entity, EmployerEntity employer);
         Result GetListingById(int listingId); //working, tested
         Result GetPotentialApplicantsByCriteria(List<JobListingCriteriaEntity> criteria);
         Result GetPotentialApplicantsByListingId(int jobListingId);
         Result GetAllListings();// working, tested 
-
+        Result GetAllListingsByEmployer(EmployerEntity employer);
+        Result GetAllListingsByEmployerV2(EmployerEntity employer);
         //Boolean IsListingBelongToEmployer(int ListingId, int EmployerId);
+        Result GetAllListingsByNurseSelfAssessmentAnswer(List<NurseSelfAssessmentAnswersEntity> nurseSelfAssessmentAnswersList);
 
 
     }
@@ -207,7 +209,7 @@ namespace MyNursingFuture.BL.Managers
                 query.Query = @"
 
 
-INSERT INTO [dbo].[JobListings]
+                        INSERT INTO [dbo].[JobListings]
                                            ([EmployerId]
                                            ,[Title]
                                            ,[NurseType]
@@ -272,7 +274,7 @@ INSERT INTO [dbo].[JobListings]
 
         }
 
-        public Result EditJobListing(JobListingEntity entity, EmployerEntity employer)
+        public Result EditJobListing(JobListingEntity entity)
         {
             var result = new Result();
             try
@@ -282,13 +284,6 @@ INSERT INTO [dbo].[JobListings]
                 var credentials = new CredentialsManager();
 
                 // Check if employer is valid
-
-                result = ValidateEmployer(entity);
-
-                if (result.Success == false)
-                {
-                    return result;
-                }
 
                 // check if the listing has required fields
                 if (entity.Title == null ||
@@ -306,30 +301,28 @@ INSERT INTO [dbo].[JobListings]
 
 
                 query.Entity = entity;
-                query.Query = @"UPDATE [dbo].[JobListings] set 
-                                           [EmployerId] = @EmployerId 
-                                           ,[Title] = @Title
-                                           ,[NurseType] = ,@NurseType
-                                           ,[SpecialRequirements] = @SpecialRequirements
-                                           ,[PublishStatus] = @PublishStatus
-                                           ,[MinSalary] = @MinSalary
-                                           ,[MaxSalary] = @MaxSalary
-                                           ,[ApplicationDeadline] = @ApplicationDeadline
-                                           ,[ModificationDate] = @ModificationDate
-                                           ,[PublishStatus] = @PublishStatus
-                                           ,[Area] = @Area
-                                           ,[State] = @State
-                                           ,[Country] = @Country
-                                           ,[Suburb] = @Suburb
-                                           ,[PostalCode] = @PostalCode
-                                           ,[AddressLine1] = @AddressLine1
-                                           ,[AddressLine2] = @AddressLine2
-                                           ,[Completed] = @Completed
-                                           ,[JobType] =@JobType
+                query.Query = @"UPDATE JobListings SET  
+                                            [Title] = ISNULL( @Title , Title ) ,
+                                            [NurseType] = ISNULL( @NurseType , NurseType ) ,
+                                            [SpecialRequirements] = ISNULL( @SpecialRequirements , SpecialRequirements ) ,
+                                            [PublishStatus] = ISNULL( @PublishStatus , PublishStatus ) ,
+                                            [MinSalary] = ISNULL( @MinSalary , MinSalary ) ,
+                                            [MaxSalary] = ISNULL( @MaxSalary , MaxSalary ) ,
+                                            [ApplicationDeadline] = ISNULL( @ApplicationDeadline , ApplicationDeadline ) ,
+                                            [ModificationDate] = ISNULL( @ModificationDate , ModificationDate ) ,
+                                            [Area] = ISNULL( @Area , Area ) ,
+                                            [State] = ISNULL( @State , State ) ,
+                                            [Country] = ISNULL( @Country , Country ) ,
+                                            [Suburb] = ISNULL( @Suburb , Suburb ) ,
+                                            [PostalCode] = ISNULL( @PostalCode , PostalCode ) ,
+                                            [AddressLine1] = ISNULL( @AddressLine1 , AddressLine1 ) ,
+                                            [AddressLine2] = ISNULL( @AddressLine2 , AddressLine2 ) ,
+                                            [Completed] = ISNULL( @Completed , Completed ) ,
+                                            [JobType] = ISNULL( @JobType , JobType )   
                                      WHERE JobListingId = @JobListingId";
 
 
-                result = con.InsertQuery(query);
+                result = con.ExecuteQueryUnScoped(query);
                 return result;
             }
             catch (Exception ex)
@@ -479,8 +472,18 @@ INSERT INTO [dbo].[JobListings]
                 };
 
 
-                return con.ExecuteGetOneItemQuery<JobListingEntity>(query);
+                result = con.ExecuteGetOneItemQuery<JobListingEntity>(query);
 
+                var listing = (JobListingEntity)result.Entity;
+                var listing_cri_man = new JobListingCriteriaManager();
+
+
+                var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                listing.JobListingCriteria = criteria;
+
+                result.Entity = listing;
+
+                return result;
 
 
             }
@@ -515,8 +518,19 @@ INSERT INTO [dbo].[JobListings]
                     "
                 };
 
+                result = con.ExecuteQuery<JobListingEntity>(query);
+                var listing_list = (List<JobListingEntity>)result.Entity;
 
-                return con.ExecuteQuery<JobListingEntity>(query);
+                var listing_cri_man = new JobListingCriteriaManager();
+                foreach (JobListingEntity listing in listing_list)
+                {
+
+                    var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                    listing.JobListingCriteria = criteria;
+                }
+
+                result.Entity = listing_list;
+                return result;
 
 
 
@@ -593,22 +607,32 @@ INSERT INTO [dbo].[JobListings]
                 var con = new DapperConnectionManager();
                 var query = new QueryEntity();
                 var credentials = new CredentialsManager();
+                string query_stringa = @"DECLARE @Starter table (defaultQuizId  int);
+                                        DECLARE @Quizz table ( UserId int, QuestionId int, [Value] Money)
 
-                string query_string = "SELECT UserId FROM NurseSelfAssessmentAnswers  ";
+                                        INSERT INTO @Starter 
+                                        SELECT defaultQuizId FROM Users WHERE  defaultQuizId <> 0 OR defaultQuizId <> NULL;
+
+                                        INSERT INTO @Quizz
+                                        SELECT  
+                                        UserId, QuestionId,  [Value]
+                                        FROM NurseSelfAssessmentAnswers NSAA
+                                        INNER JOIN @Starter Stt
+                                        ON NSAA.UserQuizId = Stt.defaultQuizId;";
+                string query_string = query_stringa + "SELECT DISTINCT UserId FROM @Quizz    ";
                 List<String> select_queries = new List<String>();
                 int counter = 0;
                 foreach (JobListingCriteriaEntity criterion in criteria)
                 {
-                    /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
-                                            , criterion.AspectId, criterion.Value , counter));*/
-                    // query_string += String.Format("INNER JOIN (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter);
-                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) ", criterion.AspectId, criterion.Value);
+                    query_string += String.Format("INTERSECT (SELECT DISTINCT UserId FROM @Quizz WHERE QuestionId = {0} AND Value >= {1} ) ", criterion.QuestionId, criterion.Value);
+
+
 
                     counter++;
                 }
 
                 query.Query = query_string;
-                return con.ExecuteQuery(query);
+                return con.ExecuteQuery<int>(query);
 
             }
             catch (Exception ex)
@@ -649,7 +673,7 @@ INSERT INTO [dbo].[JobListings]
                     return result;
                 }
 
-                
+
                 listing.maxSalary = listing.maxSalary == 0 ? 200000 : listing.maxSalary;
                 listing.minSalary = listing.minSalary == 0 ? 40000 : listing.minSalary;
 
@@ -661,12 +685,12 @@ INSERT INTO [dbo].[JobListings]
                 {
                     result.Success = false;
                     result.Message = Listing_Re.Message;
-                    return result; 
+                    return result;
                 }
                 var criteria = (List<JobListingCriteriaEntity>)Listing_Re.Entity;
 
                 // Assemble inner join query
-                string query_string = String.Format(@"WITH SRC AS (SELECT UserId FROM Users WHERE {0} > = minsalary  AND maxsalary >=  {1} AND IsLookingForJob = 1 ) SELECT DISTINCT T0.UserId FROM SRC AS T0 ", listing.maxSalary,  listing.minSalary);
+                string query_string = String.Format(@"WITH SRC AS (SELECT UserId FROM Users WHERE {0} > = minsalary  AND maxsalary >=  {1} AND IsLookingForJob = 1 ) SELECT DISTINCT T0.UserId FROM SRC AS T0 ", listing.maxSalary, listing.minSalary);
                 List<String> select_queries = new List<String>();
                 int counter = 1;
                 foreach (JobListingCriteriaEntity criterion in criteria)
@@ -674,7 +698,7 @@ INSERT INTO [dbo].[JobListings]
                     /*                    select_queries.Add(String.Format(" (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON H.UserId = T{2}.UserId "
                                             , criterion.AspectId, criterion.Value , counter));*/
                     //query_string += String.Format(" INNER JOIN (SELECT DISTINCT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) AS T{2} ON T{3}.UserId = T{2}.UserId ", criterion.AspectId, criterion.Value, counter, counter - 1);
-                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE AspectId = {0} AND Value >= {1} ) ", criterion.AspectId, criterion.Value);
+                    query_string += String.Format("INTERSECT (SELECT UserId FROM NurseSelfAssessmentAnswers WHERE QuestionId = {0} AND Value >= {1} ) ", criterion.QuestionId, criterion.Value);
 
                     counter++;
                 }
@@ -698,8 +722,182 @@ INSERT INTO [dbo].[JobListings]
 
         }
 
+        private enum Mode { DICTQuestionIdValue, DICTQuestionIdObject, LISTObject }
+        private dynamic transformCriteria(List<JobListingCriteriaEntity> criteria, Mode mode)
+        {
+            switch (mode)
+            {
+                case Mode.DICTQuestionIdValue:
 
 
+                    return criteria.ToDictionary(x => x.QuestionId, x => x.Value);
+                case Mode.DICTQuestionIdObject:
+                    return criteria.ToDictionary(x => x.QuestionId, x => x);
+                case Mode.LISTObject:
+                    return criteria;
+                default:
+                    return null;
+            }
+
+
+        }
+
+        public Result GetAllListingsByEmployer(EmployerEntity employer)
+        {
+            var result = new Result();
+            try
+            {
+
+                var credentials = new CredentialsManager();
+
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity
+                {
+                    Entity = employer,
+                    Query = @"SELECT *
+                          FROM JobListings
+                          WHERE EmployerId= @EmployerId
+                    "
+                };
+
+                result = con.ExecuteQuery<JobListingEntity>(query);
+                var listing_list = (List<JobListingEntity>)result.Entity;
+
+                var listing_cri_man = new JobListingCriteriaManager();
+                foreach (JobListingEntity listing in listing_list)
+                {
+
+                    var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                    listing.JobListingCriteria = criteria;
+                }
+
+                result.Entity = listing_list;
+                return result;
+
+
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = "An error occurred" + ex.Message;
+            }
+            return result;
+
+        }
+
+
+        public Result GetAllListingsByEmployerV2(EmployerEntity employer)
+        {
+            var result = new Result();
+            try
+            {
+
+                var credentials = new CredentialsManager();
+
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity
+                {
+                    Entity = employer,
+                    Query = @"SELECT *
+                          FROM JobListings
+                          WHERE EmployerId= @EmployerId
+                    "
+                };
+
+                result = con.ExecuteQuery<JobListingEntity>(query);
+                var listing_list = (List<JobListingEntity>)result.Entity;
+
+                var formatted_listing_list = new List<dynamic>();
+                var listing_cri_man = new JobListingCriteriaManager();
+                foreach (JobListingEntity listing in listing_list)
+                {
+
+                    var criteria = (List<JobListingCriteriaEntity>)listing_cri_man.GetCriteriaByListingId(listing.JobListingId).Entity;
+                    var formatted_Criteria = transformCriteria(criteria, Mode.DICTQuestionIdValue);
+                    listing.JobListingCriteria_Dict_QuestionID_Value = formatted_Criteria;
+                }
+
+                result.Entity = listing_list;
+                return result;
+
+
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = "An error occurred" + ex.Message;
+            }
+            return result;
+
+        }
+
+        public Result GetAllListingsByNurseSelfAssessmentAnswer(List<NurseSelfAssessmentAnswersEntity> nurseSelfAssessmentAnswersList)
+        {
+            var result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                var credentials = new CredentialsManager();
+
+                string query_stringa = @"DECLARE @Starter table (JobListingId  int);
+                                        DECLARE @Quizz table ( JobListingId int, QuestionId int, [Value] Money)
+
+                                        INSERT INTO @Starter 
+                                        SELECT JobListingId FROM JobListings WHERE ApplicationDeadline > GETDATE() AND PublishStatus = 1   ;
+
+                                        INSERT INTO @Quizz
+                                        SELECT  
+                                        JLC.JobListingId, QuestionId,  [Value]
+                                        FROM  [JobListingCriteria] JLC
+                                        INNER JOIN @Starter Stt
+                                        ON JLC.JobListingId = Stt.JobListingId;";
+                string query_string = query_stringa + "SELECT DISTINCT JobListingId FROM [JobListingCriteria]    ";
+                List<String> select_queries = new List<String>();
+                int counter = 0;
+                foreach (NurseSelfAssessmentAnswersEntity NAAEntity in nurseSelfAssessmentAnswersList)
+                {
+                    query_string += String.Format("INTERSECT (SELECT DISTINCT JobListingId FROM  [JobListingCriteria] WHERE QuestionId = {0} AND Value <= {1} ) ", NAAEntity.QuestionId, NAAEntity.Value);
+
+
+
+                    counter++;
+                }
+
+                query.Query = query_string;
+                return con.ExecuteQuery<int>(query);
+
+            }
+            catch (Exception ex)
+            {
+                if (result == null)
+                {
+                    result = new Result();
+                }
+                Logger.Log(ex);
+                result.Entity = null;
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+            return result;
+
+
+
+        }
     }
 }
 

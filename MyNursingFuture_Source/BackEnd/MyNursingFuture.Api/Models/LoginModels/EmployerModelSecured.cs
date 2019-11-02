@@ -6,28 +6,24 @@
  * <date>  </date>
  * <summary> </summary>
  */
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using MyNursingFuture.BL.Entities;
 
 namespace MyNursingFuture.Api.Models
 {
-    public class JobListingModel
+    /// <summary>
+    /// Employer Model for API return
+    /// 
+    /// </summary>
+    public class EmployerModelSecured
     {
-        public int JobListingId { get; set; }
         public int EmployerId { get; set; }
-        public string Title { get; set; }
-        public string NurseType { get; set; }
-        public string SpecialRequirements { get; set; }
-        public bool PublishStatus { get; set; }
-        public int minSalary { get; set; }
-        public int maxSalary { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime ApplicationDeadline { get; set; }
-
-        public DateTime ModificationDate { get; set; }
+        public string Email { get; set; }
+        public string EmployerName { get; set; }
+        public string Company { get; set; }
         public string Area { get; set; }
         public string State { get; set; }
         public string Country { get; set; }
@@ -35,7 +31,6 @@ namespace MyNursingFuture.Api.Models
         public string PostalCode { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
-        public bool Completed { get; set; }
-        public string JobType { get; set; }
+
     }
 }

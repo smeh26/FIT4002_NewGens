@@ -13,7 +13,9 @@ using System.Configuration;
 
 namespace MyNursingFuture.BL.Managers
 {   public interface INurseSelfAssessmentAnswersManager {
-        Result GetAnswerbyID(int userId);
+        Result GetAnswerbyUserID(int userId);
+        Result GetAnswersbyUserQuizzId(int userQuizzId);
+
         Result InsertAnswer(int userId, NurseSelfAssessmentAnswersEntity answer);
         Result InsertAnswers(int userId, List<NurseSelfAssessmentAnswersEntity> answer_list);
         Result UpdateAnswer(int userId, NurseSelfAssessmentAnswersEntity answer);
@@ -45,7 +47,7 @@ namespace MyNursingFuture.BL.Managers
 
         }
 
-        public Result GetAnswerbyID(int userId)
+        public Result GetAnswerbyUserID(int userId)
         /*
         * Get all answers of a user 
         * 
@@ -56,9 +58,37 @@ namespace MyNursingFuture.BL.Managers
             {
                 var con = new DapperConnectionManager();
                 var query = new QueryEntity();
-                query.Entity = new { };
-                query.Query = @"SELECT * FROM UsersQuizzes WHERE Results IS NOT NULL AND TYPE = 'ASSESSMENT'";
+                query.Entity = new { UserId = userId  };
+                query.Query = @"SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = @UserId";
                 result = con.ExecuteQuery<UsersQuizzesEntity>(query);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+
+
+
+
+        }
+
+        public Result GetAnswersbyUserQuizzId(int userQuizzId)
+        /*
+        * Get all answers of a UserQuizzId 
+        * 
+        */
+        {
+            Result result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = new { UserQuizId = userQuizzId };
+                query.Query = @"SELECT * FROM NurseSelfAssessmentAnswers WHERE UserQuizId = @UserQuizId ";
+                result = con.ExecuteQuery<NurseSelfAssessmentAnswersEntity>(query);
 
                 return result;
             }
@@ -105,14 +135,15 @@ namespace MyNursingFuture.BL.Managers
 
                 String query_string = String.Format(@"
                 BEGIN TRAN
-                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = {0} and AspectId = @AspectId )
+                IF EXISTS (SELECT * FROM NurseSelfAssessmentAnswers WHERE UserId = {0} and QuestionId = @QuestionId and UserQuizId = @UserQuizId)
                 BEGIN
                     UPDATE NurseSelfAssessmentAnswers SET Value = @Value 
                                                         , LastUpdate= @LastUpdate 
                                                         , QuestionId = @QuestionId 
                                                         , AnswerId = @AnswerId
+                                                        , AspectId = @AspectId
                                                         , TextAnswerField = @TextAnswerField
-                    WHERE UserId = {0} and AspectId = @AspectId
+                    WHERE UserId = {0} and QuestionId = @QuestionId and UserQuizId = @UserQuizId
                 END 
                 ELSE
                 BEGIN 
@@ -122,14 +153,16 @@ namespace MyNursingFuture.BL.Managers
                                                         ,QuestionId
                                                         ,AnswerId
                                                         ,TextAnswerField
-                                                        ,LastUpdate)
+                                                        ,LastUpdate
+                                                        ,UserQuizId)
                                                     VALUES({0}
                                                             , @AspectId
                                                             , @Value 
                                                             , @QuestionId
                                                             ,@AnswerId
                                                             ,@TextAnswerField
-                                                            ,@LastUpdate)
+                                                            ,@LastUpdate
+                                                            ,@UserQuizId)
                 END
                 COMMIT TRAN
 
