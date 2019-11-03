@@ -51,9 +51,9 @@ class RegisterEmployer extends React.Component {
                     <input type="text" value={email} name="email" placeholder="Email address" onChange={this.handleChangeInput} />
                     <input type="password" value={password} name="password" placeholder="Password" onChange={this.handleChangeInput} />
                 </div>
-                {this.props.userError &&
+                {/* {this.props.userError &&
                     <p>{this.props.userError}</p>
-                }
+                } */}
                 <button className="btn" onClick={this.handleRegister}>Create profile</button>
             </div>
         )
