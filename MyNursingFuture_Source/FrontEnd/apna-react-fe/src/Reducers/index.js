@@ -6,7 +6,8 @@ import framework from './Framework'
 import articles from './Articles'
 import quiz from './Quiz';
 import user from './User';
+import matches from './MatchesReducer';
 
-const reducers = combineReducers({ headerFooterMenus, contact, content, framework, articles, quiz, user});
+const reducers = combineReducers({ headerFooterMenus, contact, content, framework, articles, quiz, user, matches});
 
 export default reducers;

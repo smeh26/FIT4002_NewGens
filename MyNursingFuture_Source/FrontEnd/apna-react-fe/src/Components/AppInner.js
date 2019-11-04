@@ -49,6 +49,7 @@ import UserProfile from '../Pages/UserProfile'
 import UserQuizzes from '../Pages/UserQuizzes'
 import UserHub from '../Pages/UserHub'
 import ReasonsArticlePage from '../Pages/ReasonsArticlePage';
+import UserMatches from '../Pages/UserMatches';
 
 
 class AppInner extends Component {  
@@ -529,6 +530,8 @@ handleLogIn() {
             
             <Route exact path="/user" component={UserHub} />
             <Route exact path="/user/register" component={RegisterUser} />
+
+            <Route exact path="/user/matches" component={UserMatches} />
 
             <Footer />
             </div>

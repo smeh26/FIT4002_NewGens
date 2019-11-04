@@ -1547,6 +1547,40 @@ ol {
     transition: .5s;
 }
 
+.btnSmall {
+    -webkit-user-select: none;
+    /* Chrome/Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+ */
+    -o-user-select: none;
+    height: 40px;
+    width: 80px;
+    user-select: none;
+    border-radius: 6px;
+    font-weight: 500;
+    color: white !important;
+    border: 1px solid #52CBCB !important;
+    background-color: #52CBCB;
+    background-image: -moz-linear-gradient(left, #44D1DE, #52CBCB);
+    background-image: -webkit-gradient(linear, 0 0, 100% 0, from(#44D1DE), to(#52CBCB));
+    background-image: -webkit-linear-gradient(left, #44D1DE, #52CBCB);
+    background-image: -o-linear-gradient(left, #44D1DE, #52CBCB);
+    background-image: linear-gradient(to right, #44D1DE, #52CBCB);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff44d1de', endColorstr='#ff52cbcb', GradientType=1);
+    text-align: center;
+    padding: 0px;
+    max-width: 100%;
+    cursor: pointer;
+    display: table;
+    /* margin-left: auto;
+    margin-right: auto; */
+    text-decoration: none;
+    transition: .5s;
+}
+
     .btn:hover,
     .btn:focus{
         color: #52CBCB !important;

@@ -19,6 +19,7 @@ class Sidebar extends Component{
         { href: "#", title: 'Hi, ' + this.props.name, className: 'no-decoration'},
         { href: "/user/quizzes/selfAssessment", title: 'My self-assessments', className: 'sign-in'},
         { href: "/user/quizzes/careerPathways", title: 'Career quiz results', className: 'sign-in'},
+        { href: "/user/matches", title: 'View Matches', className: 'sign-in'},
         { href: "/user/profile", title: 'Account settings', className: 'sign-in'},
         { href: "#", title: 'Sign out', className: 'sign-in', action: 'logOut'},
         { href: "", spacer: true }
