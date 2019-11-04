@@ -16,6 +16,7 @@ namespace MyNursingFuture.BL.Managers
         Result GetByAspect(int aspectId);
         Result UpdatePosition(int questionId, int position);
         Result UpdateFieldNameAndPosition(int questionId, int position, string fieldName);
+        Result Get();
     }
     public class QuestionsManager : IQuestionsManager
     {
@@ -34,7 +35,24 @@ namespace MyNursingFuture.BL.Managers
 
         public Result Get()
         {
-            throw new NotImplementedException();
+            var con = new DapperConnectionManager();
+            var query = new QueryEntity();
+
+            query.Query = @"SELECT * FROM Questions
+WHERE AspectId IS NOT NULL
+                            ";
+            query.Entity = new {};
+
+            var result = con.ExecuteQuery<QuestionEntity>(query);
+
+            if (!result.Success)
+            {
+                result.Message = "Bad request - Question not found" ;
+                return result;
+            }
+
+            return result;
+
         }
 
         public Result Get(int id)
@@ -139,7 +157,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
 
 
             query.Query = @"SELECT QuestionId, Text FROM Questions
@@ -175,7 +193,7 @@ namespace MyNursingFuture.BL.Managers
         {
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
-            Result result = null;
+            var result = new Result();
             using (var scope = new TransactionScope())
             {
                 query.Query = @"DELETE FROM UserDataQuestions where QuestionId = @QuestionId";
@@ -212,13 +230,13 @@ namespace MyNursingFuture.BL.Managers
         public Result Insert(QuestionEntity entity)
         {
             var con = new DapperConnectionManager();
-            Result result = null;
+            var result = new Result();
             using (var scope = new TransactionScope())
             {
                 var query = new QueryEntity();
                 query.Entity = entity;
-                query.Query = @"INSERT INTO Questions (QuizId, Type, AspectId, Text, SubText, Requirements, Examples) 
-                            VALUES(@QuizId, @Type, @AspectId, @Text, @SubText, @Requirements, @Examples)";
+                query.Query = @"INSERT INTO Questions (QuizId, Type, AspectId, Text, SubText, EmployerText, EmployerSubText, Requirements, Examples) 
+                            VALUES(@QuizId, @Type, @AspectId, @Text, @SubText, @EmployerText, @EmployerSubText, @Requirements, @Examples)";
                 result = con.InsertQueryUnScoped(query);
 
                 if (!result.Success)
@@ -234,8 +252,8 @@ namespace MyNursingFuture.BL.Managers
                 {
                     q.QuestionId = questionId;
                     queryAnswers.Entity = q;
-                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, Value, MatchText, Type, TextValue) 
-                            VALUES(@QuestionId, @Text, @Value, @MatchText, @Type, @TextValue)";
+                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, EmployerText, Value, MatchText, Type, TextValue) 
+                            VALUES(@QuestionId, @Text, @EmployerText, @Value, @MatchText, @Type, @TextValue)";
                     resultAnswers = con.InsertQueryUnScoped(queryAnswers);
                     if (!resultAnswers.Success)
                     {
@@ -274,13 +292,13 @@ namespace MyNursingFuture.BL.Managers
         public Result Update(QuestionEntity entity)
         {
             var con = new DapperConnectionManager();
-            Result result = null;
+            var result = new Result();
 
             using (var scope = new TransactionScope())
             {
                 var query = new QueryEntity();
                 query.Entity = entity;
-                query.Query = @"UPDATE Questions set Text = @Text, SubText = @SubText, Requirements = @Requirements, Examples = @Examples WHERE QuestionId = @QuestionId";
+                query.Query = @"UPDATE Questions set Text = @Text, SubText = @SubText, EmployerText = IFNULL(@EmployerText, @EmployerText), EmployerSubText = IFNULL(@EmployerSubText, @EmployerSubText)  , SubText = @SubText , Requirements = @Requirements, Examples = @Examples WHERE QuestionId = @QuestionId";
                 result = con.ExecuteQueryUnScoped(query);
 
                 if (!result.Success)
@@ -312,8 +330,8 @@ namespace MyNursingFuture.BL.Managers
                 {
                     q.QuestionId = questionId;
                     queryAnswers.Entity = q;
-                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, Value, MatchText, Type, TextValue) 
-                            VALUES(@QuestionId, @Text, @Value, @MatchText, @Type, @TextValue)";
+                    queryAnswers.Query = @"INSERT INTO Answers (QuestionId, Text, EmployerText , Value, MatchText, Type, TextValue) 
+                            VALUES(@QuestionId, @Text, @EmployerText, @Value, @MatchText, @Type, @TextValue)";
                     resultAnswers = con.InsertQueryUnScoped(queryAnswers);
                     if (!resultAnswers.Success)
                     {

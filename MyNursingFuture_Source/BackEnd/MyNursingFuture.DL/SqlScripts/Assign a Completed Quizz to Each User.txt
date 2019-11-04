@@ -1,0 +1,17 @@
+
+# 
+
+
+WITH SRC AS  (SELECT DIStinct D.UserId, FIRST_VALUE(D.UserQuizId) OVER (PARTITION BY D.UserId ORDER BY D.Date) Quiz_ID_to_use 
+	FROM (select * from UsersQuizzes where Completed = 1 AND Type = 'ASSESSMENT') as D)
+
+
+Update Users
+SET 
+Users. = SRC.Quiz_ID_to_use
+
+FROM 
+Users INNER JOIN  SRC
+
+ON Users.UserId = SRC.UserId
+	

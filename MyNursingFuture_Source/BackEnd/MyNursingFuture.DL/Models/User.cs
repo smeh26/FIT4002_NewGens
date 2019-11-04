@@ -8,7 +8,7 @@ namespace MyNursingFuture.DL.Models
         public string Email { get; set; }
         public string Name { get; set; }
         public string ApnaMemberId { get; set; }
-        public bool ApnaUser { get; set; }
+        public Nullable<bool> ApnaUser { get; set; }
         public string Password { get; set; }
         public string Hash { get; set; }
         public DateTime? CreateDate { get; set; }
@@ -26,6 +26,14 @@ namespace MyNursingFuture.DL.Models
         public string PatientsTitle { get; set; }
         public string Qualification { get; set; }
         public string Setting { get; set; }
-        public bool SaveOnly { get; set; }
+        public Nullable<bool> SaveOnly { get; set; }
+
+        // V1 extension
+        public Nullable<bool> IsLookingForJob { get; set; }
+        public int MaxSalary { get; set; }
+        public int MinSalary { get; set; }
+        public int salary { get; set; }
+        public int defaultQuizId { get; set; }
+
     }
 }

@@ -15,6 +15,7 @@ using System.Configuration;
 using MyNursingFuture.Api.Filters;
 using Newtonsoft.Json;
 using System.Web.Hosting;
+using Swashbuckle.Swagger.Annotations;
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -31,11 +32,34 @@ namespace MyNursingFuture.Api.Controllers
             _cacheManager = cacheManager;
             
         }
-        
-        // POST: api/Login
-        public async Task<HttpResponseMessage> Post([FromBody]UserEntity value)
+        private struct UserLoginReturnType
         {
-            Result result = null;
+
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public UserModel Entity { get; set; }
+
+        }
+
+        /// <summary>
+        /// Employer registration API
+        /// </summary>
+        /// <remarks> TODO: enforce required fields
+        /// 
+        /// Implement object copy function to Filter out unnessary fields  
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserLoginReturnType))]
+        // POST: api/Login
+        public async Task<HttpResponseMessage> Post([FromBody]LoginObject loginobject)
+        {
+            var value = new UserEntity();
+            PropertyCopier<LoginObject, UserEntity>.Copy(loginobject, value);
+
+            var result = new Result();
             var tokenLogin = false;
             var apnaLogin = false;
 
@@ -57,7 +81,7 @@ namespace MyNursingFuture.Api.Controllers
                 result = _usersManager.Login(value);
                 apnaLogin = !result.Success;
             }
-
+            // Disable APNA login for now 
             Result apnaUserResult = null;
             var tryLoginApna = ConfigurationManager.AppSettings["apna.login"] == "true";
             //APNA CRM LOGIN
@@ -90,36 +114,23 @@ namespace MyNursingFuture.Api.Controllers
             }
 
             if (!result.Success)
-                return Request.CreateResponse(HttpStatusCode.OK, result);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+           
 
             var user = new UserModel();
             var userEntity = (UserEntity)result.Entity;
-            user.Email = userEntity.Email;
-            user.Token = userEntity.Token;
-            user.Name = userEntity.Name;
-            user.ApnaUser = apnaLogin;
-            user.UserId = userEntity.UserId;
 
-            user.NurseType = userEntity.NurseType;
-            user.Area = userEntity.Area;
-            user.State = userEntity.State;
-            user.ActiveWorking = userEntity.ActiveWorking;
-            user.Age = userEntity.Age;
-            user.Country = userEntity.Country;
-            user.Suburb = userEntity.Suburb;
-            user.PostalCode = userEntity.PostalCode;
-            user.Patients = userEntity.Patients;
-            user.PatientsTitle = userEntity.PatientsTitle;
-            user.Qualification = userEntity.Qualification;
-            user.Setting = userEntity.Setting;
+            PropertyCopier<UserEntity, UserModel>.Copy(userEntity, user);
             result.Entity = user;
+
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
        
         // DELETE: api/Login/5
         public HttpResponseMessage Delete(int id, [FromBody]UserEntity value)
         {
-            Result result = null;
+            var result = new Result();
             if (string.IsNullOrEmpty(value.Token) || value.UserId == 0)
             {
                 result = new Result(false);

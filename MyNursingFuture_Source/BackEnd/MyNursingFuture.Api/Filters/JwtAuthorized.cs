@@ -24,6 +24,9 @@ namespace MyNursingFuture.Api.Filters
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             var token =  actionContext.Request.Headers.Authorization;
+
+
+
             if(token == null)
             {
                 Challenge(actionContext);
@@ -40,6 +43,7 @@ namespace MyNursingFuture.Api.Filters
             user.Token = token.Parameter;
             actionContext.Request.Properties.Add("user", user);
             base.OnAuthorization(actionContext);
+
         }
         private void Challenge(HttpActionContext actionContext)
         {

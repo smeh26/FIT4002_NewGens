@@ -84,7 +84,7 @@ namespace MyNursingFuture.Api.Controllers
             }
             catch (Exception e)
             {
-                return Request.CreateResponse<HttpError>(HttpStatusCode.InternalServerError, new HttpError("Internal Server Error. Reference: Server error"));
+                return Request.CreateResponse<HttpError>(HttpStatusCode.InternalServerError, new HttpError("Internal Server Error. Reference: Server error" + e.Message));
             }
         }
 

@@ -11,7 +11,9 @@ namespace MyNursingFuture.DL.Models
         public int QuestionId { get; set; }
         public int QuizId { get; set; }
         public string Text { get; set; }
+        public string EmployerText { get; set; }
         public string SubText { get; set; }
+        public string EmployerSubText { get; set; }
         public string Type { get; set; }
         public int? AspectId { get; set; }
         public string Requirements { get; set; }
