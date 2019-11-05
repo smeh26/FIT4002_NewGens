@@ -492,20 +492,20 @@ export const setActionsData = (data) => {
     data: data
   }
 }
-
+//Set JobListing data for the reducer to add to state
 export const setJobListingData = (data) => {
   return {
     type: 'SET_JOBLISTING_DATA',
     data,
   }
 }
-
+//request job listing data to start the request
 export const requestJobListingData = () => {
   return {
     type: 'START_JOBLISTING_REQUEST',
   }
 };
-
+//complete job listing data to start the request
 export const completeRequestJobListingData = () => {
   return {
     type: 'END_JOBLISTING_REQUEST',
@@ -543,7 +543,7 @@ export function fetchGlossaryData() {
     }
   }
 }
-
+//check if nurse is authorised using token
 export function fetchCheckNurseAuth(token) {
   return function (dispatch, getState) {
     dispatch(requestLogin());
@@ -592,7 +592,7 @@ export function fetchCheckNurseAuth(token) {
     });
   }
 }
-
+//check employer is authorised using token, for refreshed pages and such
 export function fetchCheckEmployerAuth(token) {
   return (dispatch, getState) => {
     dispatch(requestLogin());
@@ -634,7 +634,7 @@ export function fetchCheckEmployerAuth(token) {
       }).finally(() => dispatch(endLogin()));
   }
 }
-
+//employer login function using API
 export function fetchLoginEmployer(email, password) {
   return function (dispatch, getState) {
     dispatch(requestLogin());
@@ -894,7 +894,7 @@ export function fetchSubmitArticleFeedback(articleId, title, feedback, positive)
   }
 }
 
-
+//fetch joblistings from the database using API
 export function fetchJobListings() {
   return (dispatch, getState) => {
     if (!cookies.hasItem('token')) {
@@ -1006,7 +1006,7 @@ export function loadQuiz(type, id) {
     }
   }
 }
-
+//nurse login using API
 export function fetchLoginNurse(e, p) {
   return function (dispatch, getState) {
     dispatch(requestLogin());
@@ -1046,7 +1046,7 @@ export function fetchLoginNurse(e, p) {
     });
   }
 }
-
+//register employer using API
 export function fetchRegisterEmployer(n, e, p) {
   return function (dispatch, getState) {
     dispatch(requestRegister());
@@ -1082,7 +1082,7 @@ export function fetchRegisterEmployer(n, e, p) {
       });
   }
 }
-
+//register nurse using API
 export function fetchRegister(n, e, p) {
   return function (dispatch, getState) {
     dispatch(requestRegister());

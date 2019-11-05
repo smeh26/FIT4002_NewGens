@@ -2,7 +2,7 @@ const initialState = {
     listing: [],
     isLoading: false,
 }
-
+//reducer to add data received from APi to global state.
 export default (state = initialState, action) => {
     switch (action.type) {
         case 'SET_JOBLISTING_DATA':

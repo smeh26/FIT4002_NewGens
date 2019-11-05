@@ -4,10 +4,11 @@ import { fetchJobListings } from '../../Actions/index'
 import '../../styles/bootstrap-table.css';
 
 class JobListings extends React.Component {
+    //get all Joblistings on Mount from actions
     componentDidMount() {
         this.props.getJobListings();
     }
-
+    //format the date to display properly 
     formatDate = (date) => {
         var d = new Date(date),
             month = '' + (d.getMonth() + 1),
@@ -21,7 +22,7 @@ class JobListings extends React.Component {
 
         return [year, month, day].join('-');
     }
-
+    //display the table with the information regarding the joblistings
     render() {
         if (this.props.isLoading) {
             return <div className="loading-wrapper"><img src="/img/loading.gif" /></div>
@@ -67,12 +68,12 @@ class JobListings extends React.Component {
 
     }
 }
-
+//use props from mainstate in this component
 const mapStateToProps = (state) => ({
     joblistings: state.app.joblistings.listing,
     isLoading: state.app.joblistings.isLoading,
 });
-
+//get joblistings action
 const mapDispatchToProps = (dispatch) => ({
     getJobListings: () => {
         dispatch(fetchJobListings());

@@ -6,6 +6,7 @@ import { Redirect } from 'react-router'
 class RegisterEmployer extends React.Component {
     constructor(props) {
         super(props);
+        //the state of the register employer component, the required items to register an employee
         this.state = {
             name: '',
             email: '',
@@ -43,23 +44,25 @@ class RegisterEmployer extends React.Component {
 
         const { name, email, password } = this.state;
         return (
+            //The UI elements that are rendered
             <div className="container m-5">
                 <h1>Sign up as an Employer to find your matches!</h1>
 
                 <div className="input-block">
+                    
                     <input type="text" value={name} name="name" placeholder="Company Name" onChange={this.handleChangeInput} />
                     <input type="text" value={email} name="email" placeholder="Email address" onChange={this.handleChangeInput} />
                     <input type="password" value={password} name="password" placeholder="Password" onChange={this.handleChangeInput} />
                 </div>
-                {/* {this.props.userError &&
+                {this.props.userError &&
                     <p>{this.props.userError}</p>
-                } */}
+                }
                 <button className="btn" onClick={this.handleRegister}>Create profile</button>
             </div>
         )
     }
 }
-
+//Items from state to be used in this component
 const mapStateToProps = (state) => {
     return {
         userError: state.app.user.error,
@@ -67,7 +70,7 @@ const mapStateToProps = (state) => {
         // isLoading: state.app.user.isLoading,
     }
 };
-
+//The function to be used from the actions that actually registers the employer using the API
 const mapDispatchToProps = (dispatch, props) => {
     return {
         register: function (n, e, p) {

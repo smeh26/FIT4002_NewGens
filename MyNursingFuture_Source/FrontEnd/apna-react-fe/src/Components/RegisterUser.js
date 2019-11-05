@@ -2,10 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux'
 import { fetchRegister } from '../Actions'
 import { Redirect } from 'react-router'
-
+//register user component
 class RegisterUser extends React.Component {
     constructor(props) {
         super(props);
+        //state of component to register nurse
         this.state = {
             name: '',
             email: '',
@@ -23,13 +24,13 @@ class RegisterUser extends React.Component {
             [e.target.name]: e.target.value,
         })
     }
-
+//action to register the nurse
     handleRegister = () => {
         this.setState({ loading: true });
         const { name, email, password } = this.state;
         this.props.register(name, email, password);
     }
-
+// render modal to display register nurse form
     render() {
 
         console.log('logged in ', this.props.loggedIn)
@@ -59,7 +60,7 @@ class RegisterUser extends React.Component {
         )
     }
 }
-
+//props to be used on component from global state
 const mapStateToProps = (state) => {
     return {
         userError: state.app.user.error,
@@ -67,7 +68,7 @@ const mapStateToProps = (state) => {
         // isLoading: state.app.user.isLoading,
     }
 };
-
+//register action to be used as a prop in this component from actions
 const mapDispatchToProps = (dispatch, props) => {
     return {
         register: function (n, e, p) {
