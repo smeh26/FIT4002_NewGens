@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 namespace MyNursingFuture.DL.Models
 {
-    public class JobListingCriteria: NurseSelfAssessmentAnswers
+    public class JobListingCriteria
     {
         public int JobListingId { get; set; }
         //public int AspectId { get; set; }
         //public int QuestionId { get; set; }
         //public int AnswerId { get; set; }
+        public int AspectId { get; set; }
+        public int QuestionId { get; set; }
+        public int AnswerId { get; set; }
+        public decimal Value { get; set; }
+        public Nullable<DateTime> LastUpdate { get; set; }
 
 
     }

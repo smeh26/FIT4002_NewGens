@@ -19,11 +19,11 @@ namespace MyNursingFuture.BL.Managers
         Result Login(EmployerEntity entity);
         Result Login(string token);
 
-        //Result LoginApna(EmployerEntity entity);
         Result GenerateRecoveringCode(EmployerEntity entity);
         Result ChangePassword(EmployerEntity entity);
         Result Delete(EmployerEntity entity);
         Result UpdateDetails(EmployerEntity entity);
+        Result UpdateMembership(EmployerEntity entity);
         Result ResetPassword(EmployerEntity entity);
         Result GetEmployerById(int employerId);
     }
@@ -175,93 +175,11 @@ namespace MyNursingFuture.BL.Managers
             return result;
         }
 
-
-/*        public Result LoginApna(EmployerEntity entity)
-        {
-            var result = new Result();
-            try
-            {
-                var con = new DapperConnectionManager();
-                var query = new QueryEntity();
-                var credentials = new CredentialsManager();
-                entity.Email = entity.Email.Trim().ToLower();
-                query.Query = @"SELECT * FROM Employers
-                            where Email = @Email and Active = 1 and ApnaUser = 1";
-                query.Entity = entity;
-                result = con.ExecuteQuery<EmployerEntity>(query);
-
-                if (!result.Success)
-                {
-                    result.Message = "Login error";
-                    return result;
-                }
-
-                var r = (IEnumerable<EmployerEntity>)result.Entity;
-
-                var user = r.FirstOrDefault();
-
-                if (user == null)
-                {
-                    var resultRegisterUser = RegisterUserApna(entity, con);
-                    if (!resultRegisterUser.Success)
-                    {
-                        return resultRegisterUser;
-                    }
-                    user = (EmployerEntity)resultRegisterUser.Entity;
-                }
-                user.Token = credentials.GenerateEmployerToken(user);
-                result.Entity = user;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                result.Entity = null;
-                result = result ?? new Result(false);
-                result.Message = "An error occurred";
-            }
-
-            return result;
-        }
-*/
-/*        private Result RegisterUserApna(EmployerEntity entity, DapperConnectionManager con)
-        {
-            var query = new QueryEntity();
-            entity.CreateDate = DateTime.Now;
-            entity.ModifyDate = DateTime.Now;
-
-            var credentials = new CredentialsManager();
-            var hash = credentials.GenerateSalt();
-            var hash2 = credentials.GenerateSalt();
-            var password = credentials.EncodePassword(hash2, hash);
-
-            entity.Hash = hash;
-            entity.Password = password;
-            entity.ApnaUser = true;
-
-            query.Entity = entity;
-            query.Query = @"INSERT INTO Employers (Email, Name, Password, Hash, CreateDate, ModifyDate, ApnaMemberId, Country, Suburb, State, PostalCode, ApnaUser) 
-                            VALUES(@Email, @Name, @Password, @Hash, @CreateDate, @ModifyDate, @ApnaMemberId, @Country, @Suburb, @State, @PostalCode, @ApnaUser )";
-
-            var result = con.InsertQuery(query);
-            if (result.Success)
-            {
-                entity.EmployerID = (int)result.Entity;
-                entity.Password = "";
-                entity.Hash = "";
-                entity.Token = credentials.GenerateEmployerToken(entity);
-                result.Entity = entity;
-
-                Task.Run(() => new EmailManager().SendEmail(entity.Email, DL.Models.EmailType.Welcome, new
-                {
-                    CurrentUserName = entity.Name,
-                    CurrentUserEmail = entity.Email
-                }));
-
-
-            }
-            return result;
-        }*/
-
+        /// <summary>
+        /// Use for login API with TOKEN  
+        /// </summary>
+        /// <param name="token"> JWT Token String  </param>
+        /// <returns></returns>
         public Result Login(string token)
         {
             var credentials = new CredentialsManager();
@@ -276,6 +194,10 @@ namespace MyNursingFuture.BL.Managers
 
             var employer = (EmployerEntity)result.Entity;
 
+            if (employer == null)
+            {
+                return new Result(false);
+            }
 
 
             query.Entity = new { EmployerID = employer.EmployerId };
@@ -504,7 +426,7 @@ namespace MyNursingFuture.BL.Managers
 
 
                 query.Query = @"SELECT count(*) as n FROM Employers
-                            where Email = @Email and Active = 1 and EmployerID <> @EmployerID";
+                            where Email = @Email and Active = 1 and EmployerId <> @EmployerId";
                 query.Entity = entity;
                 result = con.ExecuteQuery(query);
 
@@ -527,12 +449,13 @@ namespace MyNursingFuture.BL.Managers
 
                 entity.ModifyDate = DateTime.Now;
 
-                query.Query = @"Update Employers Set 
+                query.Query = @"
+                        BEGIN TRAN
+                        Update Employers Set 
 
                                                     [EmployerName] = ISNULL( @EmployerName , EmployerName ) ,
                                                     [AgentFirstName] = ISNULL( @AgentFirstName , AgentFirstName ) ,
                                                     [AgentLastName] = ISNULL( @AgentLastName , AgentLastName ) ,
-                                                    [Active] = ISNULL( @Active , Active ) ,
                                                     [Email] = ISNULL( @Email , Email ) ,
                                                     [ModifyDate] = ISNULL( @ModifyDate , ModifyDate ) ,
                                                     [Area] = ISNULL( @Area , Area ) ,
@@ -543,10 +466,12 @@ namespace MyNursingFuture.BL.Managers
                                                     [AddressLine1] = ISNULL( @AddressLine1 , AddressLine1 ) ,
                                                     [AddressLine2] = ISNULL( @AddressLine2 , AddressLine2 ) ,
                                                     [MembershipType] = ISNULL( @MembershipType , MembershipType ) ,
-                                                    [CanViewDetails] = ISNULL( @CanViewDetails , CanViewDetails ) ,
                                                     [MembershipStartDate] = ISNULL( @MembershipStartDate , MembershipStartDate ) ,
                                                     [MembershipEndDate] = ISNULL( @MembershipEndDate , MembershipEndDate ) 
-                            where EmployerID = @EmployerID";
+                            where EmployerId = @EmployerId;
+                            SELECT * FROM EMPLOYERS WHERE EmployerId = @EmployerId;
+                            COMMIT TRAN
+    ";
                 query.Entity = entity;
                 result = con.ExecuteQuery<EmployerEntity>(query);
                 result.Message = result.Success ? "The user details has been updated" : "An error has occurred";
@@ -616,6 +541,45 @@ namespace MyNursingFuture.BL.Managers
 
 
         }
+
+        public Result UpdateMembership(EmployerEntity entity)
+        {
+            var result = new Result();
+            try
+            {
+               
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+
+
+                entity.ModifyDate = DateTime.Now;
+
+                query.Query = @"
+                        BEGIN TRAN
+                        Update Employers Set 
+                                                    [MembershipType] = ISNULL( @MembershipType , MembershipType ) ,
+                                                    [MembershipStartDate] = ISNULL( @MembershipStartDate , MembershipStartDate ) ,
+                                                    [MembershipEndDate] = ISNULL( @MembershipEndDate , MembershipEndDate ) 
+                            where EmployerId = @EmployerId;
+                            SELECT * FROM EMPLOYERS WHERE EmployerId = @EmployerId;
+                            COMMIT TRAN
+    ";
+                query.Entity = entity;
+                result = con.ExecuteQuery<EmployerEntity>(query);
+                result.Message = result.Success ? "The user details has been updated" : "An error has occurred";
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result = result ?? new Result(false);
+                result.Message = "An error occurred";
+                throw;
+            }
+            return result;
+
+
+        }
+
 
     }
 }

@@ -11,6 +11,6 @@ namespace MyNursingFuture.BL.Entities
     public class JobApplicationEntity: JobApplication, IEntity
     {
 
-
+        public List<NurseSelfAssessmentAnswersEntity> PreferedQuizz { get; set; }
     }
 }

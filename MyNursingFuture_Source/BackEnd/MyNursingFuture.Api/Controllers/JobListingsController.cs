@@ -1,4 +1,13 @@
-﻿using System;
+﻿/**
+ * 
+ * <Author> Nguyen Pham - 27348032  </Author>
+ * <copyright> The following code is the work of Nguyen Pham unless other wise specified  </copyright>
+ * <remarks> This is a part of the FIT4002 project. Product owner is APNA. Project supervisor is Robyn McNamara  </remarks>
+ * <date>  </date>
+ * <summary> </summary>
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,6 +29,16 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace MyNursingFuture.Api.Controllers
 {
+
+    public enum JobListingStatus {
+
+        Draft,
+        Published,
+        Expired
+
+
+    }
+
     [ExceptionFilter]
     public class JobListingsController : ApiController
     {
@@ -28,21 +47,25 @@ namespace MyNursingFuture.Api.Controllers
         private readonly ICacheManager _cacheManager;
         private readonly IJobListingManager _jobListingManager;
         private readonly IJobListingCriteriaManager _jobListingCriteriaManager;
+        private readonly INurseSelfAssessmentAnswersManager _nurseSelfAssessmentManager;
         public JobListingsController(IUsersManager usersManager,
          IEmployersManager employersManager,
          ICacheManager cacheManager,
          IJobListingManager jobListingManager,
-         IJobListingCriteriaManager jobListingCriteriaManager)
+         IJobListingCriteriaManager jobListingCriteriaManager,
+         INurseSelfAssessmentAnswersManager nurseSelfAssessmentAnswersManager
+         )
         {
             _usersManager = usersManager;
             _employersManager = employersManager;
             _cacheManager = cacheManager;
             _jobListingCriteriaManager = jobListingCriteriaManager;
             _jobListingManager = jobListingManager;
-
+            _nurseSelfAssessmentManager = nurseSelfAssessmentAnswersManager;
 
 
         }
+        //======================================================================================================================
 
         struct PostListingResponse {
             public string Message { get; set; }
@@ -82,7 +105,7 @@ namespace MyNursingFuture.Api.Controllers
             var employer = objemployer as EmployerEntity;
             var employerentity_full = (EmployerEntity) _employersManager.GetEmployerById(employer.EmployerId).Entity;
 
-            if (employerentity_full.MembershipEndDate == DateTime.MinValue ||  DateTime.Compare(employerentity_full.MembershipEndDate, DateTime.Now) < 0 ) 
+            if (employerentity_full.MembershipEndDate == DateTime.MinValue ||  employerentity_full.MembershipEndDate < (DateTime?) DateTime.Now ) 
                 {
                 // membership expired
                 result = new Result();
@@ -116,6 +139,14 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        //======================================================================================================================
+
+        private struct GetAllListingsResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<JobListingEntity> Entity { get; set; }
+        }
         /// <summary>
         /// API to retrieve all listing on the system
         /// </summary>
@@ -124,6 +155,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="400"></response>
         /// <response code="500"></response>
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponse))]
         [Route("api/v1/JobListings")]
         public HttpResponseMessage GetAllListings()
         {
@@ -146,6 +178,10 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+
+
+        //======================================================================================================================
+
         /// <summary>
         /// API to retrieve all listings of the current logged in employer
         /// </summary>
@@ -155,6 +191,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="500"></response>
         [EmployerJWTAuthorized]
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponse))]
         [Route("api/v1/JobListings/Employers")]
         public HttpResponseMessage GetAllListingsOfCurrentEmployer()
         {
@@ -177,15 +214,132 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+        //======================================================================================================================
+
+        /// <summary>
+        /// API to retrieve all potential Job listing for the current logged in nurse
+        /// </summary>
+        /// <remarks> TODO: enforce required fields </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [JwtAuthorized]
+        [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponse))]
+        [Route("api/v1/JobListings/User")]
+        public HttpResponseMessage GetAllListingsOfCurrentNurse()
+        {
+            //Working, tested
+            var result = new Result();
+            object objuser = null;
+            Request.Properties.TryGetValue("user", out objuser);
+            var user = objuser as UserEntity;
+            if (user == null)
+            {
+                result = new Result(false);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, result);
+            }
+
+            var nurse = (UserEntity)_usersManager.GetUserDetails(user).Entity;
+
+            if (nurse.defaultQuizId == 0 ) {
+                result.Success = false;
+                result.Message = "User must complete and nominate a Quizz to use as their profile";
+                result.Entity = null;
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+            }
+
+            result = _nurseSelfAssessmentManager.GetAnswersbyUserQuizzId(nurse.defaultQuizId);
+            var answersList = (List<NurseSelfAssessmentAnswersEntity>) result.Entity;
+
+            result = _jobListingManager.GetAllListingsByNurseSelfAssessmentAnswer(answersList);
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+            var listings = (List<int>)result.Entity;
+            var listingEntityLists = new List<JobListingEntity>();
+
+            foreach(int listingId in listings)
+            {
+                var lt_entity = (JobListingEntity)_jobListingManager.GetListingById(listingId).Entity;
+                if ( lt_entity.maxSalary >= nurse.salary) {
+                    listingEntityLists.Add(lt_entity);
+
+                }
+
+
+            }
+
+            result.Entity = listingEntityLists;
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
+
+
+
+        //========================================================================================================================
+        private struct JLModel
+        {
+            public int JobListingId { get; set; }
+            public int EmployerId { get; set; }
+            public string Title { get; set; }
+            public string NurseType { get; set; }
+            public string SpecialRequirements { get; set; }
+            public bool PublishStatus { get; set; }
+            public int minSalary { get; set; }
+            public int maxSalary { get; set; }
+            public DateTime CreateDate { get; set; }
+            public DateTime ApplicationDeadline { get; set; }
+
+            public DateTime ModificationDate { get; set; }
+            public string Area { get; set; }
+            public string State { get; set; }
+            public string Country { get; set; }
+            public string Suburb { get; set; }
+            public string PostalCode { get; set; }
+            public string AddressLine1 { get; set; }
+            public string AddressLine2 { get; set; }
+            public bool Completed { get; set; }
+            public string JobType { get; set; }
+
+            public Dictionary<int, decimal> jobListingCriteria_Dict_QuestionID_Value { get; set; }
+        }
+        private struct GetAllListingsResponseV2
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<JLModel>  Entity { get; set; }
+       
+        }
         /// <summary>
         /// API to retrieve all listings of the current logged in employer
         /// </summary>
-        /// <remarks> Return type is in the QuestionId / Value format </remarks>
+        /// <remarks> The type  of jobListingCriteria_Dict_QuestionID_Value is in a dictionary which the key is the question id and the value is the value of the anwser
+        /// 
+        /// 
+        /// <code>
+        /// jobListingCriteria_Dict_QuestionID_Value :
+        ///     {
+        ///     int  : decimal  # QuestionID : Value  
+        /// } 
+        /// 
+        /// </code>
+        /// 
+        /// 
+        /// 
+        ///  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
         /// <response code="500"></response>
         [EmployerJWTAuthorized]
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetAllListingsResponseV2))]
         [Route("api/v2/JobListings/Employers")]
         public HttpResponseMessage GetAllListingsOfCurrentEmployerV2()
         {
@@ -210,22 +364,7 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
-        /*        [HttpPut]
-                [EmployerJWTAuthorized]
-                [Route("api/v1/JobListings/Criteria")]
-                public HttpResponseMessage PutCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
-                {
-                    var result = new Result();
-                    if (jobListingCriteria.Count == 0)
-                    {
-                        result = new Result(false);
-                        return Request.CreateResponse(HttpStatusCode.NotFound, result);
-                    }
-                    result = _jobListingCriteriaManager.InsertCriteria(jobListingCriteria);
-
-                    return Request.CreateResponse(HttpStatusCode.OK, result);
-                }
-        */
+        //======================================================================================================================
 
         /// <summary>
         /// API to put in list of required answers 
@@ -287,6 +426,9 @@ namespace MyNursingFuture.Api.Controllers
 
 
         }
+        //======================================================================================================================
+
+
 
         /// <summary>
         /// Get a single listing object by Id
@@ -298,6 +440,7 @@ namespace MyNursingFuture.Api.Controllers
         //[JwtAuthorized]
         [HttpGet]
         [GenericJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PostListingResponse))]
         [Route("api/v1/JobListings/{id}")]
         public HttpResponseMessage GetListingById(int id)
         {
@@ -319,6 +462,14 @@ namespace MyNursingFuture.Api.Controllers
 
         }
 
+        //======================================================================================================================
+
+        struct GetUserByListingResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<int> Entity { get; set; }
+        }
         /// <summary>
         /// Get all applicants (ID only) meeting the requirement of a listing (indexed by Id) 
         /// </summary>
@@ -338,6 +489,7 @@ namespace MyNursingFuture.Api.Controllers
         /// <response code="500"></response>
         [HttpGet]
         [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetUserByListingResponse))]
         [Route("api/v1/JobListings/PotentialApplicants/{id}")]
         public HttpResponseMessage GetPotentialApplicantsByListingId(int id)
         {
@@ -369,30 +521,159 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
+        /// <summary>
+        /// Get all applicants (ID only) meeting the requirement of a listing (indexed by Id) 
+        /// </summary>
+        /// <remarks> 
+        /// Check list:
+        /// - check if looking for job - done
+        /// - check if salary is in prefered range - done 
+        /// - check if nurse meet the attached citeria - done 
+        /// Return a list of nurse ID
+        /// -> use this to estimate the number of matches. 
+        /// -> use 
+        /// //TODO : filter Applicant by their prefered quiz result only ( currently it take into account everything )
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpGet]
+        [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetUserByListingResponse))]
+        [Route("api/v1/JobListings/NumberPotentialApplicants/{id}")]
+        public HttpResponseMessage GetNumberPotentialApplicantsByListingId(int id)
+        {
+            var result = new Result();
 
-        /*        [EmployerJWTAuthorized]
-                [Route("api/v1/JobListings/PotentialApplicants/")]
-                public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
-                {
-                    var result = new Result();
+            //Employer vertification 
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var employer = objemployer as EmployerEntity;
 
-                    result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
-                    if (!result.Success)
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, result);
-
-                    if (result.Entity == null)
-                        return Request.CreateResponse(HttpStatusCode.NotFound, result);
+            var listing = (JobListingEntity)_jobListingManager.GetListingById(id).Entity;
 
 
-                    return Request.CreateResponse(HttpStatusCode.OK, result);
-
-                }*/
-
-        
+            if (employer.EmployerId != listing.EmployerId)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
 
 
 
+            result = _jobListingManager.GetPotentialApplicantsByListingId(id);
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+            var number = ((List<int>)result.Entity).Count();
+            result.Entity = number;
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+        }
 
 
-    }   
+
+
+
+
+
+        //======================================================================================================================
+        struct GetNumberofUserByCriteriaResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public int Entity { get; set; }
+        }
+        /// <summary>
+        /// Get the number of nurses meeting the requirement 
+        /// </summary>
+        /// <remarks> 
+        /// To perform this, payment not required.
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
+        [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetNumberofUserByCriteriaResponse))]
+        [Route("api/v1/JobListings/PreviewPotentialApplicants/")]
+        public HttpResponseMessage GetPotentialApplicantsByCriteria([FromBody] List<JobListingCriteriaEntity> jobListingCriteria)
+        {
+            var result = new Result();
+
+            result = _jobListingManager.GetPotentialApplicantsByCriteria(jobListingCriteria);
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            result.Entity = ((List<int>)result.Entity).Count();
+            result.Message = "Total number of nurses meet the criteria in the system";
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        //======================================================================================================================
+
+        /// <summary>
+        /// Edit Listing  
+        /// </summary>
+        /// <remarks> 
+        /// To perform this, payment not required.
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
+        [HttpPut]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PostListingResponse))]
+        [Route("api/v1/JobListings/Edit/")]
+        public HttpResponseMessage UpdateJobListing([FromBody] JobListingEntity joblisting)
+        {
+            var result = new Result();
+
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var employer = objemployer as EmployerEntity;
+
+            //get full entity
+            result = _employersManager.GetEmployerById(joblisting.EmployerId);
+            var employer_entity = (EmployerEntity)result.Entity;
+
+
+            if (employer.EmployerId != employer_entity.EmployerId)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+
+            if (employer_entity.MembershipEndDate < (DateTime?)DateTime.Now )
+            {
+                joblisting.PublishStatus = false;
+                
+            }
+
+            result = new Result();
+
+            result = _jobListingManager.EditJobListing(joblisting);
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            result.Entity = _jobListingManager.GetListingById(joblisting.JobListingId).Entity;
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    }
 }

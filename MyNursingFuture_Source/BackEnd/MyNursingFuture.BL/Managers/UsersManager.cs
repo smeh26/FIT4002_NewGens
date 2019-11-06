@@ -29,6 +29,7 @@ namespace MyNursingFuture.BL.Managers
         Result UpdateDetails(UserEntity entity);
         Result ResetPassword(UserEntity entity);
         Result GetUserDetails(UserEntity entity);
+        Result GetSecuredUserDetails(int userId);
     }
     public class UsersManager: IUsersManager
     {
@@ -896,6 +897,65 @@ namespace MyNursingFuture.BL.Managers
 
         }
 
+        public Result GetSecuredUserDetails(int userId)
+        {
+            var result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                var credentials = new CredentialsManager();
+
+                query.Query = @"SELECT [UserId]
+                                      ,[Name]
+                                      ,[Email]
+                                      ,[NurseType]
+                                      ,[ActiveWorking]
+                                      ,[Area]
+                                      ,[Country]
+                                      ,[Suburb]
+                                      ,[PostalCode]
+                                      ,[State]
+                                      ,[defaultQuizId]
+                                      ,[salary] 
+                            FROM Users
+                            where UserId = @UserId and Active = 1 and ApnaUser = 0";
+                query.Entity = new { UserId = userId };
+                result = con.ExecuteGetOneItemQuery<UserEntity>(query);
+
+                if (!result.Success)
+                {
+                    result.Message = "Login error";
+                    return result;
+                }
+
+
+
+                var user = (UserEntity)result.Entity;
+
+                if (user == null)
+                {
+                    result.Message = "Invalid user";
+                    result.Success = false;
+                    result.Entity = null;
+                    return result;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result.Entity = null;
+                result = result ?? new Result(false);
+                result.Message = "An error occurred";
+            }
+
+            return result;
+
+        }
+
 
     }
+
+    
 }

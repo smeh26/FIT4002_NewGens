@@ -94,12 +94,12 @@ namespace MyNursingFuture.Util.DataFormatter
                         QuestionEntity question_entity = null;
                         if (question_Dict.TryGetValue(ans.Key, out question_entity))
                         {
-                            ans_entity.AspectId = (int) question_entity.AspectId;
+                            ans_entity.AspectId = (int)question_entity.AspectId;
 
-                            
+
                         }
                         // insert answer into database
-                         result = NSAM.InsertAnswer(entity.UserId, ans_entity);
+                        result = NSAM.InsertAnswer(entity.UserId, ans_entity);
 
                         if (!result.Success)
                         {
