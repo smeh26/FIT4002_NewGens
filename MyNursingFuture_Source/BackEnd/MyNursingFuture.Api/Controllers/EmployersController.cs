@@ -15,6 +15,7 @@ using MyNursingFuture.Api.Filters;
 using System.Web.Hosting;
 using Newtonsoft.Json;
 using System.Configuration;
+using Swashbuckle.Swagger.Annotations;
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -31,8 +32,35 @@ namespace MyNursingFuture.Api.Controllers
             _cacheManager = cacheManager;
         }
 
+
+
+        private struct RegisterEmployerResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public EmployerModel Entity { get; set; }
+        }
         // POST: api/employers
-        public HttpResponseMessage Post([FromBody]EmployerEntity value)
+        /// <summary>
+        /// This API is used for register an employer 
+        /// </summary>
+        /// <remarks> Send A JSON object with the minimum following fields for registration:
+        /// 
+        /// {
+        /// EmployerName
+        /// Email
+        /// Password
+        /// } 
+        /// 
+        /// 
+        /// API was tested, working properly
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [Route("api/v1/employers")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegisterEmployerResponse))]
+        public HttpResponseMessage RegisterEmployer([FromBody]EmployerEntity value)
         {
            // System.Diagnostics.Debugger.Break();
             var dump = ObjectDumper.Dump(value);
@@ -40,7 +68,7 @@ namespace MyNursingFuture.Api.Controllers
   
             //
             Console.WriteLine(dump);
-            Result result = null;
+            var result = new Result();
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Password) || string.IsNullOrEmpty(value.EmployerName))
             {
                 result = new Result(false);
@@ -58,102 +86,29 @@ namespace MyNursingFuture.Api.Controllers
             employer.Token = employerEntity.Token;
             employer.EmployerName = employerEntity.EmployerName;
             //employer.ApnaUser = false;
-            employer.EmployerID = employerEntity.EmployerID;
+            employer.EmployerId = employerEntity.EmployerId;
             result.Entity = employer;
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-       /* [JwtAuthorized]
-        [Route("api/employers/quiz/career/{complete}")]
-        public HttpResponseMessage GetCareerQuizzes(string complete)
-        {
-            var completeLook = complete == "complete";
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var user = objuser as UserEntity;
-            var result = _employersManager.GetQuizzes(user.UserId, QuizTypes.PATHWAY.ToString(), completeLook);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }*/
+        
+        
+        
+        
+        
+        //=========================================================================================================
 
-
-/*        [JwtAuthorized]
-        [Route("api/employers/quiz/career/save")]
-        public HttpResponseMessage SaveQuizCareer([FromBody]UsersQuizzesEntity entity)
-        {
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var user = objuser as UserEntity;
-            entity.UserId = user.UserId;
-            entity.Type = QuizTypes.PATHWAY.ToString();
-            var result = _employersManager.SaveQuiz(entity);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }*/
-
-/*        [JwtAuthorized]
-        [Route("api/employers/quiz/selfassessment/{complete}")]
-        public HttpResponseMessage GetAssessmentQuizzes(string complete)
-        {
-            var completeLook = complete == "complete";
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var user = objuser as UserEntity;
-            var result = _employersManager.GetQuizzes(user.UserId, QuizTypes.ASSESSMENT.ToString(), completeLook);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }*/
-
-
-/*        [JwtAuthorized]
-        [Route("api/employers/quiz/selfassessment/save")]
-        public HttpResponseMessage SaveAssessmentQuiz([FromBody]UsersQuizzesEntity entity)
-        {
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var user = objuser as UserEntity;
-            entity.UserId = user.UserId;
-            entity.Type = QuizTypes.ASSESSMENT.ToString();
-            var result = _employersManager.SaveQuiz(entity);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }*/
-
-/*        [JwtAuthorized]
-        [Route("api/employers/quiz/aboutyou/save")]
-        public HttpResponseMessage SaveAboutyouQuiz([FromBody]UsersQuizzesEntity entity)
-        {
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var user = objuser as UserEntity;
-            entity.UserId = user.UserId;
-            entity.Type = QuizTypes.ASSESSMENT.ToString();
-
-            var dictionary = JsonConvert.DeserializeObject<Dictionary<int, object>>(entity.Answers);
-            var result = _employersManager.SaveQuiz(entity, dictionary);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }*/
-
-/*        [JwtAuthorized]
-        [Route("api/employers/quizzes")]
-        public HttpResponseMessage GetAllQuizzes()
-        {
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var user = objuser as UserEntity;
-            var result = _employersManager.GetQuizzes(user.UserId);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }
-*/
-
-/*        [JwtAuthorized]
-        [HttpDelete]
-        [Route("api/employers/quizzes/{id}")]
-        public HttpResponseMessage GetAllQuizzes(int id)
-        {
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var user = objuser as UserEntity;
-            var result = _employersManager.GetQuizzes(user.UserId);
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }*/
-
+        /// <summary>
+        /// API to recover password
+        /// </summary>
+        /// <remarks> 
+        /// THIS API WAS NOT TESTED, DO NOT USE
+        ///         
+        ///  
+        /// REASON: not in scope</remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [Route("api/employers/recover")]
         public HttpResponseMessage Recover([FromBody]EmployerEntity value)
         {
@@ -170,6 +125,23 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+
+
+
+
+
+        //=========================================================================================================
+        /// <summary>
+        /// API to reset password
+        /// </summary>
+        /// <remarks> 
+        /// THIS API WAS NOT TESTED, DO NOT USE
+        /// 
+        /// REASON: not in scope
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
         [Route("api/employers/recover/reset")]
         public HttpResponseMessage ResetPassword([FromBody]EmployerEntity value)
         {
@@ -190,10 +162,30 @@ namespace MyNursingFuture.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [JwtAuthorized]
+
+
+
+
+
+
+        //=========================================================================================================
+        /// <summary>
+        /// API to update details of an employer enity
+        /// </summary>
+        /// <remarks>
+        /// This is the original API to update details of an entity
+        /// Use this to update any field of interest.
+        /// TODO: Bug fix
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
         [Route("api/employers/edit")]
         public HttpResponseMessage EditDetails([FromBody]EmployerEntity value)
         {
+            var result = new Result();
+
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.EmployerName))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
@@ -202,16 +194,40 @@ namespace MyNursingFuture.Api.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
-            object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
-            var employer = objuser as EmployerEntity;
-            employer.Email = value.Email;
-            employer.EmployerName = value.EmployerName;
-            var result = _employersManager.UpdateDetails(employer);
+            object objemp = null;
+            Request.Properties.TryGetValue("employer", out objemp);
+            var employer = objemp as EmployerEntity;
+
+            value.EmployerId = employer.EmployerId;
+
+            value.ModifyDate = DateTime.Now;
+            result = _employersManager.UpdateDetails(value);
+
+            var emp = (EmployerEntity)_employersManager.GetEmployerById(employer.EmployerId).Entity;
+            var em_mod = new EmployerModel();
+            PropertyCopier<EmployerEntity, EmployerModel>.Copy(emp, em_mod);
+            result.Entity = em_mod;
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [JwtAuthorized]
+
+
+
+
+
+
+        //=========================================================================================================
+        /// <summary>
+        /// API to change password of an employer entity
+        /// </summary>
+        /// <remarks> Was not tested, do not use  
+        /// 
+        /// not in scope, not priority
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
         [Route("api/employers/changepassword")]
         public HttpResponseMessage ChangePassword([FromBody]EmployerEntity value)
         {
@@ -235,13 +251,28 @@ namespace MyNursingFuture.Api.Controllers
         }
 
 
-        [JwtAuthorized]
+
+
+
+
+        //=========================================================================================================
+        /// <summary>
+        /// API to detele an employer entity
+        /// </summary>
+        /// <remarks> Was not tested, do not use  
+        /// 
+        /// not in scope, not priority
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [EmployerJWTAuthorized]
         // DELETE: api/employers/5
-        public HttpResponseMessage Delete(int id)
+        public HttpResponseMessage Delete([FromBody] int id)
         {
-            Result result = null;
+            var result = new Result();
             object objuser = null;
-            Request.Properties.TryGetValue("user", out objuser);
+            Request.Properties.TryGetValue("employer", out objuser);
             var employer = objuser as EmployerEntity;
             if (employer == null)
             {
@@ -251,6 +282,112 @@ namespace MyNursingFuture.Api.Controllers
             result = _employersManager.Delete(employer);
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
+
+
+
+
+
+
+        //=========================================================================================================
+        private struct AdjustMembershipResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+        }
+        /// <summary>
+        /// API to manage the membership of an employer
+        /// </summary>
+        /// <remarks> 
+        /// This API may need to move to the CMS 
+        /// as we agreed not to process payment on this website.
+        /// Send a JSON with employerId and Duration of the membership 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpPut]
+        [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AdjustMembershipResponse))]
+        [Route("api/v1/employers/membership")]
+        public HttpResponseMessage AdjustMembership ( [FromBody] MembershipModel mbm )
+        {
+            var employerId = mbm.EmployerId;
+            var duration = mbm.Duration;
+
+            var result = new Result();
+            var employer = (EmployerEntity) _employersManager.GetEmployerById(employerId).Entity;
+            if (employer == null)
+            {
+                result = new Result(false);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            }
+
+            employer.MembershipType = "STANDARD";
+
+            if (employer.MembershipEndDate != null && employer.MembershipEndDate > (Nullable<DateTime>)DateTime.Now )
+            {
+                employer.MembershipEndDate = ((DateTime)employer.MembershipEndDate).AddDays(mbm.Duration);
+            }
+            else {
+                employer.MembershipEndDate = DateTime.Now.AddDays(duration);
+                employer.MembershipStartDate = DateTime.Now;
+            }
+            result = _employersManager.UpdateMembership(employer);
+            //If failed
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            
+            //If it is good
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+
+        }
+
+
+
+
+
+
+
+
+        //=========================================================================================================
+        private struct GetEmployerDetailsSecuredResponse
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public EmployerModel Entity { get; set; }
+        }
+
+        /// <summary>
+        /// This API is used for a nurse to get info of the employer 
+        /// </summary>
+        /// <remarks> 
+        /// This API Is called by Nurses only
+        /// 
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpGet]
+        [JwtAuthorized]
+        [Route("api/v1/employers/sercured/{employerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetEmployerDetailsSecuredResponse))]
+        public HttpResponseMessage RegisterEmployer(int employerId)
+        {
+
+            var result = _employersManager.GetEmployerById(employerId);
+
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            var employer = new EmployerModelSecured();
+            var employerEntity = (EmployerEntity)result.Entity;
+            PropertyCopier<EmployerEntity, EmployerModelSecured>.Copy(employerEntity, employer);
+            result.Entity = employer;
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
 
     }
 }

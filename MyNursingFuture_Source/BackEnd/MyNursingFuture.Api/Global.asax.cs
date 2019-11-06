@@ -26,11 +26,25 @@ namespace MyNursingFuture.Api
             container.Register<ICacheManager, CacheManager>(Lifestyle.Scoped);
             container.Register<IAppConfigurationsManager, AppConfigurationsManager>(Lifestyle.Scoped);
             container.Register<IReportManager, ReportManager>(Lifestyle.Scoped);
+
+            container.Register<IJobApplicationManager, JobApplicationManager>(Lifestyle.Scoped);
+            container.Register<IJobListingCriteriaManager, JobListingCriteriaManager>(Lifestyle.Scoped);
+            container.Register<IJobListingManager, JobListingManager>(Lifestyle.Scoped);
+            container.Register<INurseSelfAssessmentAnswersManager, NurseSelfAssessmentAnswersManager>(Lifestyle.Scoped);
+            container.Register<IAnswersManager, AnswersManager>(Lifestyle.Scoped);
+            container.Register<IQuestionsManager, QuestionsManager>(Lifestyle.Scoped);
+            //Template for further 
+            /*            
+                        container.Register<>(Lifestyle.Scoped);
+                        container.Register<>(Lifestyle.Scoped);*/
+
             container.Register<ICredentialsManager, CredentialsManager>(Lifestyle.Singleton);
             // This is an extension method from the integration package.
             container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
            
             container.Verify();
+
+            AutoMapperConfig.Initialize();
 
             GlobalConfiguration.Configuration.DependencyResolver =
                 new SimpleInjectorWebApiDependencyResolver(container);
@@ -39,6 +53,8 @@ namespace MyNursingFuture.Api
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
             GlobalConfiguration.Configure(WebApiConfig.Register);
+
+            
         }
     }
 }

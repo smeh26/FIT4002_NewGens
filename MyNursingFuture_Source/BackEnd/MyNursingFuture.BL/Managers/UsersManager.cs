@@ -28,12 +28,14 @@ namespace MyNursingFuture.BL.Managers
         Result SaveQuiz(UsersQuizzesEntity quiz, Dictionary<int, object> questionsAnswers);
         Result UpdateDetails(UserEntity entity);
         Result ResetPassword(UserEntity entity);
+        Result GetUserDetails(UserEntity entity);
+        Result GetSecuredUserDetails(int userId);
     }
     public class UsersManager: IUsersManager
     {
         public Result Register(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 if(entity.Password.Length < 6)
@@ -122,7 +124,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result Login(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -178,7 +180,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result LoginApna (UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var con = new DapperConnectionManager();
@@ -296,6 +298,7 @@ namespace MyNursingFuture.BL.Managers
             user = r.FirstOrDefault();
             user.Password = null;
             user.Hash = null;
+            user.Token = token;
             result.Entity = user;
             return result;
         }
@@ -540,6 +543,10 @@ namespace MyNursingFuture.BL.Managers
             return new Result(false);
         }
 
+        /*
+         Get Quizz result by Client ID
+             */
+
         public Result GetQuizzes(int userId, string type, bool complete)
         {
             try
@@ -559,9 +566,10 @@ namespace MyNursingFuture.BL.Managers
         }
 
 
+
         public Result GenerateRecoveringCode(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             var con = new DapperConnectionManager();
             var query = new QueryEntity();
             var credentials = new CredentialsManager();
@@ -610,7 +618,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result ResetPassword(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 //Double validation
@@ -675,7 +683,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result ChangePassword(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 var credentials = new CredentialsManager();
@@ -742,7 +750,7 @@ namespace MyNursingFuture.BL.Managers
 
         public Result UpdateDetails(UserEntity entity)
         {
-            Result result = null;
+            var result = new Result();
             try
             {
                 if (!entity.Email.Contains("@") || entity.Email.Length < 3)
@@ -779,9 +787,32 @@ namespace MyNursingFuture.BL.Managers
                 }
                 
 
-                query.Query = @"Update Users Set Name = @Name, Email = @Email, minsalary = @Salary
+                // query.Query = @"Update Users Set Name = @Name, Email = @Email, minsalary = @Salary
+                //             where UserId = @UserId and Active = 1";
+                // query.Entity = new { UserId = entity.UserId, Email = entity.Email, Name = entity.Name, Salary = entity.Salary};
+                query.Query = @"Update Users Set 
+                                            Name = @Name, 
+                                            Email = @Email,
+                                            [NurseType] = ISNULL(@NurseType, NurseType) ,
+                                            [ActiveWorking] = ISNULL(@ActiveWorking, ActiveWorking) ,
+                                            [Area] = ISNULL(@Area, Area) ,
+                                            [Age] = ISNULL(@Age, Age) ,
+                                            [Country] = ISNULL(@Country, Country) ,
+                                            [Suburb] = ISNULL(@Suburb, Suburb) ,
+                                            [PostalCode] = ISNULL(@PostalCode, PostalCode) ,
+                                            [State] = ISNULL(@State, State) ,
+                                            [Patients] = ISNULL(@Patients, Patients) ,
+                                            [PatientsTitle] = ISNULL(@PatientsTitle, PatientsTitle) ,
+                                            [Qualification] = ISNULL(@Qualification, Qualification) ,
+                                            [Setting] = ISNULL(@Setting, Setting) ,
+                                            [IsLookingForJob] = ISNULL(@IsLookingForJob, IsLookingForJob) ,
+                                            [minsalary] = ISNULL(@minsalary, minsalary) ,
+                                            [maxsalary] = ISNULL(@maxsalary, maxsalary),
+                                            [defaultQuizId] = ISNULL(@defaultQuizId, defaultQuizId),
+                                            [salary] = ISNULL(@salary, NULL)
+
                             where UserId = @UserId and Active = 1";
-                query.Entity = new { UserId = entity.UserId, Email = entity.Email, Name = entity.Name, Salary = entity.Salary};
+                query.Entity = entity;
                 result = con.ExecuteQuery<UserEntity>(query);
                 result.Message = result.Success ? "The user details has been updated" : "An error has occurred";
             }
@@ -795,6 +826,59 @@ namespace MyNursingFuture.BL.Managers
             
             return result;
         }
+
+        public Result GetUserDetails(UserEntity entity)
+        {
+            var result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+
+                
+                query.Query = @"SELECT [UserId]
+                                        ,[Name]
+                                        ,[Email]
+                                        ,[ApnaMemberId]
+                                        ,[ApnaUser]
+                                        ,[NurseType]
+                                        ,[Area]
+                                        ,[Age]
+                                        ,[Country]
+                                        ,[Suburb]
+                                        ,[PostalCode]
+                                        ,[State]
+                                        ,[Patients]
+                                        ,[PatientsTitle]
+                                        ,[Qualification]
+                                        ,[IsLookingForJob]
+                                        ,[defaultQuizId]
+                                        ,[salary] 
+                                        FROM Users
+                            where UserId = @UserId";
+                query.Entity = entity;
+                result = con.ExecuteGetOneItemQuery<UserEntity>(query);
+
+                if (!result.Success)
+                {
+                    result.Entity = null;
+                    result.Message = "Login error";
+                    return result;
+                }
+
+                result.Message = "The current user details";
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result = result ?? new Result(false);
+                result.Message = "An error occurred";
+                throw;
+            }
+
+            return result;
+        }
+
 
 
         public Result Delete(UserEntity entity)
@@ -824,5 +908,106 @@ namespace MyNursingFuture.BL.Managers
             result.Message = result.Success ? "The user has been deleted" : "An error has occurred";
             return result;
         }
+
+        /*
+         Get a list of all UserId
+             */
+        public Result GetAllUserId() {
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = new { };
+                query.Query = @"SELECT UserId FROM Users";
+                var result = con.ExecuteQuery(query);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+
+        }
+
+        public Result GetAllPreferedQuizzId()
+        {
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                query.Entity = new { };
+                query.Query = @"SELECT defaultQuizId FROM Users Where defaultQuizId <> 0";
+                var result = con.ExecuteQuery<int>(query);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+
+        }
+
+        public Result GetSecuredUserDetails(int userId)
+        {
+            var result = new Result();
+            try
+            {
+                var con = new DapperConnectionManager();
+                var query = new QueryEntity();
+                var credentials = new CredentialsManager();
+
+                query.Query = @"SELECT [UserId]
+                                      ,[Name]
+                                      ,[Email]
+                                      ,[NurseType]
+                                      ,[ActiveWorking]
+                                      ,[Area]
+                                      ,[Country]
+                                      ,[Suburb]
+                                      ,[PostalCode]
+                                      ,[State]
+                                      ,[defaultQuizId]
+                                      ,[salary] 
+                            FROM Users
+                            where UserId = @UserId and Active = 1 and ApnaUser = 0";
+                query.Entity = new { UserId = userId };
+                result = con.ExecuteGetOneItemQuery<UserEntity>(query);
+
+                if (!result.Success)
+                {
+                    result.Message = "Login error";
+                    return result;
+                }
+
+
+
+                var user = (UserEntity)result.Entity;
+
+                if (user == null)
+                {
+                    result.Message = "Invalid user";
+                    result.Success = false;
+                    result.Entity = null;
+                    return result;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                result.Entity = null;
+                result = result ?? new Result(false);
+                result.Message = "An error occurred";
+            }
+
+            return result;
+
+        }
+
+
     }
+
+    
 }

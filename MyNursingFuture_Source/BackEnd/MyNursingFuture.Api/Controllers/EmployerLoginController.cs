@@ -1,4 +1,12 @@
-﻿using System;
+﻿/**
+ * 
+ * <Author> Nguyen Pham - 27348032  </Author>
+ * <copyright> The following code is the work of Nguyen Pham unless other wise specified  </copyright>
+ * <remarks> This is a part of the FIT4002 project. Product owner is APNA. Project supervisor is Robyn McNamara  </remarks>
+ * <date>  </date>
+ * <summary> </summary>
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,6 +24,7 @@ using System.Web.Hosting;
 using Newtonsoft.Json;
 using System.Configuration;
 using System.Threading.Tasks;
+using Swashbuckle.Swagger.Annotations;
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -31,12 +40,38 @@ namespace MyNursingFuture.Api.Controllers
             _cacheManager = cacheManager;
 
         }
-        // POST: api/Login
-        public async Task<HttpResponseMessage> Post([FromBody]EmployerEntity value)
+
+        private struct EmployerLoginReturnType{
+           
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public EmployerModel Entity { get; set; }
+
+        }
+
+        /// <summary>
+        /// Employer registration API
+        /// </summary>
+        /// <remarks> TODO: enforce required fields
+        /// 
+        /// Implement object copy function to Filter out unnessary fields  
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(EmployerLoginReturnType))]
+        [Route("api/v1/EmployerLogin")]
+        public async Task<HttpResponseMessage> Post([FromBody] LoginObject value)
         {
-            Result result = null;
+            var result = new Result();
             var tokenLogin = false;
             var apnaLogin = false;
+
+
+            var employer = new EmployerEntity();
+
+            PropertyCopier<LoginObject, EmployerEntity>.Copy(value, employer);
 
             var token = Request.Headers.Authorization;
             if (token != null)
@@ -45,7 +80,7 @@ namespace MyNursingFuture.Api.Controllers
                 result = _employersManager.Login(token.Parameter);
             }
 
-            if ((string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Password)) && !tokenLogin)
+            if ((string.IsNullOrEmpty(employer.Email) || string.IsNullOrEmpty(employer.Password)) && !tokenLogin)
             {
                 result = new Result(false);
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
@@ -53,59 +88,26 @@ namespace MyNursingFuture.Api.Controllers
 
             if (!tokenLogin && !apnaLogin)
             {
-                result = _employersManager.Login(value);
+                result = _employersManager.Login(employer);
                 apnaLogin = !result.Success;
             }
 
-/*            Result apnaUserResult = null;
-            var tryLoginApna = ConfigurationManager.AppSettings["apna.login"] == "true";
-            //APNA CRM LOGIN
-            if (!result.Success && tryLoginApna)
-            {
-                var resultToken = await GetApnaToken();
-                if (resultToken.Success)
-                {
-                    var config = (ConfigurationEntity)resultToken.Entity;
-                    var resultCheckApnaUser = await GetApnaUser(config.Value, value.Email, value.Password);
-                    if (resultCheckApnaUser.Success)
-                    {
-                        apnaUserResult = await GetApnaUserData(config.Value, value.Email);
-                        if (apnaUserResult.Success)
-                        {
-                            var apnaUser = (ApnaUser)apnaUserResult.Entity;
-                            var userEntityApna = new UserEntity();
-                            userEntityApna.ApnaMemberId = apnaUser.MemberId;
-                            userEntityApna.Email = apnaUser.Email;
-                            userEntityApna.State = apnaUser.HomeAddress.State;
-                            userEntityApna.Suburb = apnaUser.HomeAddress.Suburb;
-                            userEntityApna.PostalCode = apnaUser.HomeAddress.Postcode;
-                            userEntityApna.Country = apnaUser.HomeAddress.Country;
-                            userEntityApna.Name = String.Concat((apnaUser.FirstName ?? ""), " ", (apnaUser.LastName ?? ""));
 
-                            result = _employersManager.LoginApna(userEntityApna);
-                        }
-                    }
-                }
-            }*/
+            var employer_model = new EmployerModel();
+            var employerEntity = (EmployerEntity)result.Entity;
 
             if (!result.Success)
-                return Request.CreateResponse(HttpStatusCode.OK, result);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            employer_model.Token = employerEntity.Token;
+            PropertyCopier<EmployerEntity, EmployerModel>.Copy(employerEntity, employer_model);
 
-            var employer = new EmployerModel();
-            var employerEntity = (EmployerEntity)result.Entity;
-            employer.Email = employerEntity.Email;
-            employer.Token = employerEntity.Token;
-            employer.EmployerName = employerEntity.EmployerName;
-//            employer.ApnaUser = apnaLogin;
-            employer.EmployerID = employerEntity.EmployerID;
+            if (token != null)
+            {
+                employer_model.Token = token.Parameter;
+            }
 
-            employer.Area = employerEntity.Area;
-            employer.State = employerEntity.State;
-            employer.Country = employerEntity.Country;
-            employer.Suburb = employerEntity.Suburb;
-            employer.PostalCode = employerEntity.PostalCode;
-            employer.Setting = employerEntity.Setting;
-            result.Entity = employer;
+
+            result.Entity = employer_model;
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
     }

@@ -1,6 +1,7 @@
 var conf;
 
 conf = {
+<<<<<<< HEAD
   apiUrl: 'https://mynursingfutureapi.azurewebsites.net/',
   // apiUrl: 'http://localhost:5056/',
   apiBaseUrl: 'api/',
@@ -40,5 +41,13 @@ conf = {
 //     imagesDirectory: 'app/Content/img/'
 //   };
 
+=======
+    apiUrl: 'https://mynursingfutureapi.azurewebsites.net/',
+    apiBaseUrl: 'api/',
+    siteUrl: 'http://localhost:3000/',
+    shareBaseUrl: 'http://localhost:3000/',
+    imagesDirectory: 'img/'
+  };
+>>>>>>> bc980297bb8da53481415626ba19c77f0623152c
 
 export default conf;

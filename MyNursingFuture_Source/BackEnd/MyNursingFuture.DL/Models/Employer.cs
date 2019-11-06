@@ -8,9 +8,12 @@ namespace MyNursingFuture.DL.Models
 {
     public class Employer : IModel
     {
-        public int EmployerID { get; set; }
+        public int EmployerId { get; set; }
         public string Email { get; set; }
         public string EmployerName { get; set; }
+        public string AgentFirstName { get; set; }
+        public string AgentLastName { get; set; }
+        public Nullable<Boolean> Active { get; set; }
         public string Company { get; set; }
         public string Password { get; set; }
         public string Hash { get; set; }
@@ -25,6 +28,12 @@ namespace MyNursingFuture.DL.Models
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string Setting { get; set; }
-        public bool SaveOnly { get; set; } 
+        public Nullable<bool> SaveOnly { get; set; }
+
+        // extension for membership 
+        public string MembershipType { get; set; }
+        public bool CanViewDetails { get; set; }
+        public Nullable<DateTime> MembershipStartDate { get; set; }
+        public Nullable<DateTime> MembershipEndDate { get; set; }
     }
 }
