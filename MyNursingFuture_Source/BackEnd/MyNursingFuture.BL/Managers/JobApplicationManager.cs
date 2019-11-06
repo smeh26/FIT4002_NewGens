@@ -55,7 +55,9 @@ namespace MyNursingFuture.BL.Managers
                                                 IsDraft = @IsDraft, 
                                                 ApplicationStatus = @ApplicationStatus , 
                                                 AppliedDate = @AppliedDate , 
-                                                LastModifiedDate= @LastModifiedDate
+                                                LastModifiedDate= @LastModifiedDate,
+                                                ExpectedSalary = @ExpectedSalary
+
                     WHERE JobListingId = @JobListingId and UserId = @UserId
                 END 
                 ELSE
@@ -89,28 +91,21 @@ namespace MyNursingFuture.BL.Managers
                 query.Entity = jobApplication;
                 query.Query = @"
                 BEGIN TRAN
-                IF EXISTS (SELECT * FROM JobApplications WHERE JobListingId = @JobListingId and UserId = @UserId )
-                BEGIN
-                    UPDATE JobApplications SET  Summary = @Summary , 
+                
+                UPDATE JobApplications SET  Summary = @Summary , 
                                                 IsDraft = @IsDraft, 
                                                 ApplicationStatus = @ApplicationStatus , 
-                                                LastModifiedDate= @LastModifiedDate
-                    WHERE JobListingId = @JobListingId and UserId = @UserId
-                END 
-                ELSE
-                BEGIN 
-                    INSERT INTO JobApplications  (JobListingId, UserId, Summary, IsDraft, ApplicationStatus, LastModifiedDate)
-                                            VALUES  (@JobListingId, 
-                                                        @UserId, 
-                                                        @Summary, 
-                                                        @IsDraft, 
-                                                        @ApplicationStatus,
-                                                        @LastModifiedDate
-)
-                END 
+                                                LastModifiedDate= @LastModifiedDate,
+                                                IsShortlisted = @IsShortlisted,
+                                                IsDeclined = @IsDeclined,
+                                                ShortListedDate = ISNULL(@ShortListedDate, NULL),
+                                                DeclinedDate = ISNULL(@DeclinedDate, NULL)
+                    WHERE JobListingId = @JobListingId and UserId = @UserId;
+
+                SELECT *  FROM JobApplications WHERE JobListingId = @JobListingId and UserId = @UserId;
                 COMMIT TRAN
                 ";
-                result = con.ExecuteQuery(query);
+                result = con.ExecuteGetOneItemQuery<JobApplicationEntity>(query);
 
                 return result;
             }
@@ -138,7 +133,8 @@ namespace MyNursingFuture.BL.Managers
                                                 IsShortlisted = @IsShortlisted,
                                                 IsDeclined = @IsDeclined,
                                                 ShortListedDate = ISNULL(@ShortListedDate, NULL),
-                                                DeclinedDate = ISNULL(@DeclinedDate, NULL)
+                                                DeclinedDate = ISNULL(@DeclinedDate, NULL),
+                                                MakeContactDeadline = ISNULL(@MakeContactDeadline, NULL)
 
                 WHERE JobApplicationId = @JobApplicationId AND JobListingId = @JobListingId AND UserId = @UserId;
                 SELECT * FROM JobApplications WHERE JobApplicationId = @JobApplicationId AND JobListingId = @JobListingId and UserId = @UserId;
