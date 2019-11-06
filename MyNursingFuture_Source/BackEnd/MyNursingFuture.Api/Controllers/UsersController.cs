@@ -26,6 +26,7 @@ using Newtonsoft.Json;
 using System.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using Swashbuckle.Swagger.Annotations;
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -501,5 +502,45 @@ namespace MyNursingFuture.Api.Controllers
             result = _usersManager.Delete(user);
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
+
+        // ==========================================================================================================================================
+        struct GetUserQuiz_Response
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public List<NurseSelfAssessmentAnswersEntity> Entity { get; set; }
+
+        }
+
+        /// <summary>
+        /// API to get UserQuiz Result by ID 
+        /// </summary>
+        /// 
+        /// 
+        /// <remarks> use this API in case you need to fetch a quiz, knowing QuizId 
+        /// Authorization from either Nurse or Employer is required
+        /// </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [HttpGet]
+        [GenericJWTAuthorized]
+        [Route("api/users/quiz/{id}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GetUserQuiz_Response))]
+
+        public HttpResponseMessage GetUserQuiz(int id)
+        {
+
+            Result result = _nurseSelfAssessmentAnswersManager.GetAnswersbyUserQuizzId(id);
+
+            // return failed 
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            // if success
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+
     }
 }
