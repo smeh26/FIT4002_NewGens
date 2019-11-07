@@ -10,7 +10,11 @@
     <UseGlobalApplicationHostFile />
     <NameOfLastUsedPublishProfile>MyNursingFutureApi - Web Deploy</NameOfLastUsedPublishProfile>
     <ProjectView>ShowAllFiles</ProjectView>
+<<<<<<< HEAD
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+=======
     <LastActiveSolutionConfig>Release|Any CPU</LastActiveSolutionConfig>
+>>>>>>> bc980297bb8da53481415626ba19c77f0623152c
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>

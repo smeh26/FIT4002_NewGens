@@ -1,12 +1,11 @@
-USE [master]
-GO
+
 /****** Object:  Database [MyNursingFuture]    Script Date: 14/02/2018 1:39:38 PM ******/
 CREATE DATABASE [MyNursingFuture]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'MyNursingFuture', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\MyNursingFuture.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'MyNursingFuture', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.SQLEXPRESS\MSSQL\DATA\MyNursingFuture.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
-( NAME = N'MyNursingFuture_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\MyNursingFuture_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+( NAME = N'MyNursingFuture_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.SQLEXPRESS\MSSQL\DATA\MyNursingFuture_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
 GO
 ALTER DATABASE [MyNursingFuture] SET COMPATIBILITY_LEVEL = 130
 GO

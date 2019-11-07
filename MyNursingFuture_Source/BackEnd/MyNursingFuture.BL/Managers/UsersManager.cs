@@ -342,6 +342,55 @@ namespace MyNursingFuture.BL.Managers
             return new Result(false);
         }
 
+        public Result SaveIsLookingForWork(int userId, bool isLookingForWork)
+        {
+            try
+            {
+                var con = new DapperConnectionManager();
+
+                var query = new QueryEntity();
+
+                query.Query = @"Update users
+                            set isLookingForJobs = @isLookingForJobs
+                            where UserId = @UserId";
+                query.Entity = new
+                {
+                    UserId = userId,
+                    isLookingForJobs = isLookingForWork
+                };
+                var result = con.ExecuteQuery<UserEntity>(query);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+        }
+
+        public Result SaveMinReqSalaryk(int userId, int MinSalaryReq)
+        {
+            try
+            {
+                var con = new DapperConnectionManager();
+
+                var query = new QueryEntity();
+
+                query.Query = @"Update users
+                            set MinSalaryExpectation = @MinSalaryExp
+                            where UserId = @UserId";
+                query.Entity = new
+                {
+                    UserId = userId,
+                    MinSalaryExp = MinSalaryReq
+                };
+                var result = con.ExecuteQuery<UserEntity>(query);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return new Result(false);
+        }
         public Result SaveQuiz(UsersQuizzesEntity quiz, Dictionary<int, object> questionsAnswers)
         {
             try
@@ -738,6 +787,9 @@ namespace MyNursingFuture.BL.Managers
                 }
                 
 
+                // query.Query = @"Update Users Set Name = @Name, Email = @Email, minsalary = @Salary
+                //             where UserId = @UserId and Active = 1";
+                // query.Entity = new { UserId = entity.UserId, Email = entity.Email, Name = entity.Name, Salary = entity.Salary};
                 query.Query = @"Update Users Set 
                                             Name = @Name, 
                                             Email = @Email,

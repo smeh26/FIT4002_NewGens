@@ -117,7 +117,7 @@ class SelfAssessmentResults extends Component {
             <div className="content-block">
               <p className="text-center">You are working at the following level of practice for each domain.</p>
               {domains.map((domain,i) => {
-                console.log(domain)
+                console.log(domain.title, results.score[domain.domainId])
                 return (
                   <div className={"results-domain " + this.domainClass(domain.title)} key={i}>
                     <div className="icon">

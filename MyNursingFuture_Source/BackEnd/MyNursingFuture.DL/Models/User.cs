@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyNursingFuture.DL.Models
 {
@@ -15,6 +16,9 @@ namespace MyNursingFuture.DL.Models
         public DateTime? ModifyDate { get; set; }
         public string RecoverToken { get; set; }
         public string NurseType { get; set; }
+        public bool IsLookingForWork { get; set; }
+        [Column("minsalary")]
+        public string Salary { get; set; }
         public string Area { get; set; }
         public string State { get; set; }
         public string ActiveWorking { get; set; }

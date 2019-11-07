@@ -15,7 +15,11 @@ using System.Configuration;
 using MyNursingFuture.Api.Filters;
 using Newtonsoft.Json;
 using System.Web.Hosting;
+<<<<<<< HEAD
+using MyNursingFuture.DL;
+=======
 using Swashbuckle.Swagger.Annotations;
+>>>>>>> bc980297bb8da53481415626ba19c77f0623152c
 
 namespace MyNursingFuture.Api.Controllers
 {
@@ -63,6 +67,9 @@ namespace MyNursingFuture.Api.Controllers
             var tokenLogin = false;
             var apnaLogin = false;
 
+            var con = new DapperConnectionManager();
+            var query = new QueryEntity();
+
             var token = Request.Headers.Authorization;
             if (token != null)
             {
@@ -97,6 +104,7 @@ namespace MyNursingFuture.Api.Controllers
                         apnaUserResult = await GetApnaUserData(config.Value, value.Email);
                         if (apnaUserResult.Success)
                         {
+
                             var apnaUser = (ApnaUser)apnaUserResult.Entity;
                             var userEntityApna = new UserEntity();
                             userEntityApna.ApnaMemberId = apnaUser.MemberId;

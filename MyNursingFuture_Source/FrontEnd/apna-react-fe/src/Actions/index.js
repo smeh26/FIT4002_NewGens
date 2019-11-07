@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import {defaultPageContentByEndpoint, dummyFetch } from './RoboRamiro';
+import { defaultPageContentByEndpoint, dummyFetch } from './RoboRamiro';
 import cookies from '../Misc/cookies';
 import config from '../config';
 import { push } from 'react-router-redux'
@@ -165,7 +165,7 @@ export const setArticleListData = (data) => {
   return {
     type: 'SET_ARTICLE_LIST',
     data: data
-  }  
+  }
 }
 export const completeRequestArticleList = () => {
   return {
@@ -314,7 +314,7 @@ export const setUserQuizzes = (data) => {
 export const requestLogin = () => {
   return {
     type: 'START_LOGIN'
-  } 
+  }
 }
 export const requestUserData = () => {
   return {
@@ -348,6 +348,12 @@ export const requestRegister = () => {
     type: 'START_REGISTER'
   }
 }
+
+export const empRequestRegister = () => {
+  return {
+    type: 'EMP_START_REGISTER'
+  }
+}
 export const endRegister = (message) => {
   return {
     type: 'END_REGISTER',
@@ -362,6 +368,12 @@ export const setUserData = (user) => {
   }
 }
 
+export const setEmployerData = (employer) => {
+  return {
+    type: 'SET_EMPLOYER_DATA',
+    data: employer
+  }
+}
 export const startLogout = () => {
   return {
     type: 'START_LOGOUT'
@@ -382,6 +394,14 @@ export const unsetUserData = () => { // TODO this might not work right cuz merge
   }
 }
 
+
+// export const unsetEmployerData = () => { 
+//   return {
+//     type: 'UNSET_EMPLOYER_DATA',
+//     data: {}
+//   }
+// }
+
 export const setUserError = (error) => {
   return {
     type: 'SET_USER_ERROR',
@@ -394,6 +414,12 @@ export const unsetUserError = () => { // TODO this might not work right cuz merg
     data: {}
   }
 }
+
+// export const unsetEmpError = () => {
+//   return {
+//     type: 'UNSET_'
+//   }
+// }
 
 export const setGlossaryData = (data) => {
   return {
@@ -425,10 +451,10 @@ export const setPostcardsData = (data) => {
 }
 
 export const setEndorsedLogosData = (data) => {
-    return {
-        type: 'SET_ENDORSEDLOGOS_DATA',
-        data: data
-    }
+  return {
+    type: 'SET_ENDORSEDLOGOS_DATA',
+    data: data
+  }
 }
 
 export const setAboutYouQuizData = (data) => {
@@ -466,6 +492,25 @@ export const setActionsData = (data) => {
     data: data
   }
 }
+//Set JobListing data for the reducer to add to state
+export const setJobListingData = (data) => {
+  return {
+    type: 'SET_JOBLISTING_DATA',
+    data,
+  }
+}
+//request job listing data to start the request
+export const requestJobListingData = () => {
+  return {
+    type: 'START_JOBLISTING_REQUEST',
+  }
+};
+//complete job listing data to start the request
+export const completeRequestJobListingData = () => {
+  return {
+    type: 'END_JOBLISTING_REQUEST',
+  }
+};
 
 export const setSectorScores = (data) => {
   return {
@@ -489,72 +534,167 @@ export const setSurveyAnswer = (data) => {
 }
 
 
-export function fetchGlossaryData(){
-    return function (dispatch, getState){
-      if (getState().app.framework.glosssary && getState().app.framework.glosssary.length){
-        return;
-      } else {
-        dispatch(fetchFrameworkData());
-      }
+export function fetchGlossaryData() {
+  return function (dispatch, getState) {
+    if (getState().app.framework.glosssary && getState().app.framework.glosssary.length) {
+      return;
+    } else {
+      dispatch(fetchFrameworkData());
     }
-} 
-
-export function fetchCheckUserAuth(token){
-  return function (dispatch, getState){
+  }
+}
+//check if nurse is authorised using token
+export function fetchCheckNurseAuth(token) {
+  return function (dispatch, getState) {
     dispatch(requestLogin());
     dispatch(unsetUserError());
-    let data = JSON.stringify({'token': token});
+    let data = JSON.stringify({ 'token': token });
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + token
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
       },
       body: data
     }
-    return fetch(config.apiUrl+config.apiBaseUrl+'login', options).then(function(response){
+    return fetch(config.apiUrl + config.apiBaseUrl + 'login', options).then(function (response) {
       return response.json();
-    }).then(function(response){
-      if (!response.success){
+    }).then(function (response) {
+      if (!response.success) {
         throw response.message;
       }
       dispatch(setUserData(response.entity));
       dispatch(mapUserDataToAboutYouAnswers());
-      if (!cookies.hasItem('token')){
-        cookies.setItem('token', token);
-        dispatch(fetchSaveInProgressQuizzes());
+      if (cookies.hasItem('token')) {
+        cookies.removeItem('token');
       }
+      cookies.setItem('token', response.entity.token);
+
+      if (cookies.hasItem('_ut')) {
+        cookies.removeItem('_ut');
+      }
+      cookies.setItem('_ut', 'nurse');
+
+      dispatch(fetchSaveInProgressQuizzes());
+
       dispatch(setUserLoggedIn());
       dispatch(unsetUserError());
-    }).catch(function(error){
-      console.log(error);
-        if (error && error.message){
+    }).catch(function (error) {
+      if (error && error.message) {
+        dispatch(setUserError(error.message));
+      } else {
+        dispatch(setUserError('An unknown error occurred.'));
+      }
+
+    }).then(function () {
+      dispatch(endLogin());
+    });
+  }
+}
+//check employer is authorised using token, for refreshed pages and such
+export function fetchCheckEmployerAuth(token) {
+  return (dispatch, getState) => {
+    dispatch(requestLogin());
+    dispatch(unsetUserError());
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    }
+    return fetch(config.apiUrl + config.apiBaseUrl + 'v1/EmployerLogin', options)
+      .then((response) => response.json())
+      .then((response) => {
+        if (!response.success) {
+          throw response.message;
+        }
+        dispatch(setUserData(response.entity));
+        if (cookies.hasItem('token')) {
+          cookies.removeItem('token');
+        }
+        cookies.setItem('token', response.entity.token);
+
+        if (cookies.hasItem('_ut')) {
+          cookies.removeItem('_ut');
+        }
+        cookies.setItem('_ut', 'employer');
+
+        dispatch(setUserLoggedIn());
+        dispatch(unsetUserError());
+      }).catch(function (error) {
+        if (error && error.message) {
           dispatch(setUserError(error.message));
         } else {
           dispatch(setUserError('An unknown error occurred.'));
         }
-      
-    }).then(function(){
+      }).finally(() => dispatch(endLogin()));
+  }
+}
+//employer login function using API
+export function fetchLoginEmployer(email, password) {
+  return function (dispatch, getState) {
+    dispatch(requestLogin());
+    dispatch(unsetUserError());
+    let data = JSON.stringify({ email, password });
+    let options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: data
+    }
+    return fetch(config.apiUrl + config.apiBaseUrl + 'v1/EmployerLogin', options).then(function (response) {
+      return response.json();
+    }).then(function (response) {
+      if (!response.success) {
+        throw response.message;
+      }
+      dispatch(setUserData(response.entity));
+      if (cookies.hasItem('token')) {
+        cookies.removeItem('token');
+      }
+      cookies.setItem('token', response.entity.token);
+
+      if (cookies.hasItem('_ut')) {
+        cookies.removeItem('_ut');
+      }
+      cookies.setItem('_ut', 'employer');
+
+      dispatch(setUserLoggedIn());
+      dispatch(unsetUserError());
+    }).catch(function (error) {
+      if (error && error.message) {
+        dispatch(setUserError(error.message));
+      } else {
+        dispatch(setUserError('An unknown error occurred.'));
+      }
+
+    }).then(function () {
       dispatch(endLogin());
     });
   }
 }
 
-export function logOutUser(){
-  return function (dispatch, getState){
+export function logOutUser() {
+  return function (dispatch, getState) {
     dispatch(setUserLoggedOut());
     cookies.removeItem('token');
+    cookies.removeItem('_ut');
   }
 }
 
-export function fetchFrameworkData(type){
-  return function (dispatch, getState){
-    if (fetchingFrameworkData){return;}
+export function fetchFrameworkData(type) {
+  return function (dispatch, getState) {
+    if (fetchingFrameworkData) { return; }
     fetchingFrameworkData = true;
     const cached = getState().app.framework.domain; // since all in one call this works.
     dispatch(requestDomainData());
-    switch(type){
+    switch (type) {
       case 'roles':
         dispatch(requestRolesData());
         break;
@@ -567,9 +707,9 @@ export function fetchFrameworkData(type){
       default:
         break;
     }
-    
-    if (cached && cached.length > 0){
-      switch(type){
+
+    if (cached && cached.length > 0) {
+      switch (type) {
         case 'roles':
           dispatch(completeRequestRolesData());
           break;
@@ -582,40 +722,40 @@ export function fetchFrameworkData(type){
         default:
           break;
       }
-      dispatch(completeRequestDomainData());  
+      dispatch(completeRequestDomainData());
       fetchingFrameworkData = false;
       return;
     }
-    
+
     let options = {
       method: 'GET',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
-      } 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
+      }
     }
-    return fetch(config.apiUrl+config.apiBaseUrl+'Framework/nocache', options).then(function(response){
+    return fetch(config.apiUrl + config.apiBaseUrl + 'Framework/nocache', options).then(function (response) {
       return response.json();
     }).then(json => {
       // because all data is in one call we do it all no matter what we requested.
-      if (json && json.success){
-        if (json.entity.domains){
+      if (json && json.success) {
+        if (json.entity.domains) {
           dispatch(setDomainData(json.entity.domains));
         }
-        if (json.entity.sectors){
+        if (json.entity.sectors) {
           dispatch(setSectorData(json.entity.sectors));
         }
-        if (json.entity.aspects){
+        if (json.entity.aspects) {
           dispatch(setAspectsData(json.entity.aspects));
         }
-        if (json.entity.roles){
+        if (json.entity.roles) {
           dispatch(setRolesData(json.entity.roles));
         }
-        if (json.entity.actions){
+        if (json.entity.actions) {
           dispatch(setActionsData(json.entity.actions));
         }
-        if (json.entity.questions){
+        if (json.entity.questions) {
           let _saq = json.entity.questions.filter((q) => {
             return q.quizType == "ASSESSMENT";
           });
@@ -623,18 +763,18 @@ export function fetchFrameworkData(type){
             return q.quizType == "PATHWAY";
           });
           let _ayq = json.entity.questions.filter((q) => {
-            return q.quizType == "ABOUT" && ""+q.questionId != "77";
+            return q.quizType == "ABOUT" && "" + q.questionId != "77";
           });
-          
+
           let _survey = json.entity.questions.find((q) => { return q.questionId == 77 });
-          
+
           let _saqm = json.entity.questions.map((q) => {
-            let aspect = json.entity.aspects.find((a) => {return a.aspectId == q.aspectId});
-            if (!aspect){
-              return Object.assign({},q,{examples: JSON.parse(q.examples)});
+            let aspect = json.entity.aspects.find((a) => { return a.aspectId == q.aspectId });
+            if (!aspect) {
+              return Object.assign({}, q, { examples: JSON.parse(q.examples) });
             }
-            let domainFramework = json.entity.domains.find((d) => { return d.domainId == aspect.domainId}).framework;
-            return Object.assign({},q,{domainId: aspect.domainId, framework: domainFramework},{examples: JSON.parse(q.examples)});
+            let domainFramework = json.entity.domains.find((d) => { return d.domainId == aspect.domainId }).framework;
+            return Object.assign({}, q, { domainId: aspect.domainId, framework: domainFramework }, { examples: JSON.parse(q.examples) });
           })
           dispatch(setSelfAssessmentQuizContent(_saqm));
           dispatch(setCareerPathwaysQuizContent(_cpq));
@@ -642,34 +782,34 @@ export function fetchFrameworkData(type){
           dispatch(mapUserDataToAboutYouAnswers());
           dispatch(setSurveyData(_survey));
         }
-        if (json.entity.scoring){
+        if (json.entity.scoring) {
           dispatch(setSectorScores(json.entity.scoring));
         }
-        if (json.entity.definitions){
+        if (json.entity.definitions) {
           dispatch(setGlossaryData(json.entity.definitions));
         }
-        if (json.entity.sections){
+        if (json.entity.sections) {
           dispatch(setPageData(json.entity.sections));
         }
-        if (json.entity.menus){
+        if (json.entity.menus) {
           dispatch(setMenuData(json.entity.menus));
         }
-        if (json.entity.reasons){
-            dispatch(setReasonsData(json.entity.reasons));
+        if (json.entity.reasons) {
+          dispatch(setReasonsData(json.entity.reasons));
         }
         if (json.entity.postCards) {
-            dispatch(setPostcardsData(json.entity.postCards));
+          dispatch(setPostcardsData(json.entity.postCards));
         }
         if (json.entity.endorsedLogos) {
-            dispatch(setEndorsedLogosData(json.entity.endorsedLogos));
+          dispatch(setEndorsedLogosData(json.entity.endorsedLogos));
         }
-        
+
       } else {
         throw "null response";
       }
     }).then((r) => {
       fetchingFrameworkData = false;
-      switch(type){
+      switch (type) {
         case 'roles':
           dispatch(completeRequestRolesData());
           break;
@@ -687,12 +827,12 @@ export function fetchFrameworkData(type){
   }
 }
 
-export function fetchArticleData(articleId){
-  return function (dispatch, getState){
+export function fetchArticleData(articleId) {
+  return function (dispatch, getState) {
     const cached = getState().app.articles.articleContentById[articleId];
     dispatch(requestArticleContent(articleId));
-    
-    if (cached){
+
+    if (cached) {
       dispatch(completeRequestArticleContent());
       return;
     }
@@ -700,24 +840,24 @@ export function fetchArticleData(articleId){
     let options = {
       method: 'GET',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
-      } 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
+      }
     }
-    return fetch(config.apiUrl+config.apiBaseUrl+'articles', options).then(function(response){
+    return fetch(config.apiUrl + config.apiBaseUrl + 'articles', options).then(function (response) {
       return response.json();
     }).then(json => {
-      if (json && json.success){
-        if (json.entity){
-          for (var a in json.entity){
+      if (json && json.success) {
+        if (json.entity) {
+          for (var a in json.entity) {
             dispatch(setArticleData(json.entity[a].articleId, json.entity[a]));
           }
         }
       }
       dispatch(completeRequestArticleContent());
     });
-    
+
     // return dummyFetch('/articles/' + articleId).then(response => response.json())
     // .then(json => {
     //   dispatch(setArticleData(articleId, json));
@@ -726,66 +866,96 @@ export function fetchArticleData(articleId){
   }
 }
 
-export function fetchSubmitArticleFeedback(articleId,title,feedback,positive){
-    return function (dispatch, getState){
-      let data = JSON.stringify({
-        articleId: articleId,
-        title: title,
-        feedback: feedback,
-        positive: positive
-      })
+export function fetchSubmitArticleFeedback(articleId, title, feedback, positive) {
+  return function (dispatch, getState) {
+    let data = JSON.stringify({
+      articleId: articleId,
+      title: title,
+      feedback: feedback,
+      positive: positive
+    })
 
-      let options = {
-        method: 'POST',
-        headers: {
+    let options = {
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + cookies.getItem('token')
-        },
-        body: data
-      }
-      return fetch(config.apiUrl+config.apiBaseUrl+'Articles/feedback', options).then(function(response){
-        return response.json();
-      }).then(json => {
-        if (json && json.success){
-          dispatch(openModal('thanks'));
-        }
-      })
+      },
+      body: data
     }
+    return fetch(config.apiUrl + config.apiBaseUrl + 'Articles/feedback', options).then(function (response) {
+      return response.json();
+    }).then(json => {
+      if (json && json.success) {
+        dispatch(openModal('thanks'));
+      }
+    })
+  }
 }
 
-export function fetchUserQuizzes(forceUpdate){
-  return function (dispatch, getState){
-    if (!cookies.hasItem('token')){
-      // console.log( "User is not logged in");
+//fetch joblistings from the database using API
+export function fetchJobListings() {
+  return (dispatch, getState) => {
+    if (!cookies.hasItem('token')) {
+      return;
+    }
+
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
+      }
+    }
+
+    dispatch(requestJobListingData);
+    return fetch(config.apiUrl + config.apiBaseUrl + 'v1/JobListings/Employers', options)
+      .then((response) => response.json())
+      .then((response) => {
+        if (!response.success) {
+          throw response.message;
+        }
+        if (response.success) {
+          dispatch(setJobListingData(response.entity));
+        }
+      })
+      .finally(() => dispatch(completeRequestJobListingData));
+  }
+}
+
+export function fetchUserQuizzes(forceUpdate) {
+  return function (dispatch, getState) {
+    if (!cookies.hasItem('token')) {
       return;
     }
     const cached = getState().app.user.quizzes;
     dispatch(requestUserData());
-    if (!forceUpdate){
-      if (cached && cached.length > 0){ 
+    if (!forceUpdate) {
+      if (cached && cached.length > 0) {
         dispatch(endUserData());
         return;
       }
     }
-    
+
     let options = {
       method: 'GET',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
-      } 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
+      }
     }
-    return fetch(config.apiUrl+config.apiBaseUrl+'users/quizzes', options).then(function(response){
+    return fetch(config.apiUrl + config.apiBaseUrl + 'users/quizzes', options).then(function (response) {
       return response.json();
-    }).then(function(response){
-      if (!response.success){
+    }).then(function (response) {
+      if (!response.success) {
         throw response.message;
       }
-      if (response.success){
+      if (response.success) {
         dispatch(setUserQuizzes(response.entity));
-        
+
         // load most recent unfinished quizzes as current quizzes.
         // if (response.entity && response.entity.length && response.entity.constructor == Array){
         //   let quizzes = response.entity.sort((a,b) => {
@@ -806,28 +976,28 @@ export function fetchUserQuizzes(forceUpdate){
         //   }
         // }
       }
-    }).catch(function(error){
-        if (error && error.message){
-          dispatch(setUserError(error.message));
-        } else {
-          dispatch(setUserError('An unknown error occurred.'));
-        }
-    }).then(function(){
+    }).catch(function (error) {
+      if (error && error.message) {
+        dispatch(setUserError(error.message));
+      } else {
+        dispatch(setUserError('An unknown error occurred.'));
+      }
+    }).then(function () {
       dispatch(endUserData());
     });
   }
 }
 
-export function loadQuiz(type, id){
-  return function (dispatch, getState){
+export function loadQuiz(type, id) {
+  return function (dispatch, getState) {
     let _quiz, _answers;
-    _quiz = getState().app.user.quizzes.find((q) => { return q.userQuizId == id});
-    if (_quiz) { 
-      _answers = JSON.parse(_quiz.results).answers; 
-      if (type === 'selfAssessment'){
+    _quiz = getState().app.user.quizzes.find((q) => { return q.userQuizId == id });
+    if (_quiz) {
+      _answers = JSON.parse(_quiz.results).answers;
+      if (type === 'selfAssessment') {
         dispatch(setSelfAssessmentQuizCurrentAnswers(_answers));
         dispatch(setSelfAssessmentQuizCurrentUserQuizId(_quiz.userQuizId));
-      } else if (type === 'careerPathways'){
+      } else if (type === 'careerPathways') {
         dispatch(setCareerPathwaysQuizCurrentAnswers(_answers));
         dispatch(setCareerPathwaysQuizCurrentUserQuizId(_quiz.userQuizId));
       }
@@ -836,181 +1006,216 @@ export function loadQuiz(type, id){
     }
   }
 }
-
-export function fetchLogIn(e,p){
-  return function (dispatch, getState){
+//nurse login using API
+export function fetchLoginNurse(e, p) {
+  return function (dispatch, getState) {
     dispatch(requestLogin());
     dispatch(unsetUserError());
-    let data = JSON.stringify({'email': e, 'password': p});
+    let data = JSON.stringify({ 'email': e, 'password': p });
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: data
     }
-    return fetch(config.apiUrl+config.apiBaseUrl+'login', options).then(function(response){
+    return fetch(config.apiUrl + config.apiBaseUrl + 'login', options).then(function (response) {
       return response.json();
-    }).then(function(response){
-      if (!response.success){
+    }).then(function (response) {
+      if (!response.success) {
         throw response;
       }
 
       dispatch(setUserData(response.entity));
-      if (response.entity.token){
+      if (response.entity.token) {
         cookies.setItem('token', response.entity.token, 2592000);
       }
-      
+
       dispatch(setUserLoggedIn());
       dispatch(mapUserDataToAboutYouAnswers());
       dispatch(fetchSaveInProgressQuizzes());
-    }).catch(function(error){
-        if (error && error.message){
-          dispatch(setUserError(error.message));
-        } else {
-          dispatch(setUserError('An unknown error occurred.'));
-        }
-    }).then(function(){
+    }).catch(function (error) {
+      if (error && error.message) {
+        dispatch(setUserError(error.message));
+      } else {
+        dispatch(setUserError('An unknown error occurred.'));
+      }
+    }).then(function () {
       dispatch(endLogin());
     });
   }
 }
-
-// 'Authentication': 'bearer ' + cookies.getItem('token')
-
-
-export function fetchRegister(n,e,p){
-  return function (dispatch, getState){
+//register employer using API
+export function fetchRegisterEmployer(n, e, p) {
+  return function (dispatch, getState) {
     dispatch(requestRegister());
     dispatch(unsetUserError());
-    let data = JSON.stringify({'name': n, 'email': e, 'password': p});
+    let data = JSON.stringify({ 'employerName': n, 'email': e, 'password': p });
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: data
     };
-    return fetch(config.apiUrl+config.apiBaseUrl+'users', options)
-      .then(function(response){
+    return fetch(config.apiUrl + config.apiBaseUrl + 'v1/employers', options)
+      .then(function (response) {
         return response.json();
-      }).then(function(response){
-        if (!response.success){
+      }).then(function (response) {
+        if (!response.success) {
           throw response.message;
         }
         dispatch(setUserData(response.entity));
-        if (response.entity.token){
-          dispatch(fetchCheckUserAuth(response.entity.token));
+        if (response.entity.token) {
+          dispatch(fetchLoginEmployer(e, p));
         }
-      }).catch(function(error){
-        if (error && error.message){
+      }).catch(function (error) {
+        if (error && error.message) {
           dispatch(setUserError(error.message));
         } else {
           dispatch(setUserError('An unknown error occurred.'));
         }
-      }).then(function(){
+      }).then(function () {
+        dispatch(endRegister());
+      });
+  }
+}
+//register nurse using API
+export function fetchRegister(n, e, p) {
+  return function (dispatch, getState) {
+    dispatch(requestRegister());
+    dispatch(unsetUserError());
+    let data = JSON.stringify({ 'name': n, 'email': e, 'password': p });
+    let options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: data
+    };
+    return fetch(config.apiUrl + config.apiBaseUrl + 'users', options)
+      .then(function (response) {
+        return response.json();
+      }).then(function (response) {
+        if (!response.success) {
+          throw response.message;
+        }
+        dispatch(setUserData(response.entity));
+        if (response.entity.token) {
+          dispatch(fetchCheckNurseAuth(response.entity.token));
+        }
+      }).catch(function (error) {
+        if (error && error.message) {
+          dispatch(setUserError(error.message));
+        } else {
+          dispatch(setUserError('An unknown error occurred.'));
+        }
+      }).then(function () {
         dispatch(endRegister());
       });
   }
 }
 
-export function fetchUpdateUserDetails(name,email){
-  return function (dispatch, getState){
+export function fetchUpdateUserDetails(name, email, salary) {
+  return function (dispatch, getState) {
     dispatch(unsetUserError());
-    if ((!name || !email)){
+    if ((!name || !email || !salary)) {
       dispatch(setUserError('Please ensure you have entered the required data.'));
       return;
     }
-    if (!getState().app.user.loggedIn){
+    if (!getState().app.user.loggedIn) {
       dispatch(setUserError('Please ensure you are logged in.'));
       return;
     }
     let data = {
       name: name,
-      email: email
+      email: email,
+      salary: salary,
     };
-    
+
     data = JSON.stringify(data);
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
       },
       body: data
     };
-    return fetch(config.apiUrl+config.apiBaseUrl+'users/edit', options).then(function(response){
-        return response.json();
-      }).then(function(response){
-        if (!response.success){
-          dispatch(setUserError(response.message));
-        } else {
-          dispatch(setUserData(Object.assign({},getState().app.user.user,{name: name, email: email})));
-        }
-      }).catch(function(error){
-        if (error && error.message){
-          dispatch(setUserError(error.message));
-        } else {
-          dispatch(setUserError('An unknown error occurred.'));
-        }
-      })
+
+    return fetch(config.apiUrl + config.apiBaseUrl + 'users/edit', options).then(function (response) {
+      return response.json();
+    }).then(function (response) {
+      if (!response.success) {
+        dispatch(setUserError(response.message));
+      } else {
+        dispatch(setUserData(Object.assign({}, getState().app.user.user, { name: name, email: email, salary: salary })));
+      }
+    }).catch(function (error) {
+      if (error && error.message) {
+        dispatch(setUserError(error.message));
+      } else {
+        dispatch(setUserError('An unknown error occurred.'));
+      }
+    })
   }
 }
 
-export function fetchUpdateUserPassword(pass,newPass){
-  return function (dispatch, getState){
+export function fetchUpdateUserPassword(pass, newPass) {
+  return function (dispatch, getState) {
     dispatch(unsetUserError());
-    if (pass === newPass){
+    if (pass === newPass) {
       return;
     }
-    
+
     let data = {
       password: pass,
       newpassword: newPass
     };
-    
+
     data = JSON.stringify(data);
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
       },
       body: data
     };
-    return fetch(config.apiUrl+config.apiBaseUrl+'users/changepassword', options).then(function(response){
-        return response.json();
-      }).then(function(response){
-        if (!response.success){
-          dispatch(setUserError(response.message));
-        }
-      }).catch(function(error){
-        if (error && error.message){
-          dispatch(setUserError(error.message));
-        } else {
-          dispatch(setUserError('An unknown error occurred.'));
-        }
-      })
+    return fetch(config.apiUrl + config.apiBaseUrl + 'users/changepassword', options).then(function (response) {
+      return response.json();
+    }).then(function (response) {
+      if (!response.success) {
+        dispatch(setUserError(response.message));
+      }
+    }).catch(function (error) {
+      if (error && error.message) {
+        dispatch(setUserError(error.message));
+      } else {
+        dispatch(setUserError('An unknown error occurred.'));
+      }
+    })
   }
 }
 
-export function mapUserDataToAboutYouAnswers(){
-  return function (dispatch, getState){
+export function mapUserDataToAboutYouAnswers() {
+  return function (dispatch, getState) {
     let user = getState().app.user.user;
     let loggedIn = getState().app.user.loggedIn;
     let aboutYouQuestions = getState().app.quiz.aboutYouQuiz;
     let addressObj = {};
-    if (user && loggedIn && aboutYouQuestions && aboutYouQuestions.length > 0){
-      for (var ayq in aboutYouQuestions){
-        if (aboutYouQuestions[ayq].fieldName){
-          let camelCaseFieldName = aboutYouQuestions[ayq].fieldName.substring(0,1).toLowerCase() + aboutYouQuestions[ayq].fieldName.substring(1);
-          if (camelCaseFieldName && camelCaseFieldName != 'undefined' && (camelCaseFieldName == 'address' || typeof user[camelCaseFieldName] != 'undefined')){
+    if (user && loggedIn && aboutYouQuestions && aboutYouQuestions.length > 0) {
+      for (var ayq in aboutYouQuestions) {
+        if (aboutYouQuestions[ayq].fieldName) {
+          let camelCaseFieldName = aboutYouQuestions[ayq].fieldName.substring(0, 1).toLowerCase() + aboutYouQuestions[ayq].fieldName.substring(1);
+          if (camelCaseFieldName && camelCaseFieldName != 'undefined' && (camelCaseFieldName == 'address' || typeof user[camelCaseFieldName] != 'undefined')) {
             let val;
-            if (camelCaseFieldName == 'address'){
+            if (camelCaseFieldName == 'address') {
               addressObj = {
                 country: user.country,
                 suburb: user.suburb,
@@ -1019,15 +1224,15 @@ export function mapUserDataToAboutYouAnswers(){
               };
               dispatch(setAboutYouQuizAnswer(aboutYouQuestions[ayq].questionId, addressObj));
             } else {
-              try{
+              try {
                 val = JSON.parse(user[camelCaseFieldName]);
-              } catch(e){
+              } catch (e) {
                 val = user[camelCaseFieldName];
               }
-              if (val != {} && val != null){
+              if (val != {} && val != null) {
                 dispatch(setAboutYouQuizAnswer(aboutYouQuestions[ayq].questionId, val));
               }
-              
+
             }
           }
         }
@@ -1036,8 +1241,8 @@ export function mapUserDataToAboutYouAnswers(){
   }
 }
 
-export function fetchResetPassword(token,password){
-  return function (dispatch, getState){
+export function fetchResetPassword(token, password) {
+  return function (dispatch, getState) {
     let data = JSON.stringify({
       token: token,
       password: password
@@ -1045,32 +1250,32 @@ export function fetchResetPassword(token,password){
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
       },
       body: data
     };
-    return fetch(config.apiUrl + config.apiBaseUrl + 'users/recover/reset', options).then(function(response){
+    return fetch(config.apiUrl + config.apiBaseUrl + 'users/recover/reset', options).then(function (response) {
       return response.json();
-    }).then(function(response){
-        if (!response.success){
-          dispatch(setUserError(response.message || 'Invalid token'))
-        } else {
-          dispatch(closeModal());
-          dispatch(openModal('resetComplete'));
-        }
+    }).then(function (response) {
+      if (!response.success) {
+        dispatch(setUserError(response.message || 'Invalid token'))
+      } else {
+        dispatch(closeModal());
+        dispatch(openModal('resetComplete'));
+      }
     })
   }
 }
 
-export function fetchRequestResetPassword(email){
-  return function (dispatch, getState){
-    if (!email){
-      if (getState().app.user.user){
+export function fetchRequestResetPassword(email) {
+  return function (dispatch, getState) {
+    if (!email) {
+      if (getState().app.user.user) {
         email = getState().app.user.user.email
       }
-      if (!email){
+      if (!email) {
         dispatch(setUserError("No email provided."));
         return;
       }
@@ -1078,52 +1283,52 @@ export function fetchRequestResetPassword(email){
     let data = JSON.stringify({
       email: email
     });
-    
+
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
       },
       body: data
     };
-    
-    return fetch(config.apiUrl + config.apiBaseUrl + 'users/recover', options).then(function(response){
+
+    return fetch(config.apiUrl + config.apiBaseUrl + 'users/recover', options).then(function (response) {
       return response.json();
-    }).then(function(response){
-        if (!response.success){
-          dispatch(setUserError(response.message || 'Error requesting password reset token.'))
-        } else {
-          dispatch(openModal('resetSent'));
-        }
+    }).then(function (response) {
+      if (!response.success) {
+        dispatch(setUserError(response.message || 'Error requesting password reset token.'))
+      } else {
+        dispatch(openModal('resetSent'));
+      }
     })
   }
 }
 
-export function fetchSaveInProgressQuizzes(quiz){
-  return function (dispatch, getState){
-    if (!cookies.hasItem('token')){
+export function fetchSaveInProgressQuizzes(quiz) {
+  return function (dispatch, getState) {
+    if (!cookies.hasItem('token')) {
       throw "User is not logged in";
     }
-    
+
     var selfAssessmentCurrentAnswers = getState().app.quiz.selfAssessmentCurrentAnswers;
     var careerPathwaysCurrentAnswers = getState().app.quiz.careerPathwaysCurrentAnswers;
     var selfAssessmentCurrentUserQuizId = getState().app.quiz.selfAssessmentCurrentUserQuizId;
     var careerPathwaysCurrentUserQuizId = getState().app.quiz.careerPathwaysCurrentUserQuizId;
-    
+
     var selfAssessmentResults = getState().app.quiz.selfAssessmentResults;
     var careerPathwaysResults = getState().app.quiz.careerPathwaysResults;
-    
+
     var aboutYouAnswers = getState().app.quiz.aboutYouAnswers;
-    
-    if (!quiz || quiz === 'selfAssessment'){
-      if (Object.keys(selfAssessmentCurrentAnswers).length > 0){
+
+    if (!quiz || quiz === 'selfAssessment') {
+      if (Object.keys(selfAssessmentCurrentAnswers).length > 0) {
         let results = {
-            "answers": selfAssessmentCurrentAnswers
-          };
+          "answers": selfAssessmentCurrentAnswers
+        };
         let completed = false;
-        if (Object.keys(selfAssessmentResults).length > 0){
+        if (Object.keys(selfAssessmentResults).length > 0) {
           results.results = selfAssessmentResults;
           completed = true;
         }
@@ -1133,36 +1338,36 @@ export function fetchSaveInProgressQuizzes(quiz){
           "completed": completed,
           "results": results
         };
-        if (selfAssessmentCurrentUserQuizId){data.userQuizId = selfAssessmentCurrentUserQuizId;}
+        if (selfAssessmentCurrentUserQuizId) { data.userQuizId = selfAssessmentCurrentUserQuizId; }
         dispatch(fetchSaveQuiz('selfAssessment', JSON.stringify(data)));
       }
     }
-    
-    if (!quiz || quiz === 'careerPathways'){
-      if (Object.keys(careerPathwaysCurrentAnswers).length > 0 ){
+
+    if (!quiz || quiz === 'careerPathways') {
+      if (Object.keys(careerPathwaysCurrentAnswers).length > 0) {
         let results = {
-            "answers": careerPathwaysCurrentAnswers
+          "answers": careerPathwaysCurrentAnswers
         };
         let completed = false;
-        if (Object.keys(careerPathwaysResults).length > 0){
+        if (Object.keys(careerPathwaysResults).length > 0) {
           completed = true;
           results.results = careerPathwaysResults;
         }
         results = JSON.stringify(results);
-        
+
         let data = {
           "quizId": 1,
           "completed": completed,
           "results": results
-        };  
-        if (careerPathwaysCurrentUserQuizId){data.userQuizId = careerPathwaysCurrentUserQuizId;}
+        };
+        if (careerPathwaysCurrentUserQuizId) { data.userQuizId = careerPathwaysCurrentUserQuizId; }
         dispatch(fetchSaveQuiz('careerPathways', JSON.stringify(data)));
       }
     }
-    
-    if (aboutYouAnswers && Object.keys(aboutYouAnswers).length > 0){
-      for (let answer in aboutYouAnswers){
-        if (aboutYouAnswers[answer] && aboutYouAnswers[answer] != undefined && aboutYouAnswers[answer].constructor == Array){
+
+    if (aboutYouAnswers && Object.keys(aboutYouAnswers).length > 0) {
+      for (let answer in aboutYouAnswers) {
+        if (aboutYouAnswers[answer] && aboutYouAnswers[answer] != undefined && aboutYouAnswers[answer].constructor == Array) {
           aboutYouAnswers[answer] = JSON.stringify(aboutYouAnswers[answer]);
         }
       }
@@ -1178,56 +1383,56 @@ export function fetchSaveInProgressQuizzes(quiz){
 }
 
 // self assessment is hardcoded quiz id 0, career pathways 1
-export function fetchSaveQuiz(type, data){ 
-  return function (dispatch, getState){
-    if (!cookies.hasItem('token')){
+export function fetchSaveQuiz(type, data) {
+  return function (dispatch, getState) {
+    if (!cookies.hasItem('token')) {
       throw "User is not logged in";
     }
-    
-    if (!data || data == {}){
+
+    if (!data || data == {}) {
       return;
     }
-    
+
     let _type, uqid;
-    
-    if (type === 'careerPathways'){
+
+    if (type === 'careerPathways') {
       _type = 'career';
       uqid = getState().app.quiz.careerPathwaysCurrentUserQuizId;
     }
-    if (type === 'selfAssessment'){
+    if (type === 'selfAssessment') {
       _type = 'selfassessment';
       uqid = getState().app.quiz.selfAssessmentCurrentUserQuizId;
     }
-    if (type === 'aboutYou'){
+    if (type === 'aboutYou') {
       _type = 'aboutyou';
     }
-    
+
     dispatch(unsetUserError());
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
       },
       body: data
     };
     return fetch(config.apiUrl + config.apiBaseUrl + 'users/quiz/' + _type + '/save', options)
-      .then(function(response){
+      .then(function (response) {
         return response.json();
-      }).then(function(response){
-        if (!response.success){
+      }).then(function (response) {
+        if (!response.success) {
           throw response.message;
         }
-        if (!uqid){
-          if (_type === 'career'){
+        if (!uqid) {
+          if (_type === 'career') {
             dispatch(setCareerPathwaysQuizCurrentUserQuizId(response.entity));
-          } else if (_type === 'selfassessment'){
+          } else if (_type === 'selfassessment') {
             dispatch(setSelfAssessmentQuizCurrentUserQuizId(response.entity));
           }
         }
-      }).catch(function(error){
-        if (error && error.message){
+      }).catch(function (error) {
+        if (error && error.message) {
           dispatch(setUserError(error.message));
         } else {
           dispatch(setUserError('An unknown error occurred.'));
@@ -1238,7 +1443,7 @@ export function fetchSaveQuiz(type, data){
 
 export function fetchSaveAnonymousCarerrQuiz(data) {
   return function (dispatch, getState) {
-    if (!cookies.hasItem('token')){
+    if (!cookies.hasItem('token')) {
 
       let data = {
         careerPathwaysCurrentAnswers: getState().app.quiz.careerPathwaysCurrentAnswers,
@@ -1248,26 +1453,26 @@ export function fetchSaveAnonymousCarerrQuiz(data) {
       let options = {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify(data)
       };
-      return fetch(config.apiUrl+config.apiBaseUrl+'report/saveanoncareerreport', options).then(
+      return fetch(config.apiUrl + config.apiBaseUrl + 'report/saveanoncareerreport', options).then(
         () => console.log("career info saved")
       ).catch((error) => console.log(error))
     }
   }
 }
 
-export function fetchContactRequest(name,phone,email,message,sectorName){
-  return function (dispatch, getState){
+export function fetchContactRequest(name, phone, email, message, sectorName) {
+  return function (dispatch, getState) {
     dispatch(unsetUserError());
-    if (!name || !phone || !email || !message){
+    if (!name || !phone || !email || !message) {
       dispatch(setUserError("Please fill in all required information."));
       return;
     }
-    
+
     let data = JSON.stringify({
       name: name,
       email: email,
@@ -1275,46 +1480,46 @@ export function fetchContactRequest(name,phone,email,message,sectorName){
       message: message,
       sectorName: sectorName
     });
-    
+
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: data
     };
     return fetch(config.apiUrl + config.apiBaseUrl + 'Framework/contact', options)
-    .then(function(response){
-      return response.json();
-    }).then(function(response){
-      if (!response.success){
-        dispatch(setUserError(response.message));
-        return false;
-      }
-      return true;
-    })
+      .then(function (response) {
+        return response.json();
+      }).then(function (response) {
+        if (!response.success) {
+          dispatch(setUserError(response.message));
+          return false;
+        }
+        return true;
+      })
   }
 }
 
-export function fetchSaveCompletedQuiz(type, redirect){
-  return function (dispatch, getState){
-    if (!cookies.hasItem('token')){
+export function fetchSaveCompletedQuiz(type, redirect) {
+  return function (dispatch, getState) {
+    if (!cookies.hasItem('token')) {
       dispatch(completeRequestCareerPathwaysQuizResults());
       dispatch(completeRequestSelfAssessmentQuizResults());
       return;
     }
-    
+
     let _type, uqid, answers, results, data, quizId, survey;
-    
-    if (type === 'careerPathways'){
+
+    if (type === 'careerPathways') {
       _type = 'career';
       uqid = getState().app.quiz.careerPathwaysCurrentUserQuizId;
       answers = getState().app.quiz.careerPathwaysCurrentAnswers;
       results = getState().app.quiz.careerPathwaysResults;
       quizId = 1;
     }
-    if (type === 'selfAssessment'){
+    if (type === 'selfAssessment') {
       _type = 'selfassessment';
       uqid = getState().app.quiz.selfAssessmentCurrentUserQuizId;
       answers = getState().app.quiz.selfAssessmentCurrentAnswers;
@@ -1322,8 +1527,8 @@ export function fetchSaveCompletedQuiz(type, redirect){
       quizId = 0;
       survey = getState().app.quiz.surveyAnswer;
     }
-    
-    
+
+
     data = {
       quizId: quizId,
       completed: true,
@@ -1332,69 +1537,69 @@ export function fetchSaveCompletedQuiz(type, redirect){
         results: results,
       })
     };
-    
-    if (uqid){
+
+    if (uqid) {
       data.userQuizId = uqid;
-    } 
-    if (survey){
+    }
+    if (survey) {
       data.survey = survey;
     }
-    
+
     let aboutYouAnswers = getState().app.quiz.aboutYouAnswers;
-    if (aboutYouAnswers && Object.keys(aboutYouAnswers).length > 0){
+    if (aboutYouAnswers && Object.keys(aboutYouAnswers).length > 0) {
       let sa = JSON.stringify(aboutYouAnswers);
       let aboutYouData = JSON.stringify({
         "answers": sa
       })
       dispatch(fetchSaveQuiz('aboutYou', aboutYouData));
     }
-    
+
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + cookies.getItem('token')
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + cookies.getItem('token')
       },
       body: JSON.stringify(data)
     };
     return fetch(config.apiUrl + config.apiBaseUrl + 'users/quiz/' + _type + '/save', options)
-      .then(function(response){
+      .then(function (response) {
         return response.json();
-      }).then(function(response){
-        if (!response.success){
+      }).then(function (response) {
+        if (!response.success) {
           throw response.message;
         }
-        if (_type === 'career'){
+        if (_type === 'career') {
           dispatch(setCareerPathwaysQuizCurrentAnswers({}));
           dispatch(setCareerPathwaysQuizCurrentUserQuizId(null));
-          if (redirect){
+          if (redirect) {
             dispatch(setCareerPathwaysQuizResults({}));
             dispatch(completeRequestCareerPathwaysQuizResults());
-            if (uqid){
-              dispatch(push('/results/careerPathways/'+uqid))
-            }else{
-              dispatch(push('/results/careerPathways/'+response.entity))
+            if (uqid) {
+              dispatch(push('/results/careerPathways/' + uqid))
+            } else {
+              dispatch(push('/results/careerPathways/' + response.entity))
             }
-            
+
           }
         };
-        if (_type === 'selfassessment'){
+        if (_type === 'selfassessment') {
           dispatch(setSelfAssessmentQuizCurrentAnswers({}));
           dispatch(setSelfAssessmentQuizCurrentUserQuizId(null));
-          if (redirect){
+          if (redirect) {
             dispatch(setSelfAssessmentQuizResults({}));
             dispatch(completeRequestSelfAssessmentQuizResults());
-            if (uqid){
-              dispatch(push('/results/selfAssessment/'+uqid))
-            }else{
-              dispatch(push('/results/selfAssessment/'+response.entity))
+            if (uqid) {
+              dispatch(push('/results/selfAssessment/' + uqid))
+            } else {
+              dispatch(push('/results/selfAssessment/' + response.entity))
             }
           }
         };
         dispatch(fetchUserQuizzes(true));
-      }).catch(function(error){
-        if (error && error.message){
+      }).catch(function (error) {
+        if (error && error.message) {
           dispatch(setUserError(error.message));
         } else {
           dispatch(setUserError('An unknown error occurred.'));
@@ -1403,35 +1608,35 @@ export function fetchSaveCompletedQuiz(type, redirect){
   }
 }
 
-export function fetchArticleList(){
-  return function (dispatch, getState){
+export function fetchArticleList() {
+  return function (dispatch, getState) {
     const cached = getState().app.articles.articleList;
     dispatch(requestArticleList());
-    
-    if (cached && cached.length > 0){
+
+    if (cached && cached.length > 0) {
       dispatch(setArticleListData(cached));
       dispatch(completeRequestArticleList());
       return;
     }
-    
+
     return dummyFetch('/articles/list').then(response => response.json())
-    .then(json => {
-      dispatch(setArticleListData(json));
-      dispatch(completeRequestArticleList());
-    })
+      .then(json => {
+        dispatch(setArticleListData(json));
+        dispatch(completeRequestArticleList());
+      })
   }
 }
 
-export function fetchSelfAssessmentQuizData(){
-  return function(dispatch, getState){
+export function fetchSelfAssessmentQuizData() {
+  return function (dispatch, getState) {
     const cached = getState().app.quiz.selfAssessment;
     dispatch(requestSelfAssessmentQuizContent());
-    
-    if (cached && cached.length > 0){
+
+    if (cached && cached.length > 0) {
       dispatch(completeRequestSelfAssessmentQuizContent());
       return;
     }
-    
+
     // return dummyFetch('/quiz/selfAssessment').then(response => response.json())
     // .then(json => {
     //   dispatch(setSelfAssessmentQuizContent(json));
@@ -1442,55 +1647,55 @@ export function fetchSelfAssessmentQuizData(){
   }
 }
 
-export function fetchCareerPathwaysQuizData(){
-  return function(dispatch, getState){
+export function fetchCareerPathwaysQuizData() {
+  return function (dispatch, getState) {
     const cached = getState().app.quiz.careerPathways;
     dispatch(requestCareerPathwaysQuizContent());
-    
-    if (cached && cached.length > 0){
+
+    if (cached && cached.length > 0) {
       dispatch(completeRequestCareerPathwaysQuizContent());
       return;
     }
-    
+
     dispatch(fetchFrameworkData('questions'));
     dispatch(completeRequestCareerPathwaysQuizContent());
   }
 }
 
-export function fetchCareerPathwaysQuizResults(){
-  return function(dispatch, getState){
+export function fetchCareerPathwaysQuizResults() {
+  return function (dispatch, getState) {
     var quiz = getState().app.quiz.careerPathways
     var userAnswers = getState().app.quiz.careerPathwaysCurrentAnswers;
     var mappedAnswers = [];
-    for(var a in userAnswers) {
-      if(userAnswers.hasOwnProperty(a)) {
-          mappedAnswers.push({
-            questionId: a,
-            value: userAnswers[a]
-          })
+    for (var a in userAnswers) {
+      if (userAnswers.hasOwnProperty(a)) {
+        mappedAnswers.push({
+          questionId: a,
+          value: userAnswers[a]
+        })
       }
     }
     let patients = [];
     let patientsLookup = {};
-    
-    let pq = getState().app.quiz.aboutYouQuiz.find((ayq) => { return ayq.fieldName == 'Patients'});
-    if (pq){
-      for (let plq of pq.answers){
+
+    let pq = getState().app.quiz.aboutYouQuiz.find((ayq) => { return ayq.fieldName == 'Patients' });
+    if (pq) {
+      for (let plq of pq.answers) {
         patientsLookup[plq.value] = plq.text;
       }
     }
-    
-    if (getState().app.user.user && getState().app.user.user.patients){
+
+    if (getState().app.user.user && getState().app.user.user.patients) {
       patients = JSON.parse(getState().app.user.user.patients);
     } else {
-      if (pq && getState().app.quiz.aboutYouAnswers && getState().app.quiz.aboutYouAnswers[pq.questionId]){
+      if (pq && getState().app.quiz.aboutYouAnswers && getState().app.quiz.aboutYouAnswers[pq.questionId]) {
         patients = getState().app.quiz.aboutYouAnswers[pq.questionId];
       }
     }
-    
+
     dispatch(requestCareerPathwaysQuizResults());
-    
-    return scoreCareerQuiz(mappedAnswers,getState().app.framework.sectors,getState().app.framework.sectorScores, quiz,patients,patientsLookup).then(json => {
+
+    return scoreCareerQuiz(mappedAnswers, getState().app.framework.sectors, getState().app.framework.sectorScores, quiz, patients, patientsLookup).then(json => {
       dispatch(setCareerPathwaysQuizResults(json));
       dispatch(completeRequestCareerPathwaysQuizResults());
     }).then(() => {
@@ -1498,16 +1703,16 @@ export function fetchCareerPathwaysQuizResults(){
     });
   }
 }
-export function fetchSelfAssessmentQuizResults(framework){
-  return function(dispatch, getState){
+export function fetchSelfAssessmentQuizResults(framework) {
+  return function (dispatch, getState) {
     var quiz = getState().app.quiz.selfAssessment;
     var userAnswers = getState().app.quiz.selfAssessmentCurrentAnswers;
     var mappedAnswers = [];
-    for(var a in userAnswers) {
-      if(userAnswers.hasOwnProperty(a)) {
-        var qq = quiz.find((q) => {return q.questionId == +a});
+    for (var a in userAnswers) {
+      if (userAnswers.hasOwnProperty(a)) {
+        var qq = quiz.find((q) => { return q.questionId == +a });
         // until i get real data from server gonna use my dumb aspect id thing.
-        if (qq.aspectId){
+        if (qq.aspectId) {
           var qqDomainId = qq.domainId;
           var qqAspectId = qq.aspectId;
           var mappedAnswer = {
@@ -1520,9 +1725,9 @@ export function fetchSelfAssessmentQuizResults(framework){
         }
       }
     }
-    
+
     dispatch(requestSelfAssessmentQuizResults());
-    
+
     return scoreSelfAssessmentQuiz(mappedAnswers, getState().app.framework.aspects, framework).then(json => {
       dispatch(setSelfAssessmentQuizResults(json));
       dispatch(fetchSaveCompletedQuiz('selfAssessment', true));
@@ -1530,58 +1735,58 @@ export function fetchSelfAssessmentQuizResults(framework){
   }
 }
 
-export function fetchPageData(endpoint){
-  return function (dispatch, getState){
+export function fetchPageData(endpoint) {
+  return function (dispatch, getState) {
     const cached = getState().app.content.sections;
     dispatch(requestPageContent(endpoint));
-    
-    if (cached && cached.length > 0){
+
+    if (cached && cached.length > 0) {
       dispatch(completeRequestPageContent());
       return;
     }
-    
+
     dispatch(fetchFrameworkData());
     dispatch(completeRequestPageContent());
   }
 }
 
-export function scoreSelfAssessmentQuiz(answers, aspects, framework){
+export function scoreSelfAssessmentQuiz(answers, aspects, framework) {
   var scores = {};
   var averages = {};
   var actions = {};
-  if (!framework){framework = 'rn'}
-  for (let a of answers){
+  if (!framework) { framework = 'rn' }
+  for (let a of answers) {
     var domainId = a.domainId
-    if (!scores[domainId]){ scores[domainId] = 0; }
+    if (!scores[domainId]) { scores[domainId] = 0; }
     scores[domainId] += +a.value;
-    
+
     // actions
-    let answerAspect = aspects.find((asp) => { return asp.aspectId == a.aspectId});
-    if (answerAspect){
-      let actionsToAdd = answerAspect.actionsList.filter((act) => { return act.levelAction > a.answerValue || act.levelAction == 2});
-      if (!actions[""+a.domainId]){
-        actions[""+a.domainId] = [];
+    let answerAspect = aspects.find((asp) => { return asp.aspectId == a.aspectId });
+    if (answerAspect) {
+      let actionsToAdd = answerAspect.actionsList.filter((act) => { return act.levelAction > a.answerValue || act.levelAction == 2 });
+      if (!actions["" + a.domainId]) {
+        actions["" + a.domainId] = [];
       }
-      for (let act in actionsToAdd){
-        let currentDomainActions = actions[""+a.domainId].find((action) => { return actionsToAdd[act].actionId == action.actionId});
+      for (let act in actionsToAdd) {
+        let currentDomainActions = actions["" + a.domainId].find((action) => { return actionsToAdd[act].actionId == action.actionId });
         let duplicate = currentDomainActions && currentDomainActions.length > 0;
-        if (!duplicate){
-          actions[""+a.domainId].push(actionsToAdd[act].actionId);
+        if (!duplicate) {
+          actions["" + a.domainId].push(actionsToAdd[act].actionId);
         }
       }
     }
     // /actions
-    
+
   }
-  for(let s in scores){
-    var numberInDomain = answers.filter((ss,ii) => { return +ss.domainId == +s }).length;
+  for (let s in scores) {
+    var numberInDomain = answers.filter((ss, ii) => { return +ss.domainId == +s }).length;
     averages[s] = scores[s] / numberInDomain;
   }
-  
-  var dateString =  new Date().toDateString().split(' ');
+
+  var dateString = new Date().toDateString().split(' ');
   dateString = dateString[2] + ' ' + dateString[1] + ' ' + dateString[3];
-  
-  return new Promise((res,rej) => {
+
+  return new Promise((res, rej) => {
     setTimeout(() => {
       res({
         score: averages,
@@ -1594,8 +1799,8 @@ export function scoreSelfAssessmentQuiz(answers, aspects, framework){
   });
 }
 
-export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizId, download, saveOnly){
-  return function (dispatch, getState){
+export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizId, download, saveOnly) {
+  return function (dispatch, getState) {
     let domainIdNameLookup = {};
     let aspectsByDomain = {};
     let aspectStrengthsByDomain = {};
@@ -1608,26 +1813,26 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
       anon = false
     }
 
-    if (quiz == null){
-      if (quizId == null || isNaN(+quizId)){
+    if (quiz == null) {
+      if (quizId == null || isNaN(+quizId)) {
         quiz = {
           answers: getState().app.quiz.selfAssessmentCurrentAnswers,
           results: getState().app.quiz.selfAssessmentResults
         }
         anon = true;
-      }else{
-        quiz = JSON.parse(getState().app.user.quizzes.find((q) => { return q.userQuizId == quizId}).results);
+      } else {
+        quiz = JSON.parse(getState().app.user.quizzes.find((q) => { return q.userQuizId == quizId }).results);
       }
-      
+
     }
     let frameworkDomains = getState().app.framework.domain.filter((d) => {
       return d.framework == quiz.results.framework;
     });
 
-    for( var d in frameworkDomains){
-      let currentDomain = frameworkDomains[""+d];
-      let _ass = getState().app.framework.aspects.filter((a) => { return a.domainId == currentDomain.domainId});
-      let _questionAnswers = getState().app.quiz.selfAssessment.filter((e) => { 
+    for (var d in frameworkDomains) {
+      let currentDomain = frameworkDomains["" + d];
+      let _ass = getState().app.framework.aspects.filter((a) => { return a.domainId == currentDomain.domainId });
+      let _questionAnswers = getState().app.quiz.selfAssessment.filter((e) => {
         return typeof quiz.answers[e.questionId] != "undefined"
       });
 
@@ -1635,26 +1840,26 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
         return {
           aspectId: q.aspectId,
           answerValue: quiz.answers[q.questionId],
-          answerText: q.answers.find((a) => { return a.value == quiz.answers[q.questionId]}).text
+          answerText: q.answers.find((a) => { return a.value == quiz.answers[q.questionId] }).text
         }
       });
-      
+
       aspectStrengthsByDomain["" + currentDomain.domainId] = mappedQuestionAnswers.filter((qa) => {
-          return _ass.find((a) => { return qa.aspectId == a.aspectId && qa.answerValue >= 0.33 });
-      }).sort((a,b) => {
-        if (a.answerValue < b.answerValue){return 1;}
-        if (a.answerValue > b.answerValue){return -1;}
+        return _ass.find((a) => { return qa.aspectId == a.aspectId && qa.answerValue >= 0.33 });
+      }).sort((a, b) => {
+        if (a.answerValue < b.answerValue) { return 1; }
+        if (a.answerValue > b.answerValue) { return -1; }
         return 0;
       }).map((e) => {
         return e.aspectId;
-      }).slice(0,3);
-      
-      aspectsByDomain[""+currentDomain.domainId] = _ass.map((ass) => {
+      }).slice(0, 3);
+
+      aspectsByDomain["" + currentDomain.domainId] = _ass.map((ass) => {
         let _qa = mappedQuestionAnswers.find((a) => { return a.aspectId == ass.aspectId });
         return {
           aspectId: ass.aspectId,
           answer: _qa.answerValue,
-          answerText: _qa.answerText.replace(/’/g,"'"),
+          answerText: _qa.answerText.replace(/’/g, "'"),
           name: ass.title,
           definition: ass.text.replace(/<\/?[^>]+(>|$)/g, ""),
           actionsToGrow: ass.actionsList.filter((a) => { return (a.levelAction == 2 && _qa.answerValue >= 0.66) || (a.levelAction == 1 && _qa.answerValue >= 0.33 && _qa.answerValue < 0.66) || (a.levelAction == 0 && _qa.answerValue < 0.33) }).map((a) => { return { text: a.title } }).slice(0, 4)
@@ -1665,15 +1870,15 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
       // -- Start get actions and push them into our action list.
       /*let actionsToAdd = aspectsByDomain[""+currentDomain.domainId];
       var hasDuplicateAction = false;
-
+ 
       for (var e in actionsToAdd){
         let actionsToGrow = actionsToAdd["" + e].actionsToGrow;
-
+ 
         for (var f in actionsToGrow) {
           if (currentDomain.actionsList.length > 9) { // getting only a max limit of 10 items
             break;
           }
-
+ 
           // Check for duplicates before adding to actions.
           hasDuplicateAction = false;
           for (var g in currentDomain.actionsList) {
@@ -1681,7 +1886,7 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
               hasDuplicateAction = true;
             }
           }
-
+ 
           if (!hasDuplicateAction) { // If false, push to array otherwise we found a duplicate so skip..
             currentDomain.actionsList.push(actionsToGrow["" + f]);
           }
@@ -1690,18 +1895,18 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
       // -- End get actions
 
 
-      topActionsByDomain[""+currentDomain.domainId] = currentDomain.actionsList;
-      domainIdNameLookup[""+currentDomain.domainId] = currentDomain.title;
+      topActionsByDomain["" + currentDomain.domainId] = currentDomain.actionsList;
+      domainIdNameLookup["" + currentDomain.domainId] = currentDomain.title;
 
       //console.log('currentDomain.actionsList', currentDomain.actionsList);
       //console.log('topActionsByDomain[""+currentDomain.domainId]', currentDomain.domainId, topActionsByDomain[""+currentDomain.domainId]);
     }
     //return;
-    
+
     let postCards = shuffle(getState().app.framework.postcards);
-    
-    
-    
+
+
+
     let resUser = {
       name: user.name || name,
       date: quiz.results.date,
@@ -1727,10 +1932,10 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
       email: email,
       saveOnly: saveOnly
     }
-    
+
     let data
 
-    if (anon){
+    if (anon) {
       data = JSON.stringify(resAnon)
     } else {
       data = JSON.stringify(resUser)
@@ -1739,53 +1944,53 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
     let options = {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: data
     }
     let endpoint;
-    if (user.name){
+    if (user.name) {
       options.headers.Authorization = 'Bearer ' + cookies.getItem('token');
       endpoint = 'report'
-    }else{
+    } else {
       endpoint = 'report/anonymous'
     }
-    
-    if (download){
-    return fetch(config.apiUrl+config.apiBaseUrl+'report/download', options).then(function(response){
-      return response.blob();
-    }).then(function(response){
-      let filename = "Report-" + new Date().getTime() + ".pdf";
-      if (typeof window.chrome !== 'undefined') {
+
+    if (download) {
+      return fetch(config.apiUrl + config.apiBaseUrl + 'report/download', options).then(function (response) {
+        return response.blob();
+      }).then(function (response) {
+        let filename = "Report-" + new Date().getTime() + ".pdf";
+        if (typeof window.chrome !== 'undefined') {
           // Chrome version
           var link = document.createElement('a');
           link.href = URL.createObjectURL(response);
           link.download = filename;
           link.click();
-      } else if (typeof window.navigator.msSaveBlob !== 'undefined') {
+        } else if (typeof window.navigator.msSaveBlob !== 'undefined') {
           // IE version
           var blob = new Blob([response], { type: 'application/pdf' });
           window.navigator.msSaveBlob(blob, filename);
-      } else {
+        } else {
           // Firefox version
           var file = new File([response], filename, { type: 'application/force-download' });
           window.open(URL.createObjectURL(file));
-      }
-      
-    });
-    }else{
-      return fetch(config.apiUrl+config.apiBaseUrl+endpoint, options).then(function(response){
+        }
+
+      });
+    } else {
+      return fetch(config.apiUrl + config.apiBaseUrl + endpoint, options).then(function (response) {
         return response.json();
-      }).then(function(response){
-      
+      }).then(function (response) {
+
       });
     }
-    
+
 
 
   }
-  
+
   //name
   //date
   //domainName lookup {id: name}
@@ -1801,17 +2006,17 @@ export function selfAssessmentResultsToReportJSON(quiz, user, name, email, quizI
   //    action {text}
 }
 
-export function scoreCareerQuiz(answers,sectors,scoring,quizData,patients,patientsLookup){
+export function scoreCareerQuiz(answers, sectors, scoring, quizData, patients, patientsLookup) {
   var sectorScores = {};
   var sectorPositives = {};
   var sectorNegatives = {};
   var sectorPercentages = {};
   var sectorDifferenceCeilings = {};
-  
+
   // hard coding this because it was not scoped and is being put in too late
   var invalidPatientTypesBySector = {
     "1": [], //general
-    "2": [1,6,3,4,2], //residential
+    "2": [1, 6, 3, 4, 2], //residential
     "3": [], // refugee
     "4": [], // community
     "5": [1], // correctional
@@ -1821,67 +2026,67 @@ export function scoreCareerQuiz(answers,sectors,scoring,quizData,patients,patien
     "9": [1], // sexual health
     "10": [], // hospital setting
   }
-  
-  for (let sec of scoring){
-    sectorDifferenceCeilings[sec.sectorId] = sec.idealAnswers.reduce((acc,val) => {
+
+  for (let sec of scoring) {
+    sectorDifferenceCeilings[sec.sectorId] = sec.idealAnswers.reduce((acc, val) => {
       let aVal = +(val.value);
-      if (aVal == 0){aVal = 1}
+      if (aVal == 0) { aVal = 1 }
       return acc + aVal;
-    },1);
-    
-    if (!sectorNegatives[sec.sectorId]){ sectorNegatives[sec.sectorId] = []; }
-    if (!sectorPositives[sec.sectorId]){ sectorPositives[sec.sectorId] = []; }
-    
+    }, 1);
+
+    if (!sectorNegatives[sec.sectorId]) { sectorNegatives[sec.sectorId] = []; }
+    if (!sectorPositives[sec.sectorId]) { sectorPositives[sec.sectorId] = []; }
+
     var patientsDiff = 0;
     let skipInvalidPatientsCheck = false;
-    if (invalidPatientTypesBySector[""+sec.sectorId]){
-      if (patients.constructor == Array){
-        if (patients.includes(7)){
+    if (invalidPatientTypesBySector["" + sec.sectorId]) {
+      if (patients.constructor == Array) {
+        if (patients.includes(7)) {
           skipInvalidPatientsCheck = true;
         }
-      } else if (patients.constructor == String || patients.constructor == Number){
-        if (patients == "7"){
+      } else if (patients.constructor == String || patients.constructor == Number) {
+        if (patients == "7") {
           skipInvalidPatientsCheck = true;
         }
       }
-      if (!skipInvalidPatientsCheck){
+      if (!skipInvalidPatientsCheck) {
         let foundInvalid = false;
-        for (let pt of patients){
-          if (invalidPatientTypesBySector[""+sec.sectorId].includes(pt)){
+        for (let pt of patients) {
+          if (invalidPatientTypesBySector["" + sec.sectorId].includes(pt)) {
             foundInvalid = true;
             sectorNegatives[sec.sectorId].push("Do not work with " + patientsLookup[pt]);
           } else {
             sectorPositives[sec.sectorId].push("Work with " + patientsLookup[pt]);
           }
         }
-        if (foundInvalid){patientsDiff = 0.1;}
+        if (foundInvalid) { patientsDiff = 0.1; }
       }
 
     }
-  
-    
-    for (let sectorAnswer of sec.idealAnswers){ 
 
-      var userAnswer = answers.find((a) => {return a.questionId == sectorAnswer.questionId});
-      if (!userAnswer){continue;} // this shouldn't happen but uhh lets ignore it anyway
-      
+
+    for (let sectorAnswer of sec.idealAnswers) {
+
+      var userAnswer = answers.find((a) => { return a.questionId == sectorAnswer.questionId });
+      if (!userAnswer) { continue; } // this shouldn't happen but uhh lets ignore it anyway
+
       if (!sectorScores[sec.sectorId]) { sectorScores[sec.sectorId] = 0; }
-      
+
       var diff = Math.abs(userAnswer.value - sectorAnswer.value);
-      
+
       let matchText;
       let matchedAnswer = quizData.find((q) => {
         return q.questionId === sectorAnswer.questionId;
       }).answers.find((a) => {
         return a.value === sectorAnswer.value;
       });
-      if (matchedAnswer){ matchText = matchedAnswer.matchText }
-      if (matchText){
-        if (diff <= 0.5){
-          if (!sectorPositives[sec.sectorId]){ sectorPositives[sec.sectorId] = []; }
+      if (matchedAnswer) { matchText = matchedAnswer.matchText }
+      if (matchText) {
+        if (diff <= 0.5) {
+          if (!sectorPositives[sec.sectorId]) { sectorPositives[sec.sectorId] = []; }
           sectorPositives[sec.sectorId].push(matchText);
-        }else if (diff >= 0.6){
-          if (!sectorNegatives[sec.sectorId]){ sectorNegatives[sec.sectorId] = []; }
+        } else if (diff >= 0.6) {
+          if (!sectorNegatives[sec.sectorId]) { sectorNegatives[sec.sectorId] = []; }
           sectorNegatives[sec.sectorId].push(matchText);
         }
       }
@@ -1890,11 +2095,11 @@ export function scoreCareerQuiz(answers,sectors,scoring,quizData,patients,patien
     }
   }
 
-  var dateString =  new Date().toDateString().split(' ');
+  var dateString = new Date().toDateString().split(' ');
   dateString = dateString[2] + ' ' + dateString[1] + ' ' + dateString[3];
-  
+
   //return sectorScores;
-  return new Promise((res,rej) => {
+  return new Promise((res, rej) => {
     setTimeout(() => {
       res({
         score: sectorScores,
@@ -1903,7 +2108,7 @@ export function scoreCareerQuiz(answers,sectors,scoring,quizData,patients,patien
         scorePercentages: sectorPercentages,
         date: dateString,
         id: 0
-         });
+      });
     }, 1500);
   });
 }

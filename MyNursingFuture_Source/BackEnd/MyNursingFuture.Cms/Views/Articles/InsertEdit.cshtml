@@ -173,7 +173,15 @@
                     <div class="col-xs-4">
                         @Html.ActionLink("Reasons Carousel", "InsertGenericItemArticle", "ContentItems", new { articleId = @Model.ArticleId, type = "REASONSLIST" }, new { @class = "btn" })
                     </div>
-
+                    <div class="col-xs-4">
+                        @Html.ActionLink("Auth Nurse", "InsertGenericItemArticle", "ContentItems", new { articleId = @Model.ArticleId, type = "AUTHNURSE" }, new { @class = "btn" })
+                    </div>
+                    <div class="col-xs-4">
+                        @Html.ActionLink("Auth Employer", "InsertGenericItemArticle", "ContentItems", new { articleId = @Model.ArticleId, type = "AUTHEMPLOYER" }, new { @class = "btn" })
+                    </div>
+                    <div class="col-xs-4">
+                        @Html.ActionLink("Job Listings", "InsertGenericItemArticle", "ContentItems", new { articleId = @Model.ArticleId, type = "JOBLISTINGS" }, new { @class = "btn" })
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

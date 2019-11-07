@@ -2261,6 +2261,9 @@ export const defaultPageContentByEndpoint = {
     name: '',
     email: '',
     amsId: '', // reference to their ams user ref
+    minSalaryReq: '',
+    locationPref: '',
+    isLookingForJob: ''
   },
   '/user/quiz/career/inprogress': [],
   '/user/quiz/career/complete': [],

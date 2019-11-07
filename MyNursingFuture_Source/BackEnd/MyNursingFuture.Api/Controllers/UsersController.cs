@@ -381,10 +381,14 @@ namespace MyNursingFuture.Api.Controllers
         [Route("api/users/edit")]
         public HttpResponseMessage EditDetails([FromBody]UserModel userModel)
         {
+<<<<<<< HEAD
+            if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Name) || string.IsNullOrEmpty(value.Salary))
+=======
             var value = new UserEntity();
             PropertyCopier<UserModel, UserEntity>.Copy(userModel, value);
 
             if (string.IsNullOrEmpty(value.Email) || string.IsNullOrEmpty(value.Name))
+>>>>>>> bc980297bb8da53481415626ba19c77f0623152c
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
             }
@@ -395,6 +399,13 @@ namespace MyNursingFuture.Api.Controllers
             object objuser = null;
             Request.Properties.TryGetValue("user", out objuser);
             var user = objuser as UserEntity;
+<<<<<<< HEAD
+            user.Salary = value.Salary;
+            user.Email = value.Email;
+            user.Name = value.Name;
+            var result = _usersManager.UpdateDetails(user);
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+=======
             value.UserId = user.UserId;
             value.ModifyDate = DateTime.Now;
 
@@ -415,6 +426,7 @@ namespace MyNursingFuture.Api.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.BadRequest, new Result(false));
+>>>>>>> bc980297bb8da53481415626ba19c77f0623152c
         }
 
         /// <summary>
