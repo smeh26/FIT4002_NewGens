@@ -30,6 +30,8 @@ namespace MyNursingFuture.DL.Models
         public Nullable<bool> IsDeclined { set; get; }
         public Nullable<DateTime> DeclinedDate { get; set; }
         public DateTime LastModifiedDate { get; set; }
+        public int ExpectedSalary { get; set; }
+        public Nullable<DateTime> MakeContactDeadline { get; set; }
 
     }
 }

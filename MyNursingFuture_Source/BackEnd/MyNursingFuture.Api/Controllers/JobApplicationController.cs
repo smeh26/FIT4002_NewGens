@@ -148,7 +148,11 @@ namespace MyNursingFuture.Api.Controllers
                 jobApplication.ApplicationStatus = ApplicationStatus.Submitted.ToString();
             }
 
+            var nurse = (UserEntity)_usersManager.GetSecuredUserDetails(user.UserId).Entity;
+
+
             jobApplication.EmployerId = jobListingEntity.EmployerId;
+            jobApplication.ExpectedSalary = nurse.salary;
             jobApplication.UserId = user.UserId;
             jobApplication.AppliedDate = DateTime.Now;
             jobApplication.LastModifiedDate = jobApplication.AppliedDate;
@@ -185,8 +189,8 @@ namespace MyNursingFuture.Api.Controllers
         /// <summary>
         /// API For shortlisting a Job Application
         /// </summary>
-        /// <remarks>  Functional
-        /// 
+        /// <remarks>  Give a standard of 60 days to contact the nurse
+        /// If different date is required, use a different API
         /// TODO - Unit tests  </remarks>
         /// <response code="200"></response>
         /// <response code="400"></response>
@@ -194,11 +198,11 @@ namespace MyNursingFuture.Api.Controllers
         [HttpPost]
         [EmployerJWTAuthorized]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationResponse))]
-        [Route("api/v1/Applications/Shorlist/{applicationId}")]
+        [Route("api/v1/Applications/Shortlist/{applicationId}")]
         public HttpResponseMessage ShortListApplicationByApplicationId(int applicationId)
         {
             Result result = new Result();
-            //Employer vertification 
+            //Employer verification 
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
             if (objemployer == null)
@@ -215,6 +219,62 @@ namespace MyNursingFuture.Api.Controllers
             jobApplication.ShortListedDate = DateTime.Now;
             jobApplication.IsDeclined = false;
             jobApplication.DeclinedDate = null;
+            jobApplication.MakeContactDeadline = DateTime.Now.AddDays(60);
+
+            result = _jobApplicationManager.ShortlistOrDeclineJobApplication(jobApplication);
+
+
+            // return failed 
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+
+            // if success
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
+        }
+
+        public struct ShortList_Application
+        {
+            public int ApplicationId { set; get; }
+            public int NumberOfDaysEmployerWillMakeContact { set; get; }
+
+        }
+
+        //===============================================================================
+        /// <summary>
+        /// API For shortlisting a Job Application with Specified number of dates 
+        /// </summary>
+        /// <remarks>  This API give a different way to shortlist an application and specify a set number of date that the employer will make contact with the   
+        /// TODO - Unit tests  </remarks>
+        /// <response code="200">Application is Shortlisted</response>
+        /// <response code="400"> Bad request, the API  failed to fetch the record</response>
+        /// <response code="500">Server Error</response>
+        [HttpPost]
+        [EmployerJWTAuthorized]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationResponse))]
+        [Route("api/v1/Applications/Shortlist/")]
+        public HttpResponseMessage ShortListApplication([FromBody] ShortList_Application application)
+        {
+            int applicationId = application.ApplicationId;
+            Result result = new Result();
+            //Employer verification 
+            object objemployer = null;
+            Request.Properties.TryGetValue("employer", out objemployer);
+            if (objemployer == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var employer = objemployer as EmployerEntity;
+            var jobApplication = (JobApplicationEntity)_jobApplicationManager.GetJobApplicationByApplicationId(applicationId).Entity;
+
+            // verify if the employer owns the listing
+            var listing = (JobListingEntity)_jobListingManager.GetListingById(jobApplication.JobListingId).Entity;
+            if (employer.EmployerId != listing.EmployerId || jobApplication.IsDraft)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            jobApplication.ApplicationStatus = ApplicationStatus.Shortlisted.ToString();
+            jobApplication.IsShortlisted = true;
+            jobApplication.ShortListedDate = DateTime.Now;
+            jobApplication.IsDeclined = false;
+            jobApplication.DeclinedDate = null;
+            jobApplication.MakeContactDeadline = DateTime.Now.AddDays(application.NumberOfDaysEmployerWillMakeContact);
 
             result = _jobApplicationManager.ShortlistOrDeclineJobApplication(jobApplication);
 
@@ -249,7 +309,7 @@ namespace MyNursingFuture.Api.Controllers
         public HttpResponseMessage DeclineApplicationByApplicationId(int applicationId)
         {
             Result result = new Result();
-            //Employer vertification 
+            //Employer verification 
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
             if (objemployer == null)
@@ -261,11 +321,14 @@ namespace MyNursingFuture.Api.Controllers
             var listing = (JobListingEntity)_jobListingManager.GetListingById(jobApplication.JobListingId).Entity;
             if (employer.EmployerId != listing.EmployerId || jobApplication.IsDraft)
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            
+            //Update  info 
             jobApplication.ApplicationStatus = ApplicationStatus.Declined.ToString();
             jobApplication.IsShortlisted = true;
             jobApplication.ShortListedDate = null;
             jobApplication.IsDeclined = false;
             jobApplication.DeclinedDate = DateTime.Now;
+            jobApplication.MakeContactDeadline = null;
 
             result = _jobApplicationManager.ShortlistOrDeclineJobApplication(jobApplication);
 
@@ -275,9 +338,11 @@ namespace MyNursingFuture.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
 
             // if success
-            return Request.CreateResponse(HttpStatusCode.Created, result);
+            return Request.CreateResponse(HttpStatusCode.OK, result);
 
         }
+
+
 
 
 
@@ -350,7 +415,7 @@ namespace MyNursingFuture.Api.Controllers
         {
             Result result = new Result();
 
-            //Employer vertification 
+            //Employer verification 
             object objemployer = null;
             Request.Properties.TryGetValue("employer", out objemployer);
             if (objemployer == null)
@@ -360,6 +425,8 @@ namespace MyNursingFuture.Api.Controllers
             if (listing == null || listing.EmployerId != employer.EmployerId)
                 return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
             result = _jobApplicationManager.GetJobApplicationByListingId(id);
+
+            // Get default quiz for each application
             var applications = (List<JobApplicationEntity>)result.Entity;
 
             foreach (JobApplicationEntity application in applications) {
@@ -516,7 +583,7 @@ namespace MyNursingFuture.Api.Controllers
             //If failed
             if (!result.Success)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
-            //If if not found
+            //If it not found
             if (result.Entity == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound, result);
 
@@ -564,7 +631,62 @@ namespace MyNursingFuture.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, result);
 
             // if success
-            return Request.CreateResponse(HttpStatusCode.Created, result);
+            return Request.CreateResponse(HttpStatusCode.OK , result);
+
+        }
+
+        //===============================================================================
+        /// <summary>
+        /// [Nurse] - API For Nurse to Retract their Application
+        /// </summary>
+        /// <remarks> Functional
+        /// 
+        /// TODO - Unit tests   </remarks>
+        /// <response code="200"></response>
+        /// <response code="400"></response>
+        /// <response code="500"></response>
+        [JwtAuthorized]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JobApplicationResponse))]
+        [Route("api/v1/Applications/Retract/{id}")]
+        public HttpResponseMessage RetractApplication(int id)
+        {
+            Result result = new Result();
+
+            // Authentication verify block 
+            object objuser = null;
+            Request.Properties.TryGetValue("user", out objuser);
+            if (objuser == null)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            var user = objuser as UserEntity;
+
+            var applicationEntity = (JobApplicationEntity)_jobApplicationManager.GetJobApplicationByApplicationId(id).Entity;
+
+            if (applicationEntity.UserId != user.UserId)
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, new Result(false));
+            }
+
+            applicationEntity.IsShortlisted = false;
+            applicationEntity.ShortListedDate = null;
+            applicationEntity.DeclinedDate = null;
+            applicationEntity.IsDeclined = false;
+            applicationEntity.IsDraft = true;
+            applicationEntity.ApplicationStatus = ApplicationStatus.Withdrawn.ToString();
+            applicationEntity.LastModifiedDate = DateTime.Now;
+
+            result = _jobApplicationManager.UpdateJobApplication(applicationEntity);
+
+            //If failed
+            if (!result.Success)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, result);
+            //If it not found
+            if (result.Entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound, result);
+
+            //If it is good
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+
 
         }
 
