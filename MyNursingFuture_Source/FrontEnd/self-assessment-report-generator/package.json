@@ -10,7 +10,7 @@
     "json2csv": "^3.11.1",
     "msnodesqlv8": "^0.3.2",
     "mssql": "^4.0.4",
-    "pug": "^2.0.0-rc.2",
+    "pug": "^3.0.1",
     "wkhtmltopdf": "^0.3.4"
   },
   "devDependencies": {},
