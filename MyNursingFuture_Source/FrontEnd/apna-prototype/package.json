@@ -14,7 +14,7 @@
   "license": "ISC",
   "repository": "https://github.com/rxpcollective/apna",
   "dependencies": {
-    "d3": "^4.6.0",
+    "d3": "^7.6.1",
     "d3-selection": "^1.0.3",
     "d3-shape": "^1.0.4",
     "react": "^15.4.2",
