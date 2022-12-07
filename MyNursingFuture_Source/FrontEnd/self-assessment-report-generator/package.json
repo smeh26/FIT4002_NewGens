@@ -6,7 +6,7 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "body-parser": "^1.17.2",
-    "express": "^4.15.3",
+    "express": "^4.17.3",
     "json2csv": "^3.11.1",
     "msnodesqlv8": "^0.3.2",
     "mssql": "^4.0.4",
